@@ -1,23 +1,27 @@
-const http = require("http");
-const app = require("express")();
-app.listen(9091, ()=> console.log("Listening on http port 9091"))
-app.get("/", (req,res) => res.sendFile(__dirname + "/index.html"))
+var WebSocketServer = require("websocket").server
+var http = require("http")
+var express = require("express")
+var app = express()
+var port = process.env.PORT || 8081
+// app.get("/", (req,res) => res.sendFile(__dirname + "/index.html"))
 
-// const { connect } = require("http2");
-const websocketServer = require("websocket").server
-const httpServer = http.createServer();
-httpServer.listen(9090, () => console.log("listening on 9090"))
+app.use(express.static(__dirname + "/"))
+
+var server = http.createServer(app)
+server.listen(port)
+
+console.log("http server listening on %d", port)
+
+let wss = new WebSocketServer({"httpServer": server})
+console.log("websocket server created")
+
 
 //haspmap für clients
 const clients = {};
 const games = {};
 
 
-const wsServer = new websocketServer({
-    "httpServer" : httpServer
-})
-
-wsServer.on("request", request =>{
+wss.on("request", request =>{
     const connection = request.accept(null, request.origin);
     connection.on("open", ()=> console.log("opened!"))
     connection.on("close", ()=> console.log("closed!"))

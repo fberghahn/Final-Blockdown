@@ -7,32 +7,36 @@
 </head>
 <body>
     <h1>Testgame</h1>
-    <button id = 'btnCreate'>New Game</button>
-    <button id = 'btnJoin'>Join Game</button>
-    <input type="text" id = 'txtGameId'>
+    <button id='btnCreate'>New Game</button>
+    <button id='btnJoin'>Join Game</button>
+    <input type="text" id='txtGameId'>
     <div id='divPlayers'></div>
-    <div id = 'divBoard'></div>
+    <div id='divBoard'></div>
+    <div id='clientIdDisplay'></div>
+    <div id='gameIdDisplay'></div>
     <script>
-        //Websocket connection
+        
         let clientId = null;
         let gameId = null;
         let playerColor = null;
 
+        // Websocket connection
+        var host = location.origin.replace(/^http/, 'ws')
+        var ws = new WebSocket(host);
 
-        let ws = new WebSocket("ws://localhost:9090")
         
-
         // Html Elemente
         const btnCreate = document.getElementById("btnCreate");
         const btnJoin = document.getElementById("btnJoin");
         const txtGameId = document.getElementById("txtGameId");
         const divPlayers = document.getElementById("divPlayers");
         const divBoard = document.getElementById("divBoard");
-
+        const clientIdDisplay = document.getElementById("clientIdDisplay");
+        const gameIdDisplay = document.getElementById("gameIdDisplay"); // Das HTML-Element zur Anzeige der Client-ID
 
         // Events verknüpfen
         btnJoin.addEventListener("click", e => {
-            if (gameId===null ) {
+            if (gameId === null) {
                 gameId = txtGameId.value;
             }
             const payload = {
@@ -51,19 +55,19 @@
         })
 
         ws.onmessage = message => {
-            //message.data
+            // message.data
             const response = JSON.parse(message.data);
             // connection
             if (response.method === "connect") {
-                clientId = response.clientId
-                console.log("Client id Set successfully " + clientId)
+                clientId = response.clientId;
+                // Anzeige der Client-ID auf der Seite
+                clientIdDisplay.textContent = "Client ID: " + clientId;
             }
             // create game
             if (response.method === "create") {
                 gameId = response.game.id;
-                console.log("Game successfully created mit der Id " + response.game.id + " with " + response.game.balls + " balls")
+                clientIdDisplay.textContent = "Game successfully created mit der Id " + response.game.id + " with " + response.game.balls + " balls";
             }
-
 
             // Aktion auf den Server Broadcast "update" 
             if (response.method === "update"){
@@ -75,7 +79,6 @@
                     const ballObject = document.getElementById("ball" + b);
                     ballObject.style.backgroundColor = color
                 }
-
             }
             // join / client tritt dem Game bei
             if (response.method === "join") {
