@@ -1,2 +1,2 @@
 # PraxisProjekt
-Ein Multiplayer Webgame, dass über mobile Emdgeräte gesteuert wird
+Ein Multiplayer Browsergame, dass mobile Endgeräte als Controller einbindet. Gehostet wird es auf einem eigenen Vserver über apache2 und eine eigene Domain. 
