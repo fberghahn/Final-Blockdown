@@ -23,8 +23,8 @@ const games = {};
 
 wss.on("request", request =>{
     const connection = request.accept(null, request.origin);
-    connection.on("open", ()=> console.log("opened!"))
-    connection.on("close", ()=> console.log("closed!"))
+    // connection.on("open", ()=> console.log("opened!"))
+    // connection.on("close", ()=> console.log("closed!"))
     connection.on("message", message => {
         const result = JSON.parse(message.utf8Data)
         //Nachricht vom client erhalten

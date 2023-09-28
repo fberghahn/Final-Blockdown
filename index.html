@@ -57,7 +57,7 @@
             if (response.method === "create") {
                 gameId = response.game.id;
                 clientIdDisplay.textContent = "Game successfully created mit der Id " + response.game.id + " with " + response.game.balls + " balls";
-                const lobbyUrl = "https://florian-berghahn.de/?param=" + response.game.id
+                const lobbyUrl = "https://florian-berghahn.de/?gameId=" + response.game.id
                 //Qr Code erstellen über qrcodejs
                 var qrcode = new QRCode(document.getElementById("qrcode"), {
                     text: lobbyUrl,
@@ -67,8 +67,7 @@
                     colorLight : "#ffffff",
                     correctLevel : QRCode.CorrectLevel.H
                 });
-                const queryString = window.location.search;
-                console.log(queryString);
+                console.log(lobbyUrl);
             }
             
         }
