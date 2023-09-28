@@ -15,7 +15,7 @@
     <div id='clientIdDisplay'></div>
     <div id='gameIdDisplay'></div>
     <script>
-        
+        const queryString = window.location.search;
         let clientId = null;
         let gameId = null;
         let playerColor = null;
@@ -33,6 +33,8 @@
         const divBoard = document.getElementById("divBoard");
         const clientIdDisplay = document.getElementById("clientIdDisplay");
         const gameIdDisplay = document.getElementById("gameIdDisplay"); // Das HTML-Element zur Anzeige der Client-ID
+
+        gameIdDisplay.textContent = queryString;
 
         // Events verknüpfen
         btnJoin.addEventListener("click", e => {
@@ -61,12 +63,12 @@
             if (response.method === "connect") {
                 clientId = response.clientId;
                 // Anzeige der Client-ID auf der Seite
-                clientIdDisplay.textContent = "Client ID: " + clientId;
+                // clientIdDisplay.textContent = "Client ID: " + clientId;
             }
             // create game
             if (response.method === "create") {
                 gameId = response.game.id;
-                clientIdDisplay.textContent = "Game successfully created mit der Id " + response.game.id + " with " + response.game.balls + " balls";
+                // clientIdDisplay.textContent = "Game successfully created mit der Id " + response.game.id + " with " + response.game.balls + " balls";
             }
 
             // Aktion auf den Server Broadcast "update" 
@@ -121,6 +123,5 @@
             }
         }
     </script>
-    <p>test Amina Koyim</p>
 </body>
 </html>

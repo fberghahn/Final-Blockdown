@@ -9,26 +9,69 @@
 </head>
 <body>
     <h1>Testgame</h1>
-    <div class=" mobilehidden">
-        <p>This text is hidden in mobile</p>
-    </div>
-    <div class=" pcHidden">
-        <p>This text is hidden on PC</p>
-    </div>
     <div id="qrcode"></div>
+    <div id='gameIdDisplay'></div>
+    <div id='clientIdDisplay'></div>
+    <button id='btnCreate'>New Game</button>
     <script type="text/javascript">
-    if (screen.width <= 700) {
-    document.location = "mobile.html";
-    }
+        // Hier wird der URL Parameter ausgelesen für Nutzer die über den QR Code kommen
+        const queryString = window.location.search;
+        console.log(queryString);
 
-    var qrcode = new QRCode(document.getElementById("qrcode"), {
-        text: "https://florian-berghahn.de",
-        width: 128,
-        height: 128,
-        colorDark : "#5868bf",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
-    });
+        let clientId = null;
+        let gameId = null;
+
+        // Websocket connection
+        var host = location.origin.replace(/^http/, 'ws')
+        var ws = new WebSocket(host);
+
+        const gameIdDisplay = document.getElementById("gameIdDisplay");
+        const clientIdDisplay = document.getElementById("clientIdDisplay"); // Das HTML-Element zur Anzeige der Client-ID
+        const btnCreate = document.getElementById("btnCreate");
+
+        // Weiterleitung von mobilen Nutzern & weitergeben des URL Parmaeters bei der Weiterleitung
+        if (screen.width <= 700) {
+        document.location = "mobile.html" + queryString;
+        }
+
+        // Spielelobby erstellen
+        btnCreate.addEventListener("click", e => {
+            const payload = {
+                "method": "create",
+                "clientId": clientId
+            }
+            ws.send(JSON.stringify(payload));
+        })
+
+        //GameId vom Websocketserver erhalten
+        ws.onmessage = message => {
+            // message.data
+            const response = JSON.parse(message.data);
+            // connection
+            if (response.method === "connect") {
+                clientId = response.clientId;
+                // Anzeige der Client-ID auf der Seite
+                clientIdDisplay.textContent = "Client ID: " + clientId;
+            }
+            // create game
+            if (response.method === "create") {
+                gameId = response.game.id;
+                clientIdDisplay.textContent = "Game successfully created mit der Id " + response.game.id + " with " + response.game.balls + " balls";
+                const lobbyUrl = "https://florian-berghahn.de/?param=" + response.game.id
+                //Qr Code erstellen über qrcodejs
+                var qrcode = new QRCode(document.getElementById("qrcode"), {
+                    text: lobbyUrl,
+                    width: 256,
+                    height: 256,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+                const queryString = window.location.search;
+                console.log(queryString);
+            }
+            
+        }
     </script>
 </body>
 </html>
