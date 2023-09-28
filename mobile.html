@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images\favicon.png">
     <title>Testgame</title>
 </head>
 <body>
@@ -10,7 +11,6 @@
     <button id='btnJoin'>Join Game</button>
     <div id='divPlayers'></div>
     <div id='divBoard'></div>
-    <div id='gameIdDisplay'></div>
     <script>
         const queryString = window.location.search;
         let clientId = null;
@@ -26,15 +26,12 @@
         const btnJoin = document.getElementById("btnJoin");
         const divPlayers = document.getElementById("divPlayers");
         const divBoard = document.getElementById("divBoard");
-        const gameIdDisplay = document.getElementById("gameIdDisplay"); // Das HTML-Element zur Anzeige der Client-ID
 
         // gameid über URL Parameter abrufen
-        gameIdDisplay.textContent = queryString;
         const urlParams = new URLSearchParams(queryString);
         gameId = urlParams.get('gameId')
-        console.log(gameId);
 
-        // Events verknüpfen
+        // Der Gamelobby Beitreten Button
         btnJoin.addEventListener("click", e => {
             const payload = {
                 "method": "join",
