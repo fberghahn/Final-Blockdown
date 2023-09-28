@@ -3,123 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css\style.css">
     <title>Testgame</title>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
     <h1>Testgame</h1>
-    <button id='btnCreate'>New Game</button>
-    <button id='btnJoin'>Join Game</button>
-    <input type="text" id='txtGameId'>
-    <div id='divPlayers'></div>
-    <div id='divBoard'></div>
-    <div id='clientIdDisplay'></div>
-    <div id='gameIdDisplay'></div>
-    <script>
-        
-        let clientId = null;
-        let gameId = null;
-        let playerColor = null;
+    <div class=" mobilehidden">
+        <p>This text is hidden in mobile</p>
+    </div>
+    <div class=" pcHidden">
+        <p>This text is hidden on PC</p>
+    </div>
+    <div id="qrcode"></div>
+    <script type="text/javascript">
+    if (screen.width <= 700) {
+    document.location = "mobile.html";
+    }
 
-        // Websocket connection
-        var host = location.origin.replace(/^http/, 'ws')
-        var ws = new WebSocket(host);
-
-        
-        // Html Elemente
-        const btnCreate = document.getElementById("btnCreate");
-        const btnJoin = document.getElementById("btnJoin");
-        const txtGameId = document.getElementById("txtGameId");
-        const divPlayers = document.getElementById("divPlayers");
-        const divBoard = document.getElementById("divBoard");
-        const clientIdDisplay = document.getElementById("clientIdDisplay");
-        const gameIdDisplay = document.getElementById("gameIdDisplay"); // Das HTML-Element zur Anzeige der Client-ID
-
-        // Events verknüpfen
-        btnJoin.addEventListener("click", e => {
-            if (gameId === null) {
-                gameId = txtGameId.value;
-            }
-            const payload = {
-                "method": "join",
-                "clientId": clientId,
-                "gameId": gameId
-            }
-            ws.send(JSON.stringify(payload));
-        })
-        btnCreate.addEventListener("click", e => {
-            const payload = {
-                "method": "create",
-                "clientId": clientId
-            }
-            ws.send(JSON.stringify(payload));
-        })
-
-        ws.onmessage = message => {
-            // message.data
-            const response = JSON.parse(message.data);
-            // connection
-            if (response.method === "connect") {
-                clientId = response.clientId;
-                // Anzeige der Client-ID auf der Seite
-                clientIdDisplay.textContent = "Client ID: " + clientId;
-            }
-            // create game
-            if (response.method === "create") {
-                gameId = response.game.id;
-                clientIdDisplay.textContent = "Game successfully created mit der Id " + response.game.id + " with " + response.game.balls + " balls";
-            }
-
-            // Aktion auf den Server Broadcast "update" 
-            if (response.method === "update"){
-                //{1: "red", 1}
-                if (!response.game.state) return;
-                for(const b of Object.keys(response.game.state))
-                {
-                    const color = response.game.state[b];
-                    const ballObject = document.getElementById("ball" + b);
-                    ballObject.style.backgroundColor = color
-                }
-            }
-            // join / client tritt dem Game bei
-            if (response.method === "join") {
-                const game = response.game;
-                while(divPlayers.firstChild)
-                   divPlayers.removeChild(divPlayers.firstChild)
-                game.clients.forEach( c => {
-                    const d = document.createElement("div");
-                    d.style.width= "200px";
-                    d.style.background = c.color;
-                    d.textContent = c.clientId;
-                    divPlayers.appendChild(d);
-
-                    if (c.clientId === clientId) playerColor = c.color;
-                })
-
-                while(divBoard.firstChild)
-                divBoard.removeChild(divBoard.firstChild)
-                
-                for (let i = 0; i< game.balls; i ++){
-                    const b = document.createElement("button");
-                    b.id = "ball" + (i +1);
-                    b.tag = i +1
-                    b.textContent= i +1
-                    b.style.height= "150px"
-                    b.style.width= "150px"
-                    b.addEventListener("click", e => {
-                        b.style.background= playerColor
-                        const payload = {
-                            "method": "play",
-                            "clientId" : clientId,
-                            "gameId" :gameId,
-                            "ballId": b.tag,
-                            "color": playerColor
-                        }
-                        ws.send(JSON.stringify(payload))
-                    })
-                    divBoard.appendChild(b);
-                }
-            }
-        }
+    var qrcode = new QRCode(document.getElementById("qrcode"), {
+        text: "https://florian-berghahn.de",
+        width: 128,
+        height: 128,
+        colorDark : "#5868bf",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
     </script>
 </body>
 </html>
