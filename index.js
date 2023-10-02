@@ -2,7 +2,7 @@ var WebSocketServer = require("websocket").server
 var http = require("http")
 var express = require("express")
 var app = express()
-var port = process.env.PORT || 9081
+var port = process.env.PORT || 8081
 // app.get("/", (req,res) => res.sendFile(__dirname + "/index.html"))
 
 app.use(express.static(__dirname + "/"))
@@ -16,33 +16,36 @@ let wss = new WebSocketServer({"httpServer": server})
 console.log("websocket server created")
 
 
-//haspmap für clients
+//hashpmap für clients
 const clients = {};
 const games = {};
 
 
 wss.on("request", request =>{
     const connection = request.accept(null, request.origin);
-    // connection.on("open", ()=> console.log("opened!"))
-    // connection.on("close", ()=> console.log("closed!"))
     connection.on("message", message => {
         const result = JSON.parse(message.utf8Data)
         //Nachricht vom client erhalten
 
         // methode zum game erstellen
         if (result.method === "create") {
-            const clientId= result.clientId
+            const hostId= result.clientId
             const gameId = guid();
             games[gameId] = {
                 "id": gameId,
                 "balls":20,
                 "clients": []
             }
+            const color =  {"0": "Red", "1": "Green", "2": "Blue"}[games[gameId].clients.length]
+            games[gameId].clients.push({
+                "clientId" :hostId,
+                "color" : color
+            })
             const payload = {
                 "method": "create",
                 "game": games[gameId]
             }
-            const con =  clients[clientId].connection;
+            const con =  clients[hostId].connection;
             con.send(JSON.stringify(payload));
         }
         // client will dem game beitreten 
@@ -68,7 +71,6 @@ wss.on("request", request =>{
             const payLoad = {
                 "method": "join",
                 "game": game
-
             }
 
             game.clients.forEach(c => {

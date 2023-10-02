@@ -15,11 +15,12 @@
         <div id='gameIdDisplay'></div>
         <div id='clientIdDisplay'></div>
         <button id='btnCreate'>New Game</button>
+        <div id='divPlayers'></div>
+        
     </div>
     <script type="text/javascript">
         // Hier wird der URL Parameter ausgelesen für Nutzer die über den QR Code kommen
         const queryString = window.location.search;
-        console.log(queryString);
 
         let clientId = null;
         let gameId = null;
@@ -31,6 +32,8 @@
         const gameIdDisplay = document.getElementById("gameIdDisplay");
         const clientIdDisplay = document.getElementById("clientIdDisplay"); // Das HTML-Element zur Anzeige der Client-ID
         const btnCreate = document.getElementById("btnCreate");
+        const divPlayers = document.getElementById("divPlayers");
+        const divQRCode = document.getElementById("qrcode");
 
         // Weiterleitung von mobilen Nutzern & weitergeben des URL Parmaeters bei der Weiterleitung
         if (screen.width <= 700) {
@@ -72,7 +75,25 @@
                 });
                 console.log(lobbyUrl);
             }
-            
+
+            if (response.method === "update"){
+                const game = response.game;
+                while(divPlayers.firstChild)
+                    divPlayers.removeChild(divPlayers.firstChild)
+                game.clients.forEach( c => {
+                    const d = document.createElement("div");
+                    d.style.width= "200px";
+                    d.style.background = c.color;
+                    d.textContent = c.clientId;
+                    divPlayers.appendChild(d);
+
+                if (c.clientId === clientId) playerColor = c.color;
+                })
+                if (response.game.clients.length >= 3) {
+                divQRCode.style.display = "none";
+                btnCreate.style.display = "none";
+                }
+            }           
         }
     </script>
 </body>
