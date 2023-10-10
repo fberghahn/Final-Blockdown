@@ -1,10 +1,40 @@
 .mainDiv {
-    width:30%;
+    width:45%;
     margin-left:auto;
     margin-right:auto;
     margin-top: 20vh;
-
 }
+
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border-radius: 5px; /* Ecken abrunden */
+    padding: 40px 60px 40px 60px;
+    background-color: #fff;
+    opacity: 0.8;
+    height: 400px;
+    width: 700px;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.container {
+    padding: 2px 16px;
+}
+
+.inhalt{
+    opacity: 1.0 !important;
+}
+
 body {
     background-color: rgb(59, 77, 241);
+    background-image: url("/images/background2.jpg");
+    background-color: #cccccc;
+    height: 100vh;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center center;
 }
