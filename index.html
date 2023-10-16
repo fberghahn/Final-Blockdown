@@ -7,6 +7,21 @@
     <link rel="icon" type="image/png" href="images\favicon.png">
     <title>Testgame</title>
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="js/pixi.min.js"></script>
+    <script>
+        let app;
+
+        window.onload = function () {
+            app = new PIXI.Application(
+                {
+                    width:800,
+                    height:600,
+                    backgroundColor: 0xAAAAA,
+                }
+            );
+            document.body.appendChild(app.view);
+        }
+    </script>
 </head>
 <body>
     <div class="mainDiv">
