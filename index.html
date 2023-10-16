@@ -16,7 +16,7 @@
                 <div id="qrcode"></div>
                 <div id='gameIdDisplay'></div>
                 <div id='clientIdDisplay'></div>
-                <button id='btnCreate'>New Game</button>
+                <button id='btnCreate'>Neues Spiel</button>
                 <div id='divPlayers'>
             </div>    
         </div>
@@ -52,20 +52,20 @@
             ws.send(JSON.stringify(payload));
         })
 
-        //GameId vom Websocketserver erhalten
+        //Nachrichten des Servers verarbeiten
         ws.onmessage = message => {
             // message.data
             const response = JSON.parse(message.data);
-            // connection
+            // connection -> GameId vom Websocketserver erhalten
             if (response.method === "connect") {
                 clientId = response.clientId;
                 // Anzeige der Client-ID auf der Seite
-                clientIdDisplay.textContent = "Client ID: " + clientId;
+                clientIdDisplay.textContent = "Verbunden mit der Client ID: " + clientId;
             }
             // create game
             if (response.method === "create") {
                 gameId = response.game.id;
-                clientIdDisplay.textContent = "Game successfully created mit der Id " + response.game.id + " with " + response.game.balls + " balls";
+                clientIdDisplay.textContent = "Eine Lobby wurde erstellt, mit der Id: " + response.game.id + " und mit " + response.game.balls + " Feldern.";
                 const lobbyUrl = "https://florian-berghahn.de/?gameId=" + response.game.id
                 //Qr Code erstellen über qrcodejs
                 var qrcode = new QRCode(document.getElementById("qrcode"), {
@@ -95,6 +95,8 @@
                 if (response.game.clients.length >= 3) {
                 divQRCode.style.display = "none";
                 btnCreate.style.display = "none";
+                divPlayers.style.display = "none";
+                clientIdDisplay.textContent = "Alle Spieler sind nun verbunden";
                 }
             }           
         }
