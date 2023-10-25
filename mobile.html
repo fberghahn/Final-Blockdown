@@ -11,7 +11,7 @@
 
     <button id='btnJoin'>Join Game</button>
     <div id='divPlayers'></div>
-    <div id='divBoard'></div>
+    <div id='divBoard' style="display: flex; flex-direction: column; align-items: center; justify-content: center;"></div>
     <script>
         const queryString = window.location.search;
         let clientId = null;
@@ -67,27 +67,52 @@
 
             while(divBoard.firstChild)
             divBoard.removeChild(divBoard.firstChild)
-        
-            for (let i = 0; i< game.balls; i ++){
-                const b = document.createElement("button");
-                b.id = "ball" + (i +1);
-                b.tag = i +1
-                b.textContent= i +1
-                b.style.height= "150px"
-                b.style.width= "150px"
-                b.addEventListener("click", e => {
-                    b.style.background= playerColor
+                
+            //Buttons zur Steuerung erstellen
+            const buttonlinks = document.createElement("button");
+            buttonlinks.style.height= "200px";
+            buttonlinks.style.width= "200px";
+            buttonlinks.textContent= "links";
+            divBoard.appendChild(buttonlinks);
+
+
+            const buttonrechts = document.createElement("button");
+            buttonrechts.style.height= "200px";
+            buttonrechts.style.width= "200px";
+            buttonrechts.textContent= "rechts";
+            buttonrechts.style.marginTop= "20px"
+            buttonrechts.addEventListener("click", e => {
                     const payload = {
                         "method": "play",
                         "clientId" : clientId,
                         "gameId" :gameId,
-                        "ballId": b.tag,
+                        "direction": "rechts",
                         "color": playerColor
                     }
-                    ws.send(JSON.stringify(payload))
-                })
-            divBoard.appendChild(b);
-            }
+                ws.send(JSON.stringify(payload))
+            })
+            divBoard.appendChild(buttonrechts);
+
+            // for (let i = 0; i< game.balls; i ++){
+            //     const b = document.createElement("button");
+            //     b.id = "ball" + (i +1);
+            //     b.tag = i +1
+            //     b.textContent= i +1
+            //     b.style.height= "150px"
+            //     b.style.width= "150px"
+            //     b.addEventListener("click", e => {
+            //         b.style.background= playerColor
+            //         const payload = {
+            //             "method": "play",
+            //             "clientId" : clientId,
+            //             "gameId" :gameId,
+            //             "ballId": b.tag,
+            //             "color": playerColor
+            //         }
+            //         ws.send(JSON.stringify(payload))
+            //     })
+            // divBoard.appendChild(b);
+            // }
         }
 
         // Aktion auf den Server Broadcast "update" 

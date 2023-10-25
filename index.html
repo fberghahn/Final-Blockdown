@@ -8,10 +8,25 @@
     <title>Testgame</title>
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <script src="js/pixi.min.js"></script>
-    <script>
+</head>
+<body>
+    <div class="mainDiv">
+        <div class="card">
+            <div class="inhalt">
+                <h1>Testgame</h1>
+                <div id="qrcode"></div>
+                <div id='gameIdDisplay'></div>
+                <div id='clientIdDisplay'></div>
+                <button id='btnCreate'>Neues Spiel</button>
+                <div id='divPlayers'>
+            </div>    
+        </div>
+    </div>
+    <script type="text/javascript">
+
         let app;
         let player;
-
+        // Grafik Library Pixi Canvas einbinden
         window.onload = function () {
             app = new PIXI.Application(
                 {
@@ -22,7 +37,7 @@
             );
             document.body.appendChild(app.view);
 
-            // player hinzufügen
+            // player imgage hinzufügen
             player = PIXI.Sprite.from("images/player.png");
             player.anchor.set(0.5);
             player.x = app.width/2;
@@ -53,22 +68,6 @@
              player.y = pos.y;
 
             }
-    </script>
-</head>
-<body>
-    <div class="mainDiv">
-        <div class="card">
-            <div class="inhalt">
-                <h1>Testgame</h1>
-                <div id="qrcode"></div>
-                <div id='gameIdDisplay'></div>
-                <div id='clientIdDisplay'></div>
-                <button id='btnCreate'>Neues Spiel</button>
-                <div id='divPlayers'>
-            </div>    
-        </div>
-    </div>
-    <script type="text/javascript">
         // Hier wird der URL Parameter ausgelesen für Nutzer die über den QR Code kommen
         const queryString = window.location.search;
 
