@@ -2,7 +2,7 @@
     width:45%;
     margin-left:auto;
     margin-right:auto;
-    margin-top: 20vh;
+    margin-top: 5vh;
 }
 
 .card {
@@ -12,8 +12,8 @@
     padding: 40px 60px 40px 60px;
     background-color: #fff;
     opacity: 0.8;
-    height: 400px;
-    width: 700px;
+    /* height: 400px;
+    width: 700px; */
 }
 
 .card:hover {
@@ -37,4 +37,10 @@ body {
     background-size: cover;
     background-attachment: fixed;
     background-position: center center;
+}
+
+/* Zentrierung der PixiJS-App */
+canvas {
+    display: block;
+    margin: 0 auto;
 }

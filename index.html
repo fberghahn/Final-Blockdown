@@ -10,17 +10,49 @@
     <script src="js/pixi.min.js"></script>
     <script>
         let app;
+        let player;
 
         window.onload = function () {
             app = new PIXI.Application(
                 {
-                    width:800,
-                    height:600,
-                    backgroundColor: 0xAAAAA,
+                    width:1000,
+                    height:700,
+                    backgroundColor: 0x1B1B1B,
                 }
             );
             document.body.appendChild(app.view);
+
+            // player hinzufügen
+            player = PIXI.Sprite.from("images/player.png");
+            player.anchor.set(0.5);
+            player.x = app.width/2;
+            player.y = app.width/2;
+
+            // Hintergrund hinzufügen weil der canvas nicht interaktiv sein kann
+            const bg = PIXI.Sprite.from(PIXI.Texture.WHITE);
+            bg.width = app.view.width;
+            bg.height = app.view.height;
+            bg.opacity = 0
+
+            app.stage.addChild(bg);
+            app.stage.addChild(player);
+            bg.anchor.set(0.5)
+            bg.x = app.view.width / 2
+            bg.y = app.view.height / 2
+
+            //  mouse interaktion über den Hintergrund
+            bg.interactive = true
+            bg.on(`pointermove`, movePlayer)
+
         }
+    
+        function movePlayer(e) {
+             let pos = e.data.global;
+
+             player.x = pos.x;
+             player.y = pos.y;
+
+            }
     </script>
 </head>
 <body>
