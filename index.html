@@ -31,12 +31,11 @@
         window.onload = function () {
             app = new PIXI.Application(
                 {
-                    width:1000,
-                    height:700,
-                    backgroundColor: 0x1B1B1B,
+                    width:window.innerWidth,
+                    height: window.innerHeight,
+                    backgroundColor: 0x1B1B1B
                 }
             );
-            document.body.appendChild(app.view);
 
 
             // Hintergrund hinzufügen weil der canvas nicht interaktiv sein kann
@@ -78,6 +77,7 @@
         const btnCreate = document.getElementById("btnCreate");
         const divPlayers = document.getElementById("divPlayers");
         const divQRCode = document.getElementById("qrcode");
+        const card = document.getElementsByClassName("card");
 
         // Weiterleitung von mobilen Nutzern & weitergeben des URL Parmaeters bei der Weiterleitung
         if (screen.width <= 700) {
@@ -154,6 +154,22 @@
                 btnCreate.style.display = "none";
                 divPlayers.style.display = "none";
                 clientIdDisplay.textContent = "Alle Spieler sind nun verbunden";
+                card[0].style.display= "none";
+                document.body.appendChild(app.view);
+
+                // Text das alle Spieler verbunden sind
+                // const basicText = new Text('Alle Spieler sind nun verbunden', {
+                //     fontFamily: 'Arial',
+                //     fontSize: 24,
+                //     fill: 0xff1010,
+                //     align: 'center',
+                // });
+                const basicText = new PIXI.Text('Alle Spieler sind nun verbunden');
+
+                basicText.x = 400;
+                basicText.y = 100;
+
+                app.stage.addChild(basicText);
                 }
             }           
         }

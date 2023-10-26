@@ -2,14 +2,14 @@
     width:45%;
     margin-left:auto;
     margin-right:auto;
-    margin-top: 5vh;
+    margin-top: 2vh;
 }
 
 .card {
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;
     border-radius: 5px; /* Ecken abrunden */
-    padding: 40px 60px 40px 60px;
+    padding: 20px 40px 20px 40px;
     background-color: #fff;
     opacity: 0.8;
     /* height: 400px;
@@ -41,6 +41,6 @@ body {
 
 /* Zentrierung der PixiJS-App */
 canvas {
-    display: block;
     margin: 0 auto;
+    display: block;
 }
