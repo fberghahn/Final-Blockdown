@@ -25,7 +25,8 @@
     <script type="text/javascript">
 
         let app;
-        let player;
+        const players = []; // Spieler array
+
         // Grafik Library Pixi Canvas einbinden
         window.onload = function () {
             app = new PIXI.Application(
@@ -37,37 +38,31 @@
             );
             document.body.appendChild(app.view);
 
-            // player imgage hinzufügen
-            player = PIXI.Sprite.from("images/player.png");
-            player.anchor.set(0.5);
-            player.x = app.width/2;
-            player.y = app.width/2;
 
             // Hintergrund hinzufügen weil der canvas nicht interaktiv sein kann
             const bg = PIXI.Sprite.from(PIXI.Texture.WHITE);
             bg.width = app.view.width;
             bg.height = app.view.height;
-            bg.opacity = 0
+            bg.opacity = 0;
 
             app.stage.addChild(bg);
-            app.stage.addChild(player);
             bg.anchor.set(0.5)
-            bg.x = app.view.width / 2
-            bg.y = app.view.height / 2
+            bg.x = app.view.width / 2;
+            bg.y = app.view.height / 2;
 
             //  mouse interaktion über den Hintergrund
-            bg.interactive = true
-            bg.on(`pointermove`, movePlayer)
-
+            // bg.interactive = true
+            // bg.on(`pointermove`, movePlayer)
         }
     
-        function movePlayer(e) {
-             let pos = e.data.global;
+        // function movePlayer(e) {
+        //      let pos = e.data.global;
 
-             player.x = pos.x;
-             player.y = pos.y;
+        //      player1.x = pos.x;
+        //      player1.y = pos.y;
 
-            }
+        //     }
+
         // Hier wird der URL Parameter ausgelesen für Nutzer die über den QR Code kommen
         const queryString = window.location.search;
 
@@ -108,7 +103,7 @@
                 // Anzeige der Client-ID auf der Seite
                 clientIdDisplay.textContent = "Verbunden mit der Client ID: " + clientId;
             }
-            // create game
+            // Lobby wird erstellt
             if (response.method === "create") {
                 gameId = response.game.id;
                 clientIdDisplay.textContent = "Eine Lobby wurde erstellt, mit der Id: " + response.game.id + " und mit " + response.game.balls + " Feldern.";
@@ -125,6 +120,7 @@
                 console.log(lobbyUrl);
             }
 
+            // Lobbystatus und Game state updaten 
             if (response.method === "update"){
                 const game = response.game;
                 while(divPlayers.firstChild)
@@ -138,6 +134,21 @@
 
                 if (c.clientId === clientId) playerColor = c.color;
                 })
+                // Abstand zwischen den Spielern beim Spawn
+                let abstandPlayer = 50; 
+
+                // Für jeden client im Spiel ein player image hinzufügen
+                game.clients.forEach((client, index) => {
+                    const player = PIXI.Sprite.from(`images/player${index + 1}.png`);
+                    player.anchor.set(0.5);
+                    player.x = app.view.width / 2 + abstandPlayer; // auf der x-achse die images verschieben
+                    player.y = app.view.height / 2;
+                    app.stage.addChild(player);
+                    players.push(player);
+                    
+                    abstandPlayer += 50; // Abstand erhöhen damit die images sich nicht überlagern
+                });
+                // Wenn die Lobby voll ist 
                 if (response.game.clients.length >= 3) {
                 divQRCode.style.display = "none";
                 btnCreate.style.display = "none";
