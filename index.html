@@ -93,6 +93,16 @@
             ws.send(JSON.stringify(payload));
         })
 
+        // Tastatur input 
+        function handleLeertaste(event) {
+        // Wenn Enter gedrückt wird soll das Spiel starten
+        if (event.keyCode === 13 || event.key === " ") {
+            // Führen Sie hier den gewünschten Code aus, wenn die Leertaste gedrückt wird.
+            console.log("Enter wurde gedrückt!");
+            }
+        }
+        document.addEventListener("keydown", handleLeertaste);
+
         //Nachrichten des Servers verarbeiten
         ws.onmessage = message => {
             // message.data
@@ -135,21 +145,21 @@
                 if (c.clientId === clientId) playerColor = c.color;
                 })
                 // Abstand zwischen den Spielern beim Spawn
-                let abstandPlayer = 50; 
+                let abstandPlayer = 150; 
 
                 // Für jeden client im Spiel ein player image hinzufügen
                 game.clients.forEach((client, index) => {
                     const player = PIXI.Sprite.from(`images/player${index + 1}.png`);
                     player.anchor.set(0.5);
-                    player.x = app.view.width / 2 + abstandPlayer; // auf der x-achse die images verschieben
-                    player.y = app.view.height / 2;
+                    player.x = 700 + abstandPlayer; // auf der x-achse die images verschieben
+                    player.y = 900;
                     app.stage.addChild(player);
                     players.push(player);
                     
-                    abstandPlayer += 50; // Abstand erhöhen damit die images sich nicht überlagern
+                    abstandPlayer += 150; // Abstand erhöhen damit die images sich nicht überlagern
                 });
-                // Wenn die Lobby voll ist 
-                if (response.game.clients.length >= 3) {
+                // Wenn die Lobby voll ist, hier wird Spieleranzahl festgelegt
+                if (response.game.clients.length >= 2) {
                 divQRCode.style.display = "none";
                 btnCreate.style.display = "none";
                 divPlayers.style.display = "none";
@@ -158,18 +168,34 @@
                 document.body.appendChild(app.view);
 
                 // Text das alle Spieler verbunden sind
-                // const basicText = new Text('Alle Spieler sind nun verbunden', {
-                //     fontFamily: 'Arial',
-                //     fontSize: 24,
-                //     fill: 0xff1010,
-                //     align: 'center',
-                // });
-                const basicText = new PIXI.Text('Alle Spieler sind nun verbunden');
-
-                basicText.x = 400;
+                const basicText = new PIXI.Text('Alle Spieler sind nun verbunden', {
+                    fontFamily: 'Arial',
+                    fill: [
+                        "#ff0000",
+                        "#000000"
+                    ],
+                    fontSize: 38,
+                    fontWeight: 500
+                });
+                basicText.x = 700;
                 basicText.y = 100;
 
+                // Text Leertaste drücken um zu starten
+                const basicText2 = new PIXI.Text('Drücken Sie die Entertaste, um das Spiel zu starten', {
+                    fontFamily: 'Arial',
+                    fontSize: 28,
+                    fill: [
+                        "#ff0000",
+                        "#000000"
+                    ],
+                    fontWeight: 500
+                });
+                basicText2.x = 650;
+                basicText2.y = 200;
+
+
                 app.stage.addChild(basicText);
+                app.stage.addChild(basicText2);
                 }
             }           
         }
