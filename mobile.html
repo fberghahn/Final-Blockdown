@@ -40,6 +40,7 @@
                 "gameId": gameId
             }
             ws.send(JSON.stringify(payload));
+            btnJoin.style.display = "none";
         })
 
         ws.onmessage = message => {
@@ -56,14 +57,15 @@
                 while(divPlayers.firstChild)
                     divPlayers.removeChild(divPlayers.firstChild)
                 game.clients.forEach( c => {
-                    const d = document.createElement("div");
-                    d.style.width= "200px";
-                    d.style.background = c.color;
-                    d.textContent = c.clientId;
-                    divPlayers.appendChild(d);
-
                 if (c.clientId === clientId) playerColor = c.color;
                 })
+                const d = document.createElement("div");
+                    d.style.width= "200px";
+                    d.style.height= "50px";
+                    d.style.margin = "30px";
+                    d.style.background = playerColor;
+                    d.textContent = "Du bist die Farbe: " + playerColor;
+                    divPlayers.appendChild(d);
 
             while(divBoard.firstChild)
             divBoard.removeChild(divBoard.firstChild)
