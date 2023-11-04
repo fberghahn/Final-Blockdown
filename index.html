@@ -30,11 +30,12 @@
         // Grafik Library Pixi Canvas einbinden
         window.onload = function () {
             app = new PIXI.Application(
-                {
-                    width:window.innerWidth,
-                    height: window.innerHeight,
-                    backgroundColor: 0x1B1B1B
-                }
+                // {
+                //     width:window.innerWidth,
+                //     height: window.innerHeight,
+                //     backgroundColor: 0x1B1B1B
+                // }
+                { background: '#1B1B1B', resizeTo: window }
             );
 
 
@@ -48,6 +49,7 @@
             bg.anchor.set(0.5)
             bg.x = app.view.width / 2;
             bg.y = app.view.height / 2;
+            app.ticker.add(gameLoop);
 
             //  mouse interaktion über den Hintergrund
             // bg.interactive = true
@@ -67,6 +69,7 @@
 
         let clientId = null;
         let gameId = null;
+        // Gamestate ist die X-Achsen position der Spieler 
         let Xpositionen = {};
 
         // Websocket connection
@@ -94,6 +97,10 @@
             ws.send(JSON.stringify(payload));
         })
 
+        function gameLoop(player, index) {
+            player.x = Xpositionen[index];
+        }
+
         // Tastatur input 
         function handleLeertaste(event) {
         // Wenn Enter gedrückt wird soll das Spiel starten
@@ -106,6 +113,7 @@
             console.log("Enter wurde gedrückt!");
             }
         }
+    
         document.addEventListener("keydown", handleLeertaste);
 
         //Nachrichten des Servers verarbeiten
@@ -134,12 +142,21 @@
                     correctLevel : QRCode.CorrectLevel.H
                 });
                 console.log(lobbyUrl);
-                console.log(Xpositionen);
             }
 
+            if (response.method === "test"){
+                const game = response.game
+                const testindex= response.index;
+                const X = response.Xpositionen;
+                console.log(testindex);
+
+            }
             // Lobbystatus und Game state updaten 
             if (response.method === "update"){
                 const game = response.game;
+                Xpositionen = response.game.Xpositionen;
+                game.Xpositionen[0] += 50;
+                console.log(Xpositionen);
                 while(divPlayers.firstChild)
                     divPlayers.removeChild(divPlayers.firstChild)
                 game.clients.forEach( c => {
@@ -152,19 +169,18 @@
                 if (c.clientId === clientId) playerColor = c.color;
                 })
                 // Abstand zwischen den Spielern beim Spawn
-                let abstandPlayer = 150; 
+                // let abstandPlayer = 150; 
 
                 // Für jeden client im Spiel ein player image hinzufügen
                 game.clients.forEach((client, index) => {
                     const player = PIXI.Sprite.from(`images/player${index + 1}.png`);
                     player.anchor.set(0.5);
-                    player.x = Xpositionen[index]; // auf der x-achse die images setzen wie es die Update funktion vorgibt
-                    // console.log(Xpositionen[index]);
-                    player.y = 900;
+                    gameLoop(player, index) // auf der x-achse die images setzen wie es die Update funktion vorgibt                    
+                    player.y = 700;
                     app.stage.addChild(player);
                     players.push(player);
                     
-                    abstandPlayer += 150; // Abstand erhöhen damit die images sich nicht überlagern
+                    // abstandPlayer += 150; 
                 });
                 // Wenn die Lobby voll ist, hier wird Spieleranzahl festgelegt
                 if (response.game.clients.length >= 2) {

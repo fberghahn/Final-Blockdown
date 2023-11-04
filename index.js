@@ -20,13 +20,11 @@ console.log("websocket server created")
 const clients = {};
 //hashpmap für alle Spiele
 const games = {};
-//hashpmap für die Positionen auf der x-achse der Spieler
-const Xpositionen = {};
 
 wss.on("request", request =>{
     const connection = request.accept(null, request.origin);
     connection.on("message", message => {
-        const result = JSON.parse(message.utf8Data)
+        const result = JSON.parse(message.utf8Data);
         //Nachricht vom client erhalten
 
         // methode zum Lobby erstellen
@@ -36,7 +34,7 @@ wss.on("request", request =>{
             games[gameId] = {
                 "id": gameId,
                 "clients": [],
-                "Xpositionen": [700,850,900]
+                "Xpositionen": Xpositionen=[700,850,1000]
             }
             // den Host am PC den Clients hinzufügen
             games[gameId].clients.push({
@@ -61,8 +59,8 @@ wss.on("request", request =>{
                 return;
             }
             // Farben den spieler beim beitreten zuweisen, 0 ist immer der PC
-            const color =  {"1": "Red", "2": "Green", "3": "Blue"}[game.clients.length];
-            const index = game.clients.length-1;
+            const color =  {"0": "Red", "1": "Green", "2": "Blue"}[game.clients.length];
+            const index = game.clients.length;
             game.clients.push({
                 "clientId" :clientId,
                 "color" : color,
@@ -70,12 +68,14 @@ wss.on("request", request =>{
             })
             const payLoad = {
                 "method": "join",
-                "game": game
+                "game": game,
+                "index" : index
             }
 
             game.clients.forEach(c => {
                 clients[c.clientId].connection.send(JSON.stringify(payLoad))
             });
+            updateLobby();
         }
         
         //Spiel starten nach Entertaste auf dem PC
@@ -85,21 +85,36 @@ wss.on("request", request =>{
 
         //WS Nachrichten der mobilen Endgeräte zur Richtung
         if (result.method === "play") {
+            const clientId = result.clientId;
             const index= result.index;
             const gameId = result.gameId;
-            // const ballId = result.ballId;
-            // const color = result.color;
+            const game = games[gameId];
+
+            // soweit soll sich der spieler mit einem buttonklick auf dem handy in die gewählte Richtung bewegen
+            const bewegungsvariable = 50;
 
             // Gamestate erzeuegn 
-            let state = games[gameId].state;
-            if(!state) state= {}
+            // let Xpositionen = game.Xpositionen;
+            // if(!Xpositionen) Xpositionen= {}
+            // Hier wird geschaut in welche richtung der spieler sich beweget
             if (result.richtung==="links") {
-                state[ballId]
-            } 
-            
-            state[ballId] = color;
-            games[gameId].state = state;
+                game.Xpositionen[index] -= bewegungsvariable;
+            } else {
+                game.Xpositionen[index] += bewegungsvariable;
+            };
+            const payLoad = {
+                "method": "test",
+                "game": game,
+                "Xpositionen": Xpositionen,
+                "index": index
+            };
 
+            game.clients.forEach(c => {
+                clients[c.clientId].connection.send(JSON.stringify(payLoad))
+            });
+            // state[ballId] = color;
+            // games[gameId].Xpositionen = Xpositionen;
+            updateGameState();
         }
     })
     // neue client id erzeugen
@@ -130,7 +145,23 @@ function updateGameState () {
             clients[c.clientId].connection.send(JSON.stringify(payload))
         })
     }
-    setTimeout(updateGameState, 500);
+    // setTimeout(updateGameState, 500);
+}
+
+function updateLobby () {
+
+    for (const g of Object.keys(games)) {
+        const game = games[g]
+        const payload = {
+            "method": "update",
+            "game": game
+        }
+
+        game.clients.forEach(c =>{
+            clients[c.clientId].connection.send(JSON.stringify(payload))
+        })
+    }
+    // setTimeout(updateGameState, 500);
 }
 
 function S4() {

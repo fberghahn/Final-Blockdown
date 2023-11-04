@@ -55,7 +55,7 @@
             // join / client tritt dem Game bei
             if (response.method === "join") {
                 const game = response.game;
-                index = game.clients.index;
+                index = response.index;
                 while(divPlayers.firstChild)
                     divPlayers.removeChild(divPlayers.firstChild)
                 game.clients.forEach( c => {
@@ -81,6 +81,7 @@
             buttonlinks.addEventListener("click", e => {
                     const payload = {
                         "method": "play",
+                        "clientId": clientId,
                         "gameId" :gameId,
                         "index" : index,
                         "richtung": "links",
@@ -98,6 +99,7 @@
             buttonrechts.addEventListener("click", e => {
                     const payload = {
                         "method": "play",
+                        "clientId": clientId,
                         "gameId" :gameId,
                         "index" : index,
                         "richtung": "rechts",
