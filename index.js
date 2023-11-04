@@ -18,8 +18,10 @@ console.log("websocket server created")
 
 //hashpmap für clients
 const clients = {};
+//hashpmap für alle Spiele
 const games = {};
-
+//hashpmap für die Positionen auf der x-achse der Spieler
+const Xpositionen = {};
 
 wss.on("request", request =>{
     const connection = request.accept(null, request.origin);
@@ -27,19 +29,19 @@ wss.on("request", request =>{
         const result = JSON.parse(message.utf8Data)
         //Nachricht vom client erhalten
 
-        // methode zum game erstellen
+        // methode zum Lobby erstellen
         if (result.method === "create") {
             const hostId= result.clientId
             const gameId = guid();
             games[gameId] = {
                 "id": gameId,
-                "balls":20,
-                "clients": []
+                "clients": [],
+                "Xpositionen": [700,850,900]
             }
-            const color =  {"0": "Red", "1": "Green", "2": "Blue"}[games[gameId].clients.length]
+            // den Host am PC den Clients hinzufügen
             games[gameId].clients.push({
                 "clientId" :hostId,
-                "color" : color
+                "index": 0   
             })
             const payload = {
                 "method": "create",
@@ -58,16 +60,14 @@ wss.on("request", request =>{
                 //sorry max players reach
                 return;
             }
-            const color =  {"0": "Red", "1": "Green", "2": "Blue"}[game.clients.length]
+            // Farben den spieler beim beitreten zuweisen, 0 ist immer der PC
+            const color =  {"1": "Red", "2": "Green", "3": "Blue"}[game.clients.length];
+            const index = game.clients.length-1;
             game.clients.push({
                 "clientId" :clientId,
-                "color" : color
+                "color" : color,
+                "index" : index
             })
-
-            if(game.clients.length ===3 ){
-                updateGameState();
-            }
-
             const payLoad = {
                 "method": "join",
                 "game": game
@@ -77,16 +77,25 @@ wss.on("request", request =>{
                 clients[c.clientId].connection.send(JSON.stringify(payLoad))
             });
         }
+        
+        //Spiel starten nach Entertaste auf dem PC
+        if(result.method === "start"){
+            updateGameState();
+        }
 
-        //play Funktion
+        //WS Nachrichten der mobilen Endgeräte zur Richtung
         if (result.method === "play") {
-            const clientId= result.clientId;
+            const index= result.index;
             const gameId = result.gameId;
-            const ballId = result.ballId;
-            const color = result.color;
+            // const ballId = result.ballId;
+            // const color = result.color;
 
+            // Gamestate erzeuegn 
             let state = games[gameId].state;
             if(!state) state= {}
+            if (result.richtung==="links") {
+                state[ballId]
+            } 
             
             state[ballId] = color;
             games[gameId].state = state;

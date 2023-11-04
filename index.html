@@ -67,6 +67,7 @@
 
         let clientId = null;
         let gameId = null;
+        let Xpositionen = {};
 
         // Websocket connection
         var host = location.origin.replace(/^http/, 'ws')
@@ -97,7 +98,11 @@
         function handleLeertaste(event) {
         // Wenn Enter gedrückt wird soll das Spiel starten
         if (event.keyCode === 13 || event.key === " ") {
-            // Führen Sie hier den gewünschten Code aus, wenn die Leertaste gedrückt wird.
+            const payload = {
+                "method": "start",
+                "clientId": clientId
+            }
+            ws.send(JSON.stringify(payload));
             console.log("Enter wurde gedrückt!");
             }
         }
@@ -116,7 +121,8 @@
             // Lobby wird erstellt
             if (response.method === "create") {
                 gameId = response.game.id;
-                clientIdDisplay.textContent = "Eine Lobby wurde erstellt, mit der Id: " + response.game.id + " und mit " + response.game.balls + " Feldern.";
+                Xpositionen = response.game.Xpositionen;
+                clientIdDisplay.textContent = "Eine Lobby wurde erstellt, mit der Id: " + response.game.id;
                 const lobbyUrl = "https://florian-berghahn.de/?gameId=" + response.game.id
                 //Qr Code erstellen über qrcodejs
                 var qrcode = new QRCode(document.getElementById("qrcode"), {
@@ -128,6 +134,7 @@
                     correctLevel : QRCode.CorrectLevel.H
                 });
                 console.log(lobbyUrl);
+                console.log(Xpositionen);
             }
 
             // Lobbystatus und Game state updaten 
@@ -151,7 +158,8 @@
                 game.clients.forEach((client, index) => {
                     const player = PIXI.Sprite.from(`images/player${index + 1}.png`);
                     player.anchor.set(0.5);
-                    player.x = 700 + abstandPlayer; // auf der x-achse die images verschieben
+                    player.x = Xpositionen[index]; // auf der x-achse die images setzen wie es die Update funktion vorgibt
+                    // console.log(Xpositionen[index]);
                     player.y = 900;
                     app.stage.addChild(player);
                     players.push(player);

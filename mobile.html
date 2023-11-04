@@ -16,6 +16,7 @@
         const queryString = window.location.search;
         let clientId = null;
         let gameId = null;
+        let index = null;
         let playerColor = null;
 
         // Websocket connection
@@ -54,6 +55,7 @@
             // join / client tritt dem Game bei
             if (response.method === "join") {
                 const game = response.game;
+                index = game.clients.index;
                 while(divPlayers.firstChild)
                     divPlayers.removeChild(divPlayers.firstChild)
                 game.clients.forEach( c => {
@@ -76,24 +78,32 @@
             buttonlinks.style.width= "200px";
             buttonlinks.textContent= "links";
             divBoard.appendChild(buttonlinks);
+            buttonlinks.addEventListener("click", e => {
+                    const payload = {
+                        "method": "play",
+                        "gameId" :gameId,
+                        "index" : index,
+                        "richtung": "links",
+                    }
+                ws.send(JSON.stringify(payload))
+            })
 
 
             const buttonrechts = document.createElement("button");
             buttonrechts.style.height= "200px";
             buttonrechts.style.width= "200px";
             buttonrechts.textContent= "rechts";
-            buttonrechts.style.marginTop= "20px"
+            buttonrechts.style.marginTop= "30px"
+            divBoard.appendChild(buttonrechts);
             buttonrechts.addEventListener("click", e => {
                     const payload = {
                         "method": "play",
-                        "clientId" : clientId,
                         "gameId" :gameId,
-                        "direction": "rechts",
-                        "color": playerColor
+                        "index" : index,
+                        "richtung": "rechts",
                     }
                 ws.send(JSON.stringify(payload))
             })
-            divBoard.appendChild(buttonrechts);
 
             // for (let i = 0; i< game.balls; i ++){
             //     const b = document.createElement("button");
