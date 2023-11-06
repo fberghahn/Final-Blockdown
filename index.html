@@ -26,6 +26,10 @@
 
         let app;
         const players = []; // Spieler array
+        const blocks = []; // Array für die Blöcke oder hindernisse 
+        let blockSpeed = 1; // Anfangsgeschwindigkeit der Blöcke
+        let blockInterval = 1000; // Intervall, in dem neue Blöcke erzeugt werden (in Millisekunden)
+
 
         // Grafik Library Pixi Canvas einbinden, Hintergrund Farbe setzen und canvas sich dem Fenster anpassen lassen
         window.onload = function () {
@@ -65,6 +69,34 @@
         const divQRCode = document.getElementById("qrcode");
         const card = document.getElementsByClassName("card");
 
+
+        // Text das alle Spieler verbunden sind
+        const basicText = new PIXI.Text('Alle Spieler sind nun verbunden', {
+        fontFamily: 'Arial',
+        fill: [
+            "#ff0000",
+            "#000000"
+        ],
+        fontSize: 38,
+        fontWeight: 500
+            });
+        basicText.x = 700;
+        basicText.y = 100;
+
+        // Text Leertaste drücken um zu starten
+        const basicText2 = new PIXI.Text('Drücken Sie die Entertaste, um das Spiel zu starten', {
+            fontFamily: 'Arial',
+            fontSize: 28,
+            fill: [
+                "#ff0000",
+                "#000000"
+            ],
+            fontWeight: 500
+        });
+        basicText2.x = 650;
+        basicText2.y = 200;
+
+
         // Weiterleitung von mobilen Nutzern & weitergeben des URL Parmaeters bei der Weiterleitung
         if (screen.width <= 700) {
         document.location = "mobile.html" + queryString;
@@ -79,9 +111,45 @@
             ws.send(JSON.stringify(payload));
         })
 
+        function getRandomXPosition() {
+            return Math.random() * app.view.width;
+        }
+
+        function createBlock() {
+            const block = PIXI.Sprite.from(`images/block.png`);
+            block.anchor.set(0.5);
+            block.x = getRandomXPosition(); // Zufällige X-Position für den Block
+            block.y = -50; // Startposition oben außerhalb des Sichtbereichs
+            app.stage.addChild(block);
+            blocks.push(block);
+        }
+        function moveBlocks() {
+            blocks.forEach(block => {
+                block.y += blockSpeed;
+                if (block.y > app.view.height) {
+                    // Block außerhalb des Sichtbereichs, entfernen
+                    app.stage.removeChild(block);
+                    const index = blocks.indexOf(block);
+                    if (index !== -1) {
+                        blocks.splice(index, 1);
+                    }
+                }
+            });
+            // Blockgeschwindigkeit erhöhen
+            blockSpeed += 0.01;
+        }
+
+        function kollisionstest(player, block) {
+            let playerBox = player.getBounds();
+            let blockBox = block.getBounds();
+                return playerBox.x + playerBox.width > blockBox.x &&
+                        playerBox.x < blockBox.x + blockBox.width &&
+                        playerBox.y + playerBox.height > blockBox.y &&
+                        playerBox.y < blockBox.y + blockBox.height;
+        }
 
         // Tastatur input 
-        function handleLeertaste(event) {
+        function handleEntertaste(event) {
         // Wenn Enter gedrückt wird soll das Spiel starten
         if (event.keyCode === 13 || event.key === " ") {
             const payload = {
@@ -90,6 +158,16 @@
             }
             ws.send(JSON.stringify(payload));
             console.log("Enter wurde gedrückt!");
+            // Text zum starten entfernen
+            app.stage.removeChild(basicText);
+            app.stage.removeChild(basicText2);
+            const block = PIXI.Sprite.from(`images/block.png`);
+            block.anchor.set(0.5);
+            block.x = 700;              
+            block.y = 200;
+            app.stage.addChild(block);
+            blocks.push(block);
+            setInterval(createBlock, blockInterval);
             }
         }
 
@@ -100,7 +178,7 @@
             })
         }
     
-        document.addEventListener("keydown", handleLeertaste);
+        document.addEventListener("keydown", handleEntertaste);
 
         //Nachrichten des Servers verarbeiten
         ws.onmessage = message => {
@@ -145,15 +223,19 @@
                     app.stage.addChild(player);
                     players.push(player);
                 });
+                // Text der stage hinzufügen
+                app.stage.addChild(basicText);
+                app.stage.addChild(basicText2);
             }
 
-            if (response.method === "test"){
-                const game = response.game
-                const testindex= response.index;
-                const X = response.Xpositionen;
-                console.log(testindex);
+            // Test response zum debugging
+            // if (response.method === "test"){
+            //     const game = response.game
+            //     const testindex= response.index;
+            //     const X = response.Xpositionen;
+            //     console.log(testindex);
+            // }
 
-            }
             // Lobbystatus und Game state updaten 
             if (response.method === "update"){
                 const game = response.game;
@@ -185,41 +267,13 @@
                 card[0].style.display= "none";
                 document.body.appendChild(app.view);
 
-                app.ticker.add(() => gameLoop(index, players));
-                // gameLoop(index, players);
-                
-                // Text das alle Spieler verbunden sind
-                const basicText = new PIXI.Text('Alle Spieler sind nun verbunden', {
-                    fontFamily: 'Arial',
-                    fill: [
-                        "#ff0000",
-                        "#000000"
-                    ],
-                    fontSize: 38,
-                    fontWeight: 500
+                app.ticker.add(() => {
+                    gameLoop(index, players);
+                    moveBlocks(); // Blöcke bewegen
                 });
-                basicText.x = 700;
-                basicText.y = 100;
-
-                // Text Leertaste drücken um zu starten
-                const basicText2 = new PIXI.Text('Drücken Sie die Entertaste, um das Spiel zu starten', {
-                    fontFamily: 'Arial',
-                    fontSize: 28,
-                    fill: [
-                        "#ff0000",
-                        "#000000"
-                    ],
-                    fontWeight: 500
-                });
-                basicText2.x = 650;
-                basicText2.y = 200;
-
-
-                app.stage.addChild(basicText);
-                app.stage.addChild(basicText2);
-                }
             }           
         }
+    }
     </script>
 </body>
 </html>
