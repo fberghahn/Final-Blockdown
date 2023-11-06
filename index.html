@@ -27,17 +27,11 @@
         let app;
         const players = []; // Spieler array
 
-        // Grafik Library Pixi Canvas einbinden
+        // Grafik Library Pixi Canvas einbinden, Hintergrund Farbe setzen und canvas sich dem Fenster anpassen lassen
         window.onload = function () {
             app = new PIXI.Application(
-                // {
-                //     width:window.innerWidth,
-                //     height: window.innerHeight,
-                //     backgroundColor: 0x1B1B1B
-                // }
                 { background: '#1B1B1B', resizeTo: window }
             );
-
 
             // Hintergrund hinzufügen weil der canvas nicht interaktiv sein kann
             const bg = PIXI.Sprite.from(PIXI.Texture.WHITE);
@@ -49,20 +43,8 @@
             bg.anchor.set(0.5)
             bg.x = app.view.width / 2;
             bg.y = app.view.height / 2;
-            app.ticker.add(gameLoop);
-
-            //  mouse interaktion über den Hintergrund
-            // bg.interactive = true
-            // bg.on(`pointermove`, movePlayer)
+            
         }
-    
-        // function movePlayer(e) {
-        //      let pos = e.data.global;
-
-        //      player1.x = pos.x;
-        //      player1.y = pos.y;
-
-        //     }
 
         // Hier wird der URL Parameter ausgelesen für Nutzer die über den QR Code kommen
         const queryString = window.location.search;
@@ -97,9 +79,6 @@
             ws.send(JSON.stringify(payload));
         })
 
-        function gameLoop(player, index) {
-            player.x = Xpositionen[index];
-        }
 
         // Tastatur input 
         function handleLeertaste(event) {
@@ -113,13 +92,22 @@
             console.log("Enter wurde gedrückt!");
             }
         }
+
+        //Ticker funktion der app, für jeden Spieler die x position ändern 
+        function gameLoop(index, players) {
+            players.forEach((player, index) => {
+                player.x = Xpositionen[index];
+            })
+        }
     
         document.addEventListener("keydown", handleLeertaste);
 
         //Nachrichten des Servers verarbeiten
         ws.onmessage = message => {
+
             // message.data
             const response = JSON.parse(message.data);
+
             // connection -> GameId vom Websocketserver erhalten
             if (response.method === "connect") {
                 clientId = response.clientId;
@@ -144,6 +132,21 @@
                 console.log(lobbyUrl);
             }
 
+            // wenn spieler beitreten 
+            if (response.method === "join"){
+                const game = response.game
+                const index= response.index;
+                //Für jeden client im Spiel ein player image hinzufügen
+                game.clients.forEach((client, index) => {
+                    const player = PIXI.Sprite.from(`images/player${index + 1}.png`);
+                    player.anchor.set(0.5);
+                    player.x = response.game.Xpositionen[index];              
+                    player.y = 700;
+                    app.stage.addChild(player);
+                    players.push(player);
+                });
+            }
+
             if (response.method === "test"){
                 const game = response.game
                 const testindex= response.index;
@@ -154,6 +157,7 @@
             // Lobbystatus und Game state updaten 
             if (response.method === "update"){
                 const game = response.game;
+                const index= response.index;
                 Xpositionen = response.game.Xpositionen;
                 game.Xpositionen[0] += 50;
                 console.log(Xpositionen);
@@ -168,20 +172,10 @@
 
                 if (c.clientId === clientId) playerColor = c.color;
                 })
-                // Abstand zwischen den Spielern beim Spawn
-                // let abstandPlayer = 150; 
 
-                // Für jeden client im Spiel ein player image hinzufügen
-                game.clients.forEach((client, index) => {
-                    const player = PIXI.Sprite.from(`images/player${index + 1}.png`);
-                    player.anchor.set(0.5);
-                    gameLoop(player, index) // auf der x-achse die images setzen wie es die Update funktion vorgibt                    
-                    player.y = 700;
-                    app.stage.addChild(player);
-                    players.push(player);
-                    
-                    // abstandPlayer += 150; 
-                });
+                // hier findet der gamne loop statt
+                gameLoop(index, players) // auf der x-achse die images setzen wie es die Update funktion vorgibt                    
+
                 // Wenn die Lobby voll ist, hier wird Spieleranzahl festgelegt
                 if (response.game.clients.length >= 2) {
                 divQRCode.style.display = "none";
@@ -191,6 +185,9 @@
                 card[0].style.display= "none";
                 document.body.appendChild(app.view);
 
+                app.ticker.add(() => gameLoop(index, players));
+                // gameLoop(index, players);
+                
                 // Text das alle Spieler verbunden sind
                 const basicText = new PIXI.Text('Alle Spieler sind nun verbunden', {
                     fontFamily: 'Arial',
