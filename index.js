@@ -59,8 +59,9 @@ wss.on("request", request =>{
                 return;
             }
             // Farben den spieler beim beitreten zuweisen, 0 ist immer der PC
-            const color =  {"0": "Red", "1": "Green", "2": "Blue"}[game.clients.length];
             const index = game.clients.length;
+            // const index = game.clients.index(clientId)
+            const color =  {"1": "Red", "2": "Green", "3": "Blue"}[index];
             game.clients.push({
                 "clientId" :clientId,
                 "color" : color,
@@ -69,7 +70,6 @@ wss.on("request", request =>{
             const payLoad = {
                 "method": "join",
                 "game": game,
-                "index" : index
             }
 
             game.clients.forEach(c => {

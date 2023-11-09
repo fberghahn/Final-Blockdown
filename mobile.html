@@ -55,12 +55,16 @@
             // join / client tritt dem Game bei
             if (response.method === "join") {
                 const game = response.game;
-                index = response.index;
+
                 while(divPlayers.firstChild)
                     divPlayers.removeChild(divPlayers.firstChild)
                 game.clients.forEach( c => {
-                if (c.clientId === clientId) playerColor = c.color;
-                })
+                if (c.clientId === clientId) {
+                playerColor = c.color;
+                index = c.index;
+                console.log(index);
+                console.log(playerColor);
+                }})
                 const d = document.createElement("div");
                     d.style.width= "200px";
                     d.style.height= "50px";
@@ -105,41 +109,21 @@
                         "richtung": "rechts",
                     }
                 ws.send(JSON.stringify(payload))
+                console.log(index);
             })
-
-            // for (let i = 0; i< game.balls; i ++){
-            //     const b = document.createElement("button");
-            //     b.id = "ball" + (i +1);
-            //     b.tag = i +1
-            //     b.textContent= i +1
-            //     b.style.height= "150px"
-            //     b.style.width= "150px"
-            //     b.addEventListener("click", e => {
-            //         b.style.background= playerColor
-            //         const payload = {
-            //             "method": "play",
-            //             "clientId" : clientId,
-            //             "gameId" :gameId,
-            //             "ballId": b.tag,
-            //             "color": playerColor
-            //         }
-            //         ws.send(JSON.stringify(payload))
-            //     })
-            // divBoard.appendChild(b);
-            // }
         }
 
         // Aktion auf den Server Broadcast "update" 
-        if (response.method === "update"){
-            //{1: "red", 1}
-            if (!response.game.state) return;
-            for(const b of Object.keys(response.game.state))
-            {
-                const color = response.game.state[b];
-                const ballObject = document.getElementById("ball" + b);
-                ballObject.style.backgroundColor = color
-            }
-        }
+        // if (response.method === "update"){
+        //     //{1: "red", 1}
+        //     if (!response.game.state) return;
+        //     for(const b of Object.keys(response.game.state))
+        //     {
+        //         const color = response.game.state[b];
+        //         const ballObject = document.getElementById("ball" + b);
+        //         ballObject.style.backgroundColor = color
+        //     }
+        // }
     }
     </script>
 </body>

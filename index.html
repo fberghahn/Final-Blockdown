@@ -136,7 +136,7 @@
                 }
             });
             // Blockgeschwindigkeit erhöhen
-            blockSpeed += 0.01;
+            blockSpeed += 0.005;
         }
 
         function kollisionstest(player, block) {
@@ -167,6 +167,9 @@
             block.y = 200;
             app.stage.addChild(block);
             blocks.push(block);
+            app.ticker.add(() => {
+                    moveBlocks(); // Blöcke bewegen
+                });
             setInterval(createBlock, blockInterval);
             }
         }
@@ -174,7 +177,8 @@
         //Ticker funktion der app, für jeden Spieler die x position ändern 
         function gameLoop(index, players) {
             players.forEach((player, index) => {
-                player.x = Xpositionen[index];
+                player.x = Xpositionen[index+1];
+                // console.log(index);
             })
         }
     
@@ -196,8 +200,8 @@
             if (response.method === "create") {
                 gameId = response.game.id;
                 Xpositionen = response.game.Xpositionen;
-                clientIdDisplay.textContent = "Eine Lobby wurde erstellt, mit der Id: " + response.game.id;
-                const lobbyUrl = "https://florian-berghahn.de/?gameId=" + response.game.id
+                const lobbyUrl = "https://florian-berghahn.de/?gameId=" + response.game.id;
+                clientIdDisplay.textContent = "Eine Lobby wurde erstellt, mit mit dem Link: " + lobbyUrl;
                 //Qr Code erstellen über qrcodejs
                 var qrcode = new QRCode(document.getElementById("qrcode"), {
                     text: lobbyUrl,
@@ -216,7 +220,7 @@
                 const index= response.index;
                 //Für jeden client im Spiel ein player image hinzufügen
                 game.clients.forEach((client, index) => {
-                    const player = PIXI.Sprite.from(`images/player${index + 1}.png`);
+                    const player = PIXI.Sprite.from(`images/player${index+1}.png`);
                     player.anchor.set(0.5);
                     player.x = response.game.Xpositionen[index];              
                     player.y = 700;
@@ -229,12 +233,12 @@
             }
 
             // Test response zum debugging
-            // if (response.method === "test"){
-            //     const game = response.game
-            //     const testindex= response.index;
-            //     const X = response.Xpositionen;
-            //     console.log(testindex);
-            // }
+            if (response.method === "test"){
+                const game = response.game
+                const testindex= response.index;
+                const X = response.Xpositionen;
+                console.log(testindex);
+            }
 
             // Lobbystatus und Game state updaten 
             if (response.method === "update"){
@@ -256,10 +260,11 @@
                 })
 
                 // hier findet der gamne loop statt
-                gameLoop(index, players) // auf der x-achse die images setzen wie es die Update funktion vorgibt                    
+                
+                // gameLoop(index, players) // auf der x-achse die images setzen wie es die Update funktion vorgibt                    
 
                 // Wenn die Lobby voll ist, hier wird Spieleranzahl festgelegt
-                if (response.game.clients.length >= 2) {
+                if (response.game.clients.length >= 3) {
                 divQRCode.style.display = "none";
                 btnCreate.style.display = "none";
                 divPlayers.style.display = "none";
@@ -269,7 +274,6 @@
 
                 app.ticker.add(() => {
                     gameLoop(index, players);
-                    moveBlocks(); // Blöcke bewegen
                 });
             }           
         }
