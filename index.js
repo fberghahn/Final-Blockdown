@@ -53,7 +53,7 @@ wss.on("request", request =>{
             const clientId= result.clientId;
             const gameId = result.gameId;
             const game = games[gameId];
-            if (game.clients.length >= 3) 
+            if (game.clients.length >= 4) 
             {
                 //sorry max players reach
                 return;

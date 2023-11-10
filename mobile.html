@@ -62,15 +62,15 @@
                 if (c.clientId === clientId) {
                 playerColor = c.color;
                 index = c.index;
-                console.log(index);
-                console.log(playerColor);
                 }})
+
+            
                 const d = document.createElement("div");
                     d.style.width= "200px";
                     d.style.height= "50px";
                     d.style.margin = "30px";
                     d.style.background = playerColor;
-                    d.textContent = "Du bist die Farbe: " + playerColor;
+                    d.textContent = "Du bist Spieler " + index;
                     divPlayers.appendChild(d);
 
             while(divBoard.firstChild)
@@ -112,18 +112,6 @@
                 console.log(index);
             })
         }
-
-        // Aktion auf den Server Broadcast "update" 
-        // if (response.method === "update"){
-        //     //{1: "red", 1}
-        //     if (!response.game.state) return;
-        //     for(const b of Object.keys(response.game.state))
-        //     {
-        //         const color = response.game.state[b];
-        //         const ballObject = document.getElementById("ball" + b);
-        //         ballObject.style.backgroundColor = color
-        //     }
-        // }
     }
     </script>
 </body>

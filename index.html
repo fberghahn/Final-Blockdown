@@ -26,6 +26,7 @@
 
         let app;
         const players = []; // Spieler array
+        let aktiveSpielerAnzahl = null;
         const blocks = []; // Array für die Blöcke oder hindernisse 
         let blockSpeed = 1; // Anfangsgeschwindigkeit der Blöcke
         let blockInterval = 1000; // Intervall, in dem neue Blöcke erzeugt werden (in Millisekunden)
@@ -111,6 +112,7 @@
             ws.send(JSON.stringify(payload));
         })
 
+        // Hier wird eine random position innerhalb des app views auf der xachse erzeugt
         function getRandomXPosition() {
             return Math.random() * app.view.width;
         }
@@ -139,6 +141,7 @@
             blockSpeed += 0.005;
         }
 
+        // Kolisionserkennungsfunktion gibt true oder false zurück
         function kollisionstest(player, block) {
             let playerBox = player.getBounds();
             let blockBox = block.getBounds();
@@ -167,6 +170,7 @@
             block.y = 200;
             app.stage.addChild(block);
             blocks.push(block);
+            // ab hier wird der ticker zum generieren und bewegen der Blöcke hinzugefügt
             app.ticker.add(() => {
                     moveBlocks(); // Blöcke bewegen
                 });
@@ -178,8 +182,47 @@
         function gameLoop(index, players) {
             players.forEach((player, index) => {
                 player.x = Xpositionen[index+1];
-                // console.log(index);
-            })
+            });
+            let zuEntfernendeSpieler = [];
+            players.forEach((player, playerIndex) => {
+                blocks.forEach(block => {
+                    if (kollisionstest(player, block)) {
+                        console.log("Kollision erkannt zwischen Spieler und Block!");
+                        app.stage.removeChild(player);
+
+                        // Verringern Sie die Anzahl der aktiven Spieler
+                        aktiveSpielerAnzahl--;
+
+                        if (aktiveSpielerAnzahl === 1) {
+                            // Finden Sie den verbleibenden Spieler
+                            const gewinner = players.find((p, i) => app.stage.children.includes(p));
+                            const gewinnerText = new PIXI.Text('Der Sieger ist: '+ gewinner.name, {
+                            fontFamily: 'Arial',
+                            fontSize: 28,
+                            fill: [
+                                "#ff0000",
+                                "#000000"
+                            ],
+                            fontWeight: 500
+                            });
+                            gewinnerText.x = 650;
+                            gewinnerText.y = 200;
+                            app.stage.addChild(gewinnerText);
+                            console.log("Der Gewinner ist: ", gewinner.name);
+                        }
+
+                        // Fügen Sie den Index des Spielers zum Entfernen hinzu
+                        // if (!zuEntfernendeSpieler.includes(playerIndex)) {
+                        //     zuEntfernendeSpieler.push(playerIndex);
+                        // }
+                    }
+                });
+            });
+            // zuEntfernendeSpieler.sort((a, b) => b - a);
+
+            // zuEntfernendeSpieler.forEach(playerIndex => {
+            //     players.splice(playerIndex, 1);
+            // });
         }
     
         document.addEventListener("keydown", handleEntertaste);
@@ -221,11 +264,13 @@
                 //Für jeden client im Spiel ein player image hinzufügen
                 game.clients.forEach((client, index) => {
                     const player = PIXI.Sprite.from(`images/player${index+1}.png`);
+                    player.name = "Spieler " + (index + 1);
                     player.anchor.set(0.5);
                     player.x = response.game.Xpositionen[index];              
                     player.y = 700;
                     app.stage.addChild(player);
                     players.push(player);
+                    aktiveSpielerAnzahl = players.length;
                 });
                 // Text der stage hinzufügen
                 app.stage.addChild(basicText);
@@ -233,12 +278,12 @@
             }
 
             // Test response zum debugging
-            if (response.method === "test"){
-                const game = response.game
-                const testindex= response.index;
-                const X = response.Xpositionen;
-                console.log(testindex);
-            }
+            // if (response.method === "test"){
+            //     const game = response.game
+            //     const testindex= response.index;
+            //     const X = response.Xpositionen;
+            //     console.log(testindex);
+            // }
 
             // Lobbystatus und Game state updaten 
             if (response.method === "update"){
@@ -246,20 +291,20 @@
                 const index= response.index;
                 Xpositionen = response.game.Xpositionen;
                 game.Xpositionen[0] += 50;
-                console.log(Xpositionen);
+                // console.log(Xpositionen);
                 while(divPlayers.firstChild)
                     divPlayers.removeChild(divPlayers.firstChild)
                 game.clients.forEach( c => {
                     const d = document.createElement("div");
                     d.style.width= "200px";
                     d.style.background = c.color;
-                    d.textContent = c.clientId;
+                    d.textContent = "Player" + index;
                     divPlayers.appendChild(d);
 
                 if (c.clientId === clientId) playerColor = c.color;
                 })
 
-                // hier findet der gamne loop statt
+
                 
                 // gameLoop(index, players) // auf der x-achse die images setzen wie es die Update funktion vorgibt                    
 
