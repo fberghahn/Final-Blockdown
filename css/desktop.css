@@ -2,7 +2,6 @@
     width:45%;
     margin-left:auto;
     margin-right:auto;
-    margin-top: 2vh;
 }
 
 .card {
@@ -12,6 +11,7 @@
     padding: 20px 40px 20px 40px;
     background-color: #fff;
     opacity: 0.8;
+    margin-top:5vh;
     /* height: 400px;
     width: 700px; */
 }
@@ -44,3 +44,33 @@ canvas {
     margin: 0 auto;
     display: block;
 }
+
+.btn{
+    font-family: Roboto, sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: #fff;
+    background-color: #0066CC;
+    padding: 10px 30px;
+    border: 2px solid #0066cc;
+    box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
+    border-radius: 50px;
+    transition : 1000ms;
+    transform: translateY(0);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-top: 10px;
+    }
+    
+    .btn:hover{
+    transition : 1000ms;
+    padding: 8px 30px;
+    transform : translateY(-0px);
+    background-color: #fff;
+    color: #0066cc;
+    border: solid 2px #0066cc;
+    
+    }

@@ -17,7 +17,7 @@
                 <div id="qrcode"></div>
                 <div id='gameIdDisplay'></div>
                 <div id='clientIdDisplay'></div>
-                <button id='btnCreate'>Neues Spiel</button>
+                <button id='btnCreate' class="btn">Neues Spiel</button>
                 <div id='divPlayers'>
             </div>    
         </div>
@@ -29,7 +29,7 @@
         let aktiveSpielerAnzahl = null;
         const blocks = []; // Array für die Blöcke oder hindernisse 
         let blockSpeed = 1; // Anfangsgeschwindigkeit der Blöcke
-        let blockInterval = 1000; // Intervall, in dem neue Blöcke erzeugt werden (in Millisekunden)
+        let blockInterval = 500; // Intervall, in dem neue Blöcke erzeugt werden (in Millisekunden)
 
 
         // Grafik Library Pixi Canvas einbinden, Hintergrund Farbe setzen und canvas sich dem Fenster anpassen lassen
@@ -71,6 +71,7 @@
         const card = document.getElementsByClassName("card");
 
 
+
         const StandardTextStyle = new PIXI.TextStyle({
                             fontFamily: 'Arial', //Schriftart 
                             fontSize: 36, // Größe
@@ -89,13 +90,15 @@
 
         // Text das alle Spieler verbunden sind
         const basicText = new PIXI.Text('Alle Spieler sind nun verbunden', StandardTextStyle);
-        basicText.x = 600;
-        basicText.y = 100;
+        basicText.x = 950;
+        basicText.y = 200;
+        basicText.anchor.set(0.5);
 
         // Text Leertaste drücken um zu starten
         const basicText2 = new PIXI.Text('Drücken Sie die Entertaste, um das Spiel zu starten', StandardTextStyle);
-        basicText2.x = 450;
-        basicText2.y = 200;
+        basicText2.x = 950;
+        basicText2.y = 300;
+        basicText2.anchor.set(0.5);
 
 
         // Weiterleitung von mobilen Nutzern & weitergeben des URL Parmaeters bei der Weiterleitung
@@ -209,11 +212,14 @@
             // Finden Sie den verbleibenden Spieler
             const gewinner = players[0]; // Der letzte verbleibende Spieler
 
-            const gewinnerText = new PIXI.Text('Der Sieger ist: ' + gewinner.name, StandardTextStyle);
-            gewinnerText.x = 750;
-            gewinnerText.y = 200;
-            app.ticker.remove(() => {
+            const gewinnerText = new PIXI.Text('Der Sieger ist ' + gewinner.name, StandardTextStyle);
+            gewinnerText.style.fontSize = 60;
+            gewinnerText.x = app.view.width / 2;
+            gewinnerText.y = (app.view.height / 2) - 100;
+            gewinnerText.anchor.set(0.5);
+            app.ticker.stop (() => {
                         gameLoop(players);
+                        moveBlocks();
                     });
             app.stage.addChild(gewinnerText);
             console.log("Der Gewinner ist: ", gewinner.name);
@@ -267,14 +273,14 @@
                             player.name = spielerName;
                             player.anchor.set(0.5);
                             player.x = game.Xpositionen[index];              
-                            player.y = 700;
+                            player.y = 800;
                             app.stage.addChild(player);
                             players.push(player);
                         }
                     }
                 });
+                // Hier wird die Zahl der aktiven Spieler festgelegt, wichtig für die Sieger bestimmung
                 aktiveSpielerAnzahl = players.length;
-                console.log(aktiveSpielerAnzahl);
                 // Text der stage hinzufügen
                 app.stage.addChild(basicText);
                 app.stage.addChild(basicText2);
@@ -307,12 +313,11 @@
                 })                 
 
                 // Wenn die Lobby voll ist, hier wird Spieleranzahl festgelegt
-                if (response.game.clients.length >= 4) {
+                if (response.game.clients.length >= 3) {
                     // Alle HTML Elemente verschwinden lassen
                     divQRCode.style.display = "none";
                     btnCreate.style.display = "none";
                     divPlayers.style.display = "none";
-                    clientIdDisplay.textContent = "Alle Spieler sind nun verbunden";
                     card[0].style.display= "none";
                     document.body.appendChild(app.view);
 
