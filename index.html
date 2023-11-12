@@ -181,50 +181,50 @@
                 }
             }
 
-            //Ticker funktion der app, für jeden Spieler die x position ändern 
-            function gameLoop(players) {
-        players.forEach((player, index) => {
-            player.x = Xpositionen[index + 1];
-        });
-
-        let zuEntfernendeSpieler = [];
-        players.forEach((player, playerIndex) => {
-            blocks.forEach(block => {
-                if (kollisionstest(player, block)) {
-                    console.log("Kollision erkannt zwischen Spieler und Block!");
-                    app.stage.removeChild(player);
-
-                    // Fügen Sie den Index des Spielers zum Entfernen hinzu
-                    zuEntfernendeSpieler.push(playerIndex);
-                }
+        function gameLoop(players) {
+            players.forEach((player, index) => {
+                player.x = Xpositionen[index + 1];
             });
-        });
 
-        // Entfernen Sie Spieler außerhalb der Kollisionsschleife
-        zuEntfernendeSpieler.forEach(playerIndex => {
-            players.splice(playerIndex, 1);
-        });
+            players.forEach((player, playerIndex) => {
+                blocks.forEach(block => {
+                    if (kollisionstest(player, block)) {
+                        console.log("Kollision erkannt zwischen Spieler und Block!");
+                        app.stage.removeChild(player);
+                        player.kollidiert = true;
+                    }
+                });
+            });
 
-        // Aktualisieren Sie die Anzahl der aktiven Spieler
-        aktiveSpielerAnzahl = players.length;
+            // Entfernen kollidierter Spieler und Gewinnerermittlung
+            const aktiveSpieler = players.filter(player => !player.kollidiert);
+            aktiveSpielerAnzahl = aktiveSpieler.length;
 
-        if (aktiveSpielerAnzahl === 1) {
-            // Finden Sie den verbleibenden Spieler
-            const gewinner = players[0]; // Der letzte verbleibende Spieler
-
-            const gewinnerText = new PIXI.Text('Der Sieger ist ' + gewinner.name, StandardTextStyle);
-            gewinnerText.style.fontSize = 60;
-            gewinnerText.x = app.view.width / 2;
-            gewinnerText.y = (app.view.height / 2) - 100;
-            gewinnerText.anchor.set(0.5);
-            app.ticker.stop (() => {
-                        gameLoop(players);
-                        moveBlocks();
-                    });
-            app.stage.addChild(gewinnerText);
-            console.log("Der Gewinner ist: ", gewinner.name);
+            if (aktiveSpielerAnzahl === 1) {
+                const gewinner = aktiveSpieler[0];
+                const gewinnerText = new PIXI.Text('Der Sieger ist ' + gewinner.name, StandardTextStyle);
+                gewinnerText.style.fontSize = 60;
+                gewinnerText.x = app.view.width / 2;
+                gewinnerText.y = (app.view.height / 2) - 100;
+                gewinnerText.anchor.set(0.5);
+                app.ticker.stop (() => {
+                            gameLoop(players);
+                            moveBlocks();
+                        });
+                app.stage.addChild(gewinnerText);
+                console.log("Der Gewinner ist: ", gewinner.name);
+            }
         }
-    }
+
+                // Entfernen kollidierter Spieler aus dem players-Array
+                // kollidierteSpieler.forEach(kollidierterSpieler => {
+                //     const index = players.indexOf(kollidierterSpieler);
+                //     if (index !== -1) {
+                //         players.splice(index, 1);
+                //     }
+                // });
+
+                // aktiveSpielerAnzahl = players.length;
     
         document.addEventListener("keydown", handleEntertaste);
 
@@ -313,7 +313,7 @@
                 })                 
 
                 // Wenn die Lobby voll ist, hier wird Spieleranzahl festgelegt
-                if (response.game.clients.length >= 3) {
+                if (response.game.clients.length >= 4) {
                     // Alle HTML Elemente verschwinden lassen
                     divQRCode.style.display = "none";
                     btnCreate.style.display = "none";
