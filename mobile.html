@@ -8,7 +8,7 @@
     <title>Testgame</title>
 </head>
 <body>
-    <div class="zentrieren-container">
+    <div id='vorherDiv' class="zentrieren-container">
         <p class="lobbyText">Sie sind mit der Spielelobby verbunden, über den Button treten sie bei</p>
         <button id='btnJoin' class="btn">Spiel beitreten</button>
     </div>
@@ -30,6 +30,7 @@
         const btnJoin = document.getElementById("btnJoin");
         const divPlayers = document.getElementById("divPlayers");
         const divBoard = document.getElementById("divBoard");
+        const vorherDiv = document.getElementById("vorherDiv")
 
         // gameid über URL Parameter abrufen
         const urlParams = new URLSearchParams(queryString);
@@ -43,7 +44,7 @@
                 "gameId": gameId
             }
             ws.send(JSON.stringify(payload));
-            btnJoin.style.display = "none";
+            vorherDiv.style.display = "none";
         })
 
         ws.onmessage = message => {
