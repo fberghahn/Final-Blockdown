@@ -34,7 +34,7 @@ wss.on("request", request =>{
             games[gameId] = {
                 "id": gameId,
                 "clients": [],
-                "Xpositionen": Xpositionen=[700,850,1000]
+                "Xpositionen": Xpositionen=[700,850,1000, 1150]
             }
             // den Host am PC den Clients hinzufügen
             games[gameId].clients.push({
@@ -70,6 +70,7 @@ wss.on("request", request =>{
             const payLoad = {
                 "method": "join",
                 "game": game,
+                "index": index
             }
 
             game.clients.forEach(c => {

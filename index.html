@@ -71,30 +71,30 @@
         const card = document.getElementsByClassName("card");
 
 
+        const StandardTextStyle = new PIXI.TextStyle({
+                            fontFamily: 'Arial', //Schriftart 
+                            fontSize: 36, // Größe
+                            fontWeight: 'bold', 
+                            fill: ['#ffffff', '#ff9999'], // Gradient von Weiß zu einem hellen Rot
+                            stroke: '#4a1850', // Dunkle Umrandung für besseren Kontrast
+                            strokeThickness: 5, // Dicke der Umrandung
+                            dropShadow: true, // Schatten für einen 3D-Effekt
+                            dropShadowColor: '#000000', // Schattenfarbe
+                            dropShadowBlur: 4, // Weichheit des Schattens
+                            dropShadowAngle: Math.PI / 6, // Winkel des Schattens
+                            dropShadowDistance: 6, // Abstand des Schattens
+                            wordWrap: false, //Textumbruch
+                            wordWrapWidth: 440 // Breite, bei der der Text umgebrochen wird
+                        });
+
         // Text das alle Spieler verbunden sind
-        const basicText = new PIXI.Text('Alle Spieler sind nun verbunden', {
-        fontFamily: 'Arial',
-        fill: [
-            "#ff0000",
-            "#000000"
-        ],
-        fontSize: 38,
-        fontWeight: 500
-            });
-        basicText.x = 700;
+        const basicText = new PIXI.Text('Alle Spieler sind nun verbunden', StandardTextStyle);
+        basicText.x = 600;
         basicText.y = 100;
 
         // Text Leertaste drücken um zu starten
-        const basicText2 = new PIXI.Text('Drücken Sie die Entertaste, um das Spiel zu starten', {
-            fontFamily: 'Arial',
-            fontSize: 28,
-            fill: [
-                "#ff0000",
-                "#000000"
-            ],
-            fontWeight: 500
-        });
-        basicText2.x = 650;
+        const basicText2 = new PIXI.Text('Drücken Sie die Entertaste, um das Spiel zu starten', StandardTextStyle);
+        basicText2.x = 450;
         basicText2.y = 200;
 
 
@@ -153,77 +153,72 @@
 
         // Tastatur input 
         function handleEntertaste(event) {
-        // Wenn Enter gedrückt wird soll das Spiel starten
-        if (event.keyCode === 13 || event.key === " ") {
-            const payload = {
-                "method": "start",
-                "clientId": clientId
+            // Wenn Enter gedrückt wird soll das Spiel starten
+            if (event.keyCode === 13 || event.key === " ") {
+                const payload = {
+                    "method": "start",
+                    "clientId": clientId
+                }
+                ws.send(JSON.stringify(payload));
+                console.log("Enter wurde gedrückt!");
+                // Text zum starten entfernen
+                app.stage.removeChild(basicText);
+                app.stage.removeChild(basicText2);
+                const block = PIXI.Sprite.from(`images/block.png`);
+                block.anchor.set(0.5);
+                block.x = 700;              
+                block.y = 200;
+                app.stage.addChild(block);
+                blocks.push(block);
+                // ab hier wird der ticker zum generieren und bewegen der Blöcke hinzugefügt
+                app.ticker.add(() => {
+                        moveBlocks(); // Blöcke bewegen
+                    });
+                setInterval(createBlock, blockInterval);
+                }
             }
-            ws.send(JSON.stringify(payload));
-            console.log("Enter wurde gedrückt!");
-            // Text zum starten entfernen
-            app.stage.removeChild(basicText);
-            app.stage.removeChild(basicText2);
-            const block = PIXI.Sprite.from(`images/block.png`);
-            block.anchor.set(0.5);
-            block.x = 700;              
-            block.y = 200;
-            app.stage.addChild(block);
-            blocks.push(block);
-            // ab hier wird der ticker zum generieren und bewegen der Blöcke hinzugefügt
-            app.ticker.add(() => {
-                    moveBlocks(); // Blöcke bewegen
-                });
-            setInterval(createBlock, blockInterval);
-            }
-        }
 
-        //Ticker funktion der app, für jeden Spieler die x position ändern 
-        function gameLoop(index, players) {
-            players.forEach((player, index) => {
-                player.x = Xpositionen[index+1];
+            //Ticker funktion der app, für jeden Spieler die x position ändern 
+            function gameLoop(players) {
+        players.forEach((player, index) => {
+            player.x = Xpositionen[index + 1];
+        });
+
+        let zuEntfernendeSpieler = [];
+        players.forEach((player, playerIndex) => {
+            blocks.forEach(block => {
+                if (kollisionstest(player, block)) {
+                    console.log("Kollision erkannt zwischen Spieler und Block!");
+                    app.stage.removeChild(player);
+
+                    // Fügen Sie den Index des Spielers zum Entfernen hinzu
+                    zuEntfernendeSpieler.push(playerIndex);
+                }
             });
-            let zuEntfernendeSpieler = [];
-            players.forEach((player, playerIndex) => {
-                blocks.forEach(block => {
-                    if (kollisionstest(player, block)) {
-                        console.log("Kollision erkannt zwischen Spieler und Block!");
-                        app.stage.removeChild(player);
+        });
 
-                        // Verringern Sie die Anzahl der aktiven Spieler
-                        aktiveSpielerAnzahl--;
+        // Entfernen Sie Spieler außerhalb der Kollisionsschleife
+        zuEntfernendeSpieler.forEach(playerIndex => {
+            players.splice(playerIndex, 1);
+        });
 
-                        if (aktiveSpielerAnzahl === 1) {
-                            // Finden Sie den verbleibenden Spieler
-                            const gewinner = players.find((p, i) => app.stage.children.includes(p));
-                            const gewinnerText = new PIXI.Text('Der Sieger ist: '+ gewinner.name, {
-                            fontFamily: 'Arial',
-                            fontSize: 28,
-                            fill: [
-                                "#ff0000",
-                                "#000000"
-                            ],
-                            fontWeight: 500
-                            });
-                            gewinnerText.x = 650;
-                            gewinnerText.y = 200;
-                            app.stage.addChild(gewinnerText);
-                            console.log("Der Gewinner ist: ", gewinner.name);
-                        }
+        // Aktualisieren Sie die Anzahl der aktiven Spieler
+        aktiveSpielerAnzahl = players.length;
 
-                        // Fügen Sie den Index des Spielers zum Entfernen hinzu
-                        // if (!zuEntfernendeSpieler.includes(playerIndex)) {
-                        //     zuEntfernendeSpieler.push(playerIndex);
-                        // }
-                    }
-                });
-            });
-            // zuEntfernendeSpieler.sort((a, b) => b - a);
+        if (aktiveSpielerAnzahl === 1) {
+            // Finden Sie den verbleibenden Spieler
+            const gewinner = players[0]; // Der letzte verbleibende Spieler
 
-            // zuEntfernendeSpieler.forEach(playerIndex => {
-            //     players.splice(playerIndex, 1);
-            // });
+            const gewinnerText = new PIXI.Text('Der Sieger ist: ' + gewinner.name, StandardTextStyle);
+            gewinnerText.x = 750;
+            gewinnerText.y = 200;
+            app.ticker.remove(() => {
+                        gameLoop(players);
+                    });
+            app.stage.addChild(gewinnerText);
+            console.log("Der Gewinner ist: ", gewinner.name);
         }
+    }
     
         document.addEventListener("keydown", handleEntertaste);
 
@@ -237,7 +232,7 @@
             if (response.method === "connect") {
                 clientId = response.clientId;
                 // Anzeige der Client-ID auf der Seite
-                clientIdDisplay.textContent = "Verbunden mit der Client ID: " + clientId;
+                clientIdDisplay.textContent = "Erfolgreich mit dem Server verbunden";
             }
             // Lobby wird erstellt
             if (response.method === "create") {
@@ -258,20 +253,28 @@
             }
 
             // wenn spieler beitreten 
-            if (response.method === "join"){
-                const game = response.game
-                const index= response.index;
-                //Für jeden client im Spiel ein player image hinzufügen
+            if (response.method === "join") {
+                const game = response.game;
+                const PlayerIndex = response.index;
+
                 game.clients.forEach((client, index) => {
-                    const player = PIXI.Sprite.from(`images/player${index+1}.png`);
-                    player.name = "Spieler " + (index + 1);
-                    player.anchor.set(0.5);
-                    player.x = response.game.Xpositionen[index];              
-                    player.y = 700;
-                    app.stage.addChild(player);
-                    players.push(player);
-                    aktiveSpielerAnzahl = players.length;
+                    if (index != 0) {
+                        const spielerName = "Spieler " + index;
+                        let player = app.stage.children.find(c => c.name === spielerName);
+
+                        if (!player) {
+                            player = PIXI.Sprite.from(`images/player${index}.png`);
+                            player.name = spielerName;
+                            player.anchor.set(0.5);
+                            player.x = game.Xpositionen[index];              
+                            player.y = 700;
+                            app.stage.addChild(player);
+                            players.push(player);
+                        }
+                    }
                 });
+                aktiveSpielerAnzahl = players.length;
+                console.log(aktiveSpielerAnzahl);
                 // Text der stage hinzufügen
                 app.stage.addChild(basicText);
                 app.stage.addChild(basicText2);
@@ -288,38 +291,35 @@
             // Lobbystatus und Game state updaten 
             if (response.method === "update"){
                 const game = response.game;
-                const index= response.index;
                 Xpositionen = response.game.Xpositionen;
-                game.Xpositionen[0] += 50;
-                // console.log(Xpositionen);
+
                 while(divPlayers.firstChild)
                     divPlayers.removeChild(divPlayers.firstChild)
                 game.clients.forEach( c => {
                     const d = document.createElement("div");
                     d.style.width= "200px";
+                    d.style.height= "40px";
+                    d.style.marginTop = "20px";
                     d.style.background = c.color;
-                    d.textContent = "Player" + index;
-                    divPlayers.appendChild(d);
-
-                if (c.clientId === clientId) playerColor = c.color;
-                })
-
-
-                
-                // gameLoop(index, players) // auf der x-achse die images setzen wie es die Update funktion vorgibt                    
+                    d.textContent = "Spieler " + c.index;
+                    // So wird der PC als Host nicht angezeigt
+                    if (c.index != 0) divPlayers.appendChild(d);
+                })                 
 
                 // Wenn die Lobby voll ist, hier wird Spieleranzahl festgelegt
-                if (response.game.clients.length >= 3) {
-                divQRCode.style.display = "none";
-                btnCreate.style.display = "none";
-                divPlayers.style.display = "none";
-                clientIdDisplay.textContent = "Alle Spieler sind nun verbunden";
-                card[0].style.display= "none";
-                document.body.appendChild(app.view);
+                if (response.game.clients.length >= 4) {
+                    // Alle HTML Elemente verschwinden lassen
+                    divQRCode.style.display = "none";
+                    btnCreate.style.display = "none";
+                    divPlayers.style.display = "none";
+                    clientIdDisplay.textContent = "Alle Spieler sind nun verbunden";
+                    card[0].style.display= "none";
+                    document.body.appendChild(app.view);
 
-                app.ticker.add(() => {
-                    gameLoop(index, players);
-                });
+                    // Den Gameloop starten
+                    app.ticker.add(() => {
+                        gameLoop(players);
+                    });
             }           
         }
     }
