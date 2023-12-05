@@ -112,6 +112,7 @@
                 "method": "create",
                 "clientId": clientId
             }
+            // ws ist der Websocket mit dem der client und der Server verbunden sind
             ws.send(JSON.stringify(payload));
         })
 
@@ -297,7 +298,8 @@
             // Lobbystatus und Game state updaten 
             if (response.method === "update"){
                 const game = response.game;
-                Xpositionen = response.game.Xpositionen;
+                console.log(game)
+                Xpositionen = game.Xpositionen;
 
                 while(divPlayers.firstChild)
                     divPlayers.removeChild(divPlayers.firstChild)
