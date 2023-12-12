@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/desktop.css">
     <link rel="icon" type="image/png" href="images\favicon.png">
-    <title>Testgame</title>
+    <title>Final Blockdown</title>
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <script src="js/pixi.min.js"></script>
 </head>
@@ -13,7 +13,7 @@
     <div class="mainDiv">
         <div class="card">
             <div class="inhalt">
-                <h1>Testgame</h1>
+                <h1>Final Blockdown</h1>
                 <div id="qrcode"></div>
                 <div id='gameIdDisplay'></div>
                 <div id='clientIdDisplay'></div>
@@ -112,6 +112,7 @@
                 "method": "create",
                 "clientId": clientId
             }
+            // ws ist der Websocket mit dem der client und der Server verbunden sind
             ws.send(JSON.stringify(payload));
         })
 
@@ -297,7 +298,8 @@
             // Lobbystatus und Game state updaten 
             if (response.method === "update"){
                 const game = response.game;
-                Xpositionen = response.game.Xpositionen;
+                console.log(game)
+                Xpositionen = game.Xpositionen;
 
                 while(divPlayers.firstChild)
                     divPlayers.removeChild(divPlayers.firstChild)

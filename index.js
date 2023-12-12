@@ -3,7 +3,7 @@ var http = require("http")
 var express = require("express")
 var app = express()
 var port = process.env.PORT || 8081
-// app.get("/", (req,res) => res.sendFile(__dirname + "/index.html"))
+
 
 app.use(express.static(__dirname + "/"))
 
@@ -55,12 +55,11 @@ wss.on("request", request =>{
             const game = games[gameId];
             if (game.clients.length >= 4) 
             {
-                //sorry max players reach
+                //Maximale Spieleranzahl erreicht
                 return;
             }
-            // Farben den spieler beim beitreten zuweisen, 0 ist immer der PC
+            // Farben den spieler beim beitreten zuweisen, 0 ist immer der PC/Host
             const index = game.clients.length;
-            // const index = game.clients.index(clientId)
             const color =  {"1": "Red", "2": "Green", "3": "Blue"}[index];
             game.clients.push({
                 "clientId" :clientId,
@@ -94,27 +93,25 @@ wss.on("request", request =>{
             // soweit soll sich der spieler mit einem buttonklick auf dem handy in die gewählte Richtung bewegen
             const bewegungsvariable = 50;
 
-            // Gamestate erzeuegn 
-            // let Xpositionen = game.Xpositionen;
-            // if(!Xpositionen) Xpositionen= {}
+            // Gamestate je nach Handy input verändern
             // Hier wird geschaut in welche richtung der spieler sich beweget
             if (result.richtung==="links") {
                 game.Xpositionen[index] -= bewegungsvariable;
             } else {
                 game.Xpositionen[index] += bewegungsvariable;
             };
-            const payLoad = {
-                "method": "test",
-                "game": game,
-                "Xpositionen": Xpositionen,
-                "index": index
-            };
 
-            game.clients.forEach(c => {
-                clients[c.clientId].connection.send(JSON.stringify(payLoad))
-            });
-            // state[ballId] = color;
-            // games[gameId].Xpositionen = Xpositionen;
+            // Test payload für Debuggingzwecke genutzt
+            // const payLoad = {
+            //     "method": "test",
+            //     "game": game,
+            //     "Xpositionen": Xpositionen,
+            //     "index": index
+            // };
+
+            // game.clients.forEach(c => {
+            //     clients[c.clientId].connection.send(JSON.stringify(payLoad))
+            // });
             updateGameState();
         }
     })
@@ -146,6 +143,7 @@ function updateGameState () {
             clients[c.clientId].connection.send(JSON.stringify(payload))
         })
     }
+    // Hier könnte man festlegen wie oft der Gamestate pro Sekunde geupdated wird, aktuell wird er bei jedem Input von Play updated
     // setTimeout(updateGameState, 500);
 }
 
@@ -162,8 +160,9 @@ function updateLobby () {
             clients[c.clientId].connection.send(JSON.stringify(payload))
         })
     }
-    // setTimeout(updateGameState, 500);
 }
+
+// Funktion zur Random Id erstellung für Client- und Gameids  
 
 function S4() {
     return (((1+Math.random())*0x10000)|0).toString(16).substring(1); 
