@@ -10,8 +10,8 @@ Der entstandene Prototyp ist ein Multiplayer Auto-Runner basierend auf dem Clien
 - Javascript mit nodeJS als Runtime Umgebung auf dem Server
 - Websockets mit der [Websocket-Node Library](https://github.com/theturtle32/WebSocket-Node)
 - Linux-Ubuntu auf dem benötigten VServer
-- Apache2 als HTTP-Server
-- PixiJS für Browsergrafik und Interaktionen
+- [Apache2](https://httpd.apache.org/) als HTTP-Server
+- [PixiJS](https://pixijs.com/) für Browsergrafik und Interaktionen
 
 ## Hosting
 Die Live-Version zum Testen kann man über die folgende URL erreichen:
