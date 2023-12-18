@@ -38,7 +38,8 @@ var port = process.env.PORT || 9000
 2. Klicken Sie daraufhin den "Localhostlink kopieren" Button  
 3. Öffnen Sie einen neuen Tab oder ein neues Browserfenster
 4. Verkleinern Sie die Breite des Fensters unter 700 Pixel oder öffnen Sie die Entwicklertools und wählen eine mobile Ansicht aus
-5. Erstellen Sie so "Spieler" bis die Lobby voll ist und wechseln Sie zum Haupttab, wo sie das Spiel nun starten können
+5. Fügen Sie dann die kopierte URL ein damit werden Sie auf die mobile Seite weitergeleitet und können der Lobby beitreten 
+6. Erstellen Sie so "Spieler" bis die Lobby voll ist und wechseln Sie zum Haupttab, wo sie das Spiel nun starten können
 
 ## Quellen & Fremdcode
 Als Einarbeitung in das Themengebiet wurde ein Tutorial von Hussein Nasser durchgearbeitet und der entstandene Code als Grundgerüst für eine Websocketkommunikation genutzt.
