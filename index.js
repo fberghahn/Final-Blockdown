@@ -2,23 +2,29 @@ var WebSocketServer = require("websocket").server
 var http = require("http")
 var express = require("express")
 var app = express()
-var port = process.env.PORT || 8081
 
+// Port für den Vserver
+// var port = process.env.PORT || 8081
+
+// Port für lokale Ausführung da auf 8081 Postgres den Port belegt
+var port = process.env.PORT || 9000
 
 app.use(express.static(__dirname + "/"))
 
+// http server erstellen
 var server = http.createServer(app)
 server.listen(port)
 
 console.log("http server listening on %d", port)
 
+// websocket server erstellen und an http server binden
 let wss = new WebSocketServer({"httpServer": server})
 console.log("websocket server created")
 
 
-//hashpmap für clients
+//JSON-Objekt für clients
 const clients = {};
-//hashpmap für alle Spiele
+//JSON-Objekt für alle Spiele
 const games = {};
 
 wss.on("request", request =>{
@@ -100,18 +106,6 @@ wss.on("request", request =>{
             } else {
                 game.Xpositionen[index] += bewegungsvariable;
             };
-
-            // Test payload für Debuggingzwecke genutzt
-            // const payLoad = {
-            //     "method": "test",
-            //     "game": game,
-            //     "Xpositionen": Xpositionen,
-            //     "index": index
-            // };
-
-            // game.clients.forEach(c => {
-            //     clients[c.clientId].connection.send(JSON.stringify(payLoad))
-            // });
             updateGameState();
         }
     })
@@ -143,7 +137,7 @@ function updateGameState () {
             clients[c.clientId].connection.send(JSON.stringify(payload))
         })
     }
-    // Hier könnte man festlegen wie oft der Gamestate pro Sekunde geupdated wird, aktuell wird er bei jedem Input von Play updated
+    // Hier könnte man festlegen wie oft der Gamestate pro Sekunde geupdated wird, aktuell wird er bei jedem Input der mobilen Endgeräte updated
     // setTimeout(updateGameState, 500);
 }
 

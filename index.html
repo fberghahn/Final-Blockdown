@@ -181,7 +181,9 @@
                 setInterval(createBlock, blockInterval);
                 }
             }
-
+        
+        // Gameloop der alle Spieler durchgeht und die X-Positionen der Spieler festlegt und die Kollisionen erkennt
+        // wird gestartet sobald alle Spieler der Lobby beigetreten sind
         function gameLoop(players) {
             players.forEach((player, index) => {
                 player.x = Xpositionen[index + 1];
@@ -201,6 +203,7 @@
             const aktiveSpieler = players.filter(player => !player.kollidiert);
             aktiveSpielerAnzahl = aktiveSpieler.length;
 
+            // wenn nnur noch ein Spieler übrig ist, ist dieser der Gewinner
             if (aktiveSpielerAnzahl === 1) {
                 const gewinner = aktiveSpieler[0];
                 const gewinnerText = new PIXI.Text('Der Sieger ist ' + gewinner.name, StandardTextStyle);
@@ -216,16 +219,6 @@
                 console.log("Der Gewinner ist: ", gewinner.name);
             }
         }
-
-                // Entfernen kollidierter Spieler aus dem players-Array
-                // kollidierteSpieler.forEach(kollidierterSpieler => {
-                //     const index = players.indexOf(kollidierterSpieler);
-                //     if (index !== -1) {
-                //         players.splice(index, 1);
-                //     }
-                // });
-
-                // aktiveSpielerAnzahl = players.length;
     
         document.addEventListener("keydown", handleEntertaste);
 
@@ -286,14 +279,6 @@
                 app.stage.addChild(basicText);
                 app.stage.addChild(basicText2);
             }
-
-            // Test response zum debugging
-            // if (response.method === "test"){
-            //     const game = response.game
-            //     const testindex= response.index;
-            //     const X = response.Xpositionen;
-            //     console.log(testindex);
-            // }
 
             // Lobbystatus und Game state updaten 
             if (response.method === "update"){
