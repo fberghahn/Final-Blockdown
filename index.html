@@ -41,7 +41,8 @@
             );
 
             // Hintergrund hinzufügen weil der canvas nicht interaktiv sein kann
-            const bg = PIXI.Sprite.from(PIXI.Texture.WHITE);
+            // const bg = PIXI.Sprite.from(PIXI.Texture.WHITE);
+            const bg = PIXI.Sprite.from(`images/spiel-backgroundimg2.png`);
             bg.width = app.view.width;
             bg.height = app.view.height;
             bg.opacity = 0;
@@ -216,9 +217,9 @@
             if (aktiveSpielerAnzahl === 1) {
                 const gewinner = aktiveSpieler[0];
                 const gewinnerText = new PIXI.Text('Der Sieger ist ' + gewinner.name, StandardTextStyle);
-                gewinnerText.style.fontSize = 60;
+                gewinnerText.style.fontSize = 80;
                 gewinnerText.x = app.view.width / 2;
-                gewinnerText.y = (app.view.height / 2) - 100;
+                gewinnerText.y = (app.view.height / 2) - 300;
                 gewinnerText.anchor.set(0.5);
                 app.ticker.stop (() => {
                             gameLoop(players);
