@@ -82,7 +82,7 @@ wss.on("request", request =>{
             game.clients.forEach(c => {
                 clients[c.clientId].connection.send(JSON.stringify(payLoad))
             });
-            updateLobby();
+            updateGameState();
         }
         
         //Spiel starten nach Entertaste auf dem PC
@@ -142,26 +142,12 @@ function updateGameState () {
     // setTimeout(updateGameState, 500);
 }
 
-function updateLobby () {
-
-    for (const g of Object.keys(games)) {
-        const game = games[g]
-        const payload = {
-            "method": "update",
-            "game": game
-        }
-
-        game.clients.forEach(c =>{
-            clients[c.clientId].connection.send(JSON.stringify(payload))
-        })
-    }
-}
-
-// Funktion zur Random Id erstellung für Client- und Gameids  
+// Funktionen zur Random Id erstellung für Client- und Gameids  
 
 function S4() {
     return (((1+Math.random())*0x10000)|0).toString(16).substring(1); 
 }
  
-// then to call it, plus stitch in '4' in the third group
+// Guid erstellen indem man die S4 Funktion 4 mal aufruft und mit - verbindet und in Kleinbuchstaben umwandelt,
+// so wird eine 32 Zeichen lange großenteils zufällige Id erstellt
 const guid = () => (S4() + S4() + "-" + S4() + "-4" + S4().substr(0,3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
