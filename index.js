@@ -7,6 +7,7 @@ var app = express()
 // var port = process.env.PORT || 8081
 
 // Port für lokale Ausführung da auf 8081 Postgres den Port belegt
+// Hier kann der Port falls nötig geändert werden
 var port = process.env.PORT || 9000
 
 app.use(express.static(__dirname + "/"))

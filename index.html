@@ -18,6 +18,8 @@
                 <div id='gameIdDisplay'></div>
                 <div id='clientIdDisplay'></div>
                 <button id='btnCreate' class="btn">Neues Spiel</button>
+                <button id="copyButtonServer" class="btn">URL kopieren</button>
+                <button id="copyButton" class="btn">Localhost Link kopieren</button>
                 <div id='divPlayers'>
             </div>    
         </div>
@@ -59,9 +61,10 @@
         // Gamestate ist die X-Achsen position der Spieler 
         let Xpositionen = {};
 
-        // Websocket connection
+        // Verbindung zur Websocket Verbindung ändern
         var host = location.origin.replace(/^http/, 'ws')
-        var ws = new WebSocket(host);
+        // Websocket connection erstellen
+        var websocket = new WebSocket(host);
 
         const gameIdDisplay = document.getElementById("gameIdDisplay");
         const clientIdDisplay = document.getElementById("clientIdDisplay"); // Das HTML-Element zur Anzeige der Client-ID
@@ -69,9 +72,14 @@
         const divPlayers = document.getElementById("divPlayers");
         const divQRCode = document.getElementById("qrcode");
         const card = document.getElementsByClassName("card");
+        // Button zum localhost Link kopieren
+        const copyButton = document.getElementById("copyButton");
+        copyButton.style.display = "none";
+        // Button zum Server Link kopieren
+        const copyButtonServer = document.getElementById("copyButtonServer");
+        copyButtonServer.style.display = "none";
 
-
-
+        // Textstyle für die PixiJs Texte festlegen
         const StandardTextStyle = new PIXI.TextStyle({
                             fontFamily: 'Arial', //Schriftart 
                             fontSize: 36, // Größe
@@ -113,21 +121,21 @@
                 "clientId": clientId
             }
             // ws ist der Websocket mit dem der client und der Server verbunden sind
-            ws.send(JSON.stringify(payload));
+            websocket.send(JSON.stringify(payload));
         })
 
         // Hier wird eine random position innerhalb des app views auf der xachse erzeugt
         function getRandomXPosition() {
             return Math.random() * app.view.width;
         }
-
+        // 
         function createBlock() {
-            const block = PIXI.Sprite.from(`images/block.png`);
-            block.anchor.set(0.5);
-            block.x = getRandomXPosition(); // Zufällige X-Position für den Block
-            block.y = -50; // Startposition oben außerhalb des Sichtbereichs
-            app.stage.addChild(block);
-            blocks.push(block);
+        const block = PIXI.Sprite.from(`images/block.png`);
+        block.anchor.set(0.5);
+        block.x = getRandomXPosition(); // Zufällige X-Position für den Block
+        block.y = -50; // Startposition oben außerhalb des Sichtbereichs
+        app.stage.addChild(block);
+        blocks.push(block);
         }
         function moveBlocks() {
             blocks.forEach(block => {
@@ -163,7 +171,7 @@
                     "method": "start",
                     "clientId": clientId
                 }
-                ws.send(JSON.stringify(payload));
+                websocket.send(JSON.stringify(payload));
                 console.log("Enter wurde gedrückt!");
                 // Text zum starten entfernen
                 app.stage.removeChild(basicText);
@@ -223,9 +231,9 @@
         document.addEventListener("keydown", handleEntertaste);
 
         //Nachrichten des Servers verarbeiten
-        ws.onmessage = message => {
+        websocket.onmessage = message => {
 
-            // message.data
+            // Nachricht des Servers in ein JSON Objekt umwandeln
             const response = JSON.parse(message.data);
 
             // connection -> GameId vom Websocketserver erhalten
@@ -238,8 +246,32 @@
             if (response.method === "create") {
                 gameId = response.game.id;
                 Xpositionen = response.game.Xpositionen;
-                const lobbyUrl = "https://florian-berghahn.de/?gameId=" + response.game.id;
-                clientIdDisplay.textContent = "Eine Lobby wurde erstellt, mit mit dem Link: " + lobbyUrl;
+                const lobbyUrl = "https://florian-berghahn.de/?gameId=" + gameId;
+                // Button zum localhost Link kopieren sichtbar machen
+                copyButton.style.display = "block";
+                // Bei Klick die URL in Clipboard kopieren
+                copyButton.addEventListener("click", function() {
+                    var copyText = document.createElement("textarea");
+                    copyText.value = "http://localhost:9000/?gameId=" + gameId;
+                    document.body.appendChild(copyText);
+                    copyText.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(copyText);
+                    copyButton.setAttribute('title', "Localhost Link kopiert " + copyText.value);
+                });
+                // Button zum ServerURL kopieren sichtbar machen
+                copyButtonServer.style.display = "block";
+                // Bei Klick die URL in Clipboard kopieren
+                copyButtonServer.addEventListener("click", function() {
+                    var copyText = document.createElement("textarea");
+                    copyText.value = lobbyUrl;
+                    document.body.appendChild(copyText);
+                    copyText.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(copyText);
+                    copyButtonServer.setAttribute('title', "URL kopiert " + copyText.value);
+                })
+                ;
                 //Qr Code erstellen über qrcodejs
                 var qrcode = new QRCode(document.getElementById("qrcode"), {
                     text: lobbyUrl,
