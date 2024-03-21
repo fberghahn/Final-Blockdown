@@ -260,6 +260,38 @@ function gameLoop(players) {
         gewinnerText.x = app.view.width / 2;
         gewinnerText.y = (app.view.height / 2) - 300;
         gewinnerText.anchor.set(0.5);
+
+
+        const button = new FancyButton({
+            defaultView: `button.png`,
+            hoverView: `button_hover.png`,
+            pressedView: `button_pressed.png`,
+            text: 'Click me!',
+            animations: {
+                 hover: {
+                     props: {
+                         scale: {
+                             x: 1.1,
+                             y: 1.1,
+                         }
+                     },
+                     duration: 100,
+                 },
+                 pressed: {
+                     props: {
+                         scale: {
+                             x: 0.9,
+                             y: 0.9,
+                         }
+                     },
+                     duration: 100,
+                 }
+             }
+        });
+       
+        button.onPress.connect(() => console.log('Button pressed!'));
+       
+        container.addChild(button.view);
         app.ticker.stop (() => {
                     gameLoop(players);
                     moveBlocks();

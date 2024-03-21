@@ -9,12 +9,15 @@
 </head>
 <body>
     <div id='vorherDiv' class="zentrieren-container">
-        <p class="lobbyText">Sie sind mit der Spielelobby verbunden, über den Button treten Sie bei</p>
-        <!-- <button id='btnJoin' class="btn">Spiel beitreten</button> -->
-        <span id="start-btn" class='start-btn'>START </span>
+        <div class="card">
+            <p class="lobbyText">Sie sind mit der Spielelobby verbunden, über den Button treten Sie bei</p>
+            <!-- <button id='btnJoin' class="btn">Spiel beitreten</button> -->
+            <span id="start-btn" class='start-btn'>START </span>
+        </div>
     </div>
     <div id='divPlayers'></div>
-    <div id='divBoard' style="display: flex; flex-direction: column; align-items: center; justify-content: center;"></div>
+    <div id='divBoard' style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+    </div>
     <script>
         const queryString = window.location.search;
         let clientId = null;
@@ -72,9 +75,9 @@
 
             
                 const d = document.createElement("div");
-                    d.style.width= "200px";
-                    d.style.height= "50px";
-                    d.style.margin = "30px";
+                    d.style.width= "70vw";
+                    d.style.height= "5vh";
+                    d.style.margin = "5vh";
                     d.style.background = playerColor;
                     d.textContent = "Du bist Spieler " + index;
                     divPlayers.appendChild(d);
@@ -84,8 +87,7 @@
                 
             //Buttons zur Steuerung erstellen
             const buttonlinks = document.createElement("button");
-            buttonlinks.style.height = "30vh"; 
-            buttonlinks.style.width = "30vh"; 
+            buttonlinks.className = "playBtns";
             // Create an img element
             const arrowLeft = document.createElement("img");
             arrowLeft.src = "/images/pfeil-links.png";
@@ -108,8 +110,7 @@
 
 
             const buttonrechts = document.createElement("button");
-            buttonrechts.style.height = "30vh"; 
-            buttonrechts.style.width = "30vh"; 
+            buttonrechts.className = "playBtns";
             buttonrechts.style.marginTop = "10vh"; 
             // Create an img element
             const arrowRight = document.createElement("img");
