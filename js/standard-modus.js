@@ -63,6 +63,7 @@ let blockInterval = 500; // Intervall, in dem neue Blöcke erzeugt werden (in Mi
 // Websocketverbindung zum Server herstellen
 let clientId = null;
 let gameId = null;
+let isGameStarted = false; // Spielstatus
 
 // Gamestate ist die X-Achsen position der Spieler 
 let Xpositionen = {};
@@ -160,7 +161,7 @@ websocket.onmessage = message => {
         console.log(game)
         Xpositionen = game.Xpositionen;              
         //Wenn die Lobby voll ist, hier wird Spieleranzahl festgelegt
-        if (response.game.clients.length >= 3) {
+        if (response.game.clients.length >= 3 && !isGameStarted) {
             // QR-Code entfernen
             app.stage.removeChild(qrSprite);
             qrSprite = null;
@@ -173,6 +174,7 @@ websocket.onmessage = message => {
             app.ticker.add(() => {
                 gameLoop(players);
             });
+            isGameStarted = true; // Spielstatus auf gestartet setzen
         }  
     };
 
