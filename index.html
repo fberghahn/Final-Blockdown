@@ -334,18 +334,21 @@
                 })                 
 
                 // Wenn die Lobby voll ist, hier wird Spieleranzahl festgelegt
-                if (response.game.clients.length >= 4) {
+                if (response.game.clients.length >= 3) {
+                        
+                    // Navigate to the new page
+                    window.location.assign('/gamePage.html');
                     // Alle HTML Elemente verschwinden lassen
-                    divQRCode.style.display = "none";
-                    btnCreate.style.display = "none";
-                    divPlayers.style.display = "none";
-                    card[0].style.display= "none";
-                    document.body.appendChild(app.view);
+                    // divQRCode.style.display = "none";
+                    // btnCreate.style.display = "none";
+                    // divPlayers.style.display = "none";
+                    // card[0].style.display= "none";
+                    // document.body.appendChild(app.view);
 
-                    // Den Gameloop starten
-                    app.ticker.add(() => {
-                        gameLoop(players);
-                    });
+                    // // Den Gameloop starten
+                    // app.ticker.add(() => {
+                    //     gameLoop(players);
+                    // });
             }           
         }
     }

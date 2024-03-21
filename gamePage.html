@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Blockdown</title>
+    <script src="js/pixi.min.js"></script>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+</head>
+<body>
+    <canvas id="qrcode"></canvas>
+    <script>
+        window.onload = function () {
+            let app = new PIXI.Application(
+                { background: '#1B1B1B', resizeTo: window }
+            );
+            document.body.appendChild(app.view);
+
+            const bg = PIXI.Sprite.from(`images/spiel-backgroundimg2.png`);
+            bg.width = app.view.width;
+            bg.height = app.view.height;
+            bg.opacity = 0;
+
+            app.stage.addChild(bg);
+            bg.anchor.set(0.5);
+            bg.x = app.view.width / 2;
+            bg.y = app.view.height / 2;
+
+            var qrcanvas = document.getElementById("qrcode");
+            qrcanvas.style.display = "none";
+
+            var qrcode = new QRious({
+                element: document.getElementById("qrcode"),
+                background: '#ffffff',
+                backgroundAlpha: 1,
+                foreground: '#000000',
+                foregroundAlpha: 1,
+                level: 'H',
+                padding: 0,
+                size: 256,
+                value: "https://webisora.com"
+            });
+
+
+            // Warten, bis der QR-Code gerendert ist
+            setTimeout(function () {
+                var base64 = qrcanvas.toDataURL("image/png");
+                var texture = PIXI.Texture.from(base64);
+                var qrSprite = new PIXI.Sprite(texture);
+
+                qrSprite.anchor.set(0.5);
+                qrSprite.x = (app.renderer.width - qrSprite.width) / 2;
+                qrSprite.y = (app.renderer.height - qrSprite.height) / 2;
+
+                app.stage.addChild(qrSprite);
+            }, 500); 
+
+        }
+    </script>
+</body>
+</html>
