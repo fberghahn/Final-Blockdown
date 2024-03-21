@@ -7,18 +7,10 @@
     <script src="js/pixi.min.js"></script>
     <link rel="icon" type="image/png" href="images/favicon.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <link rel="stylesheet" href="/css/gamePage.css">
 </head>
 <body>
     <canvas id="qrcode"></canvas>
     <script src="js/standard-modus.js"></script>
-    <script>
-        // Hier wird der URL Parameter ausgelesen für Nutzer die über den QR Code kommen
-        const queryString = window.location.search;
-        
-        // Weiterleitung von mobilen Nutzern & weitergeben des URL Parmaeters bei der Weiterleitung
-        if (screen.width <= 700) {
-        document.location = "mobile.html" + queryString;
-        }
-    </script>
 </body>
 </html>

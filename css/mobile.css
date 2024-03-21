@@ -6,6 +6,18 @@
     height: 100vh; /* Dies stellt sicher, dass der Container die gesamte Bildschirmhöhe einnimmt */
 }
 
+body {
+    background-color: rgb(59, 77, 241);
+    background-image: url("/images/spiel-backgroundimg-mobile.png");
+    background-color: #cccccc;
+    height: 100vh;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center center;
+}
+
+
 .lobbyText{
     text-align: center;
     font-size: 20px;
@@ -39,4 +51,28 @@ background-color: #fff;
 color: #0066cc;
 border: solid 2px #0066cc;
 
+}
+
+
+.start-btn{
+    text-align: center;
+	display: inline-block;
+	margin:5px;
+    font-weight: bold;
+    padding: 10px 0 10px 10px ;
+    background-color: lightgray;
+    text-shadow: -1px -1px black, 1px 1px white;
+    color: gray;
+    -webkit-border-radius: 7px;
+	-moz-border-radius: 7px;
+	-o-border-radius: 7px;
+	border-radius: 7px;
+    box-shadow: 0 .2em gray; 
+    cursor: pointer;
+
+}
+.start-btn:active {
+	box-shadow: none;
+	position: relative;
+	top: .2em;
 }

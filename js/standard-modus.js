@@ -5,14 +5,13 @@ let app;
 window.onload = function () {
 
     app = new PIXI.Application(
-        { background: '#1B1B1B', resizeTo: window }
+        { background: '#02151E', resizeTo: window }
     );
     document.body.appendChild(app.view);
 
     const bg = PIXI.Sprite.from(`images/spiel-backgroundimg2.png`);
     bg.width = app.view.width;
     bg.height = app.view.height;
-    bg.opacity = 0;
 
     app.stage.addChild(bg);
     bg.anchor.set(0.5);
