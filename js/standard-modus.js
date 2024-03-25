@@ -54,6 +54,13 @@ qrcanvas.style.display = "none";
 
 // Spieler und Blöcke erstellen
 const players = []; // Spieler array
+
+// Get the URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+
+// Get the spieleranzahl parameter
+const spielerAnzahl = urlParams.get('spieleranzahl');
+
 let aktiveSpielerAnzahl = null;
 const blocks = []; // Array für die Blöcke oder hindernisse 
 let blockSpeed = 1; // Anfangsgeschwindigkeit der Blöcke
@@ -159,8 +166,8 @@ websocket.onmessage = message => {
         const game = response.game;
         console.log(game)
         Xpositionen = game.Xpositionen;              
-        //Wenn die Lobby voll ist, hier wird Spieleranzahl festgelegt
-        if (response.game.clients.length >= 3 && !isGameStarted) {
+        //Wenn die Lobby voll ist kann das Spiel gestartet werden, dafür muss die Spieleranzahl erreicht sein und das Spiel noch nicht gestartet sein
+        if (response.game.clients.length >= (Number(spielerAnzahl) + 1) && !isGameStarted) {
             // QR-Code entfernen
             app.stage.removeChild(qrSprite);
             qrSprite = null;
