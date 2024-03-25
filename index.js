@@ -41,7 +41,7 @@ wss.on("request", request =>{
             games[gameId] = {
                 "id": gameId,
                 "clients": [],
-                "Xpositionen": Xpositionen=[700,850,1000, 1150]
+                "Xpositionen": Xpositionen=[0,700,850,1000, 1150]
             }
             // den Host am PC den Clients hinzufügen
             games[gameId].clients.push({
@@ -60,14 +60,14 @@ wss.on("request", request =>{
             const clientId= result.clientId;
             const gameId = result.gameId;
             const game = games[gameId];
-            if (game.clients.length >= 4) 
+            if (game.clients.length >= 5) 
             {
                 //Maximale Spieleranzahl erreicht
                 return;
             }
             // Farben den spieler beim beitreten zuweisen, 0 ist immer der PC/Host
             const index = game.clients.length;
-            const color =  {"1": "Red", "2": "Green", "3": "Blue"}[index];
+            const color =  {"1": "Red", "2": "Green", "3": "Blue", "4": "Yellow"}[index];
             game.clients.push({
                 "clientId" :clientId,
                 "color" : color,
@@ -107,6 +107,19 @@ wss.on("request", request =>{
             } else {
                 game.Xpositionen[index] += bewegungsvariable;
             };
+            updateGameState();
+        }
+        if (result.method === "reset") {
+            // const clientId = result.clientId;
+            const gameId = result.gameId;
+            const game = games[gameId];
+            game.Xpositionen = [0,700,850,1000, 1150];
+            const payLoad = {
+                "method": "restart",
+                "game": game
+            }
+            const firstClient = game.clients[0];
+            clients[firstClient.clientId].connection.send(JSON.stringify(payLoad));
             updateGameState();
         }
     })

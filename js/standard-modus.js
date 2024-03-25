@@ -2,6 +2,9 @@
 
 // PixiJS-App erstellen
 let app;
+let neustartText;
+let appWidth;
+let appHeight;
 window.onload = function () {
 
     app = new PIXI.Application(
@@ -9,14 +12,18 @@ window.onload = function () {
     );
     document.body.appendChild(app.view);
 
+    appWidth = app.view.width;
+    appHeight = app.view.height;
+
     const bg = PIXI.Sprite.from(`images/spiel-backgroundimg2.png`);
-    bg.width = app.view.width;
-    bg.height = app.view.height;
+    bg.width = appWidth;
+    bg.height = appHeight;
 
     app.stage.addChild(bg);
     bg.anchor.set(0.5);
-    bg.x = app.view.width / 2;
-    bg.y = app.view.height / 2;
+    bg.x = appWidth / 2;
+    bg.y = appHeight / 2;
+    createNeustartText();
 };
 
 // Textstyle für die PixiJs Texte festlegen
@@ -48,12 +55,20 @@ basicText2.x = 950;
 basicText2.y = 300;
 basicText2.anchor.set(0.5);
 
+
+function createNeustartText() {
+    const neustartText = new PIXI.Text('Drücken Sie die Entertaste, um neu zu starten', StandardTextStyle);
+    neustartText.x = app.view.width / 2;
+    neustartText.y = (app.view.height / 2) + 300;
+    neustartText.anchor.set(0.5);
+}
+
 // QR-Code Canvas Element erstellen
 var qrcanvas = document.getElementById("qrcode");
 qrcanvas.style.display = "none";
 
 // Spieler und Blöcke erstellen
-const players = []; // Spieler array
+let players = []; // Spieler array
 
 // Get the URL parameters
 const urlParams = new URLSearchParams(window.location.search);
@@ -62,9 +77,38 @@ const urlParams = new URLSearchParams(window.location.search);
 const spielerAnzahl = urlParams.get('spieleranzahl');
 
 let aktiveSpielerAnzahl = null;
-const blocks = []; // Array für die Blöcke oder hindernisse 
+let blocks = []; // Array für die Blöcke oder hindernisse 
 let blockSpeed = 1; // Anfangsgeschwindigkeit der Blöcke
 let blockInterval = 500; // Intervall, in dem neue Blöcke erzeugt werden (in Millisekunden)
+
+function removeBlocks(blocks) {
+    for (let i = blocks.length - 1; i >= 0; i--) {
+        const block = blocks[i];
+        app.stage.removeChild(block);
+    }
+}
+
+function initiatePlayers(game, players) {
+    game.clients.forEach((client, index) => {
+        if (index != 0) {
+            const spielerName = "Spieler " + index;
+            let player = app.stage.children.find(c => c.name === spielerName);
+
+            if (!player) {
+                player = PIXI.Sprite.from(`images/player${index}.png`);
+                player.name = spielerName;
+                player.anchor.set(0.5);
+                player.x = game.Xpositionen[index];              
+                player.y = 800;
+                app.stage.addChild(player);
+                players.push(player);
+            }
+        }
+    });
+    // Here the number of active players is set, important for determining the winner
+    aktiveSpielerAnzahl = players.length;
+}
+
 
 // Websocketverbindung zum Server herstellen
 let clientId = null;
@@ -138,27 +182,7 @@ websocket.onmessage = message => {
     // wenn spieler beitreten 
     if (response.method === "join") {
         const game = response.game;
-        console.log(response.game.clients.length);
-        const PlayerIndex = response.index;
-
-        game.clients.forEach((client, index) => {
-            if (index != 0) {
-                const spielerName = "Spieler " + index;
-                let player = app.stage.children.find(c => c.name === spielerName);
-
-                if (!player) {
-                    player = PIXI.Sprite.from(`images/player${index}.png`);
-                    player.name = spielerName;
-                    player.anchor.set(0.5);
-                    player.x = game.Xpositionen[index];              
-                    player.y = 800;
-                    app.stage.addChild(player);
-                    players.push(player);
-                }
-            }
-        });
-        // Hier wird die Zahl der aktiven Spieler festgelegt, wichtig für die Sieger bestimmung
-        aktiveSpielerAnzahl = players.length;
+        initiatePlayers(game, players);
     };
 
     // Lobbystatus und Game state updaten 
@@ -167,37 +191,82 @@ websocket.onmessage = message => {
         console.log(game)
         Xpositionen = game.Xpositionen;              
         //Wenn die Lobby voll ist kann das Spiel gestartet werden, dafür muss die Spieleranzahl erreicht sein und das Spiel noch nicht gestartet sein
-        if (response.game.clients.length >= (Number(spielerAnzahl) + 1) && !isGameStarted) {
+        if (response.game.clients.length >= (Number(spielerAnzahl) + 1) && !isGameStarted ) {
             // QR-Code entfernen
             app.stage.removeChild(qrSprite);
             qrSprite = null;
 
             // Text das alle Spieler verbunden sind & man mit Enter starten kann
             app.stage.addChild(basicText);
+            basicText.style.fontSize = 36;
             app.stage.addChild(basicText2);
 
+
             // Den Gameloop starten
-            app.ticker.add(() => {
-                gameLoop(players);
-            });
-            isGameStarted = true; // Spielstatus auf gestartet setzen
+            // app.ticker.add (() => {
+            //     gameLoop(players);
+            // });
+            gameLoopTicker.start();
         }  
     };
+    if (response.method === "restart"){
+        const game = response.game;
+        console.log("Spiel wird neugestartet");
+        // Alle Blöcke entfernen
+        removeBlocks(blocks);
+        blockSpeed = 1;
+        blockInterval = 500;
+        blocks=[];
+        // Spieler zurücksetzen
+        players.forEach(player => {
+            app.stage.removeChild(player);
+        });
+        players = [];
 
-
+        // get the winner text and remove it, done with for() because the name of the winner cant be defined beforehand
+        for (let i = app.stage.children.length - 1; i >= 0; i--) {
+            const child = app.stage.children[i];
+            // Check if the child's text starts with 'Der Sieger ist'
+            if (child.text && child.text.startsWith('Der Sieger ist')) {
+                const gewinnerText = child;
+                app.stage.removeChild(gewinnerText);
+                break; // Exit the loop once the text is found and removed
+            }
+        }
+        app.stage.removeChild(neustartText);
+        // app.stage.addChild(basicText2);
+        // basicText2.updateText();
+        initiatePlayers(game, players);
+        // Spielstatus zurücksetzen
+        isGameStarted = false;
+        gameLoopTicker.start();
+        // app.ticker.start (() => {
+        //     gameLoop(players);
+        // });
+    };
 };
+
+let intervalId; // Store the interval ID
 
 // Tastatur input 
 document.addEventListener("keydown", handleEntertaste);
 function handleEntertaste(event) {
-    // Wenn Enter gedrückt wird soll das Spiel starten
-    if (event.keyCode === 13 || event.key === " ") {
+    // Get the current player count
+    const currentPlayerCount = players.length;
+    console.log("Current player count: ", currentPlayerCount);
+
+    // Wenn Enter gedrückt wird und die gewünschte Spieleranzahl erreicht ist, soll das Spiel starten
+    if ((event.keyCode === 13 || event.key === " ") && currentPlayerCount === Number(spielerAnzahl) && !isGameStarted) {
         app.stage.removeChild(basicText);
         app.stage.removeChild(basicText2);
-        app.ticker.add(() => {
-            moveBlocks(); // Blöcke bewegen
-        });
-        setInterval(createBlock, blockInterval);
+        blocks=[];
+        clearInterval(intervalId);
+        // app.ticker.add(() => {
+        //     moveBlocks(); // Blöcke bewegen
+        // });
+        moveBlocksTicker.start();
+        intervalId =  setInterval(createBlock, blockInterval);
+        isGameStarted = true; // Spielstatus auf gestartet setzen
     }
 }
 
@@ -255,6 +324,7 @@ function gameLoop(players) {
         });
     });
 
+
     // Entfernen kollidierter Spieler und Gewinnerermittlung
     const aktiveSpieler = players.filter(player => !player.kollidiert);
     aktiveSpielerAnzahl = aktiveSpieler.length;
@@ -267,12 +337,45 @@ function gameLoop(players) {
         gewinnerText.x = app.view.width / 2;
         gewinnerText.y = (app.view.height / 2) - 300;
         gewinnerText.anchor.set(0.5);
-        app.ticker.stop (() => {
-                    gameLoop(players);
-                    moveBlocks();
-                });
         app.stage.addChild(gewinnerText);
         console.log("Der Gewinner ist: ", gewinner.name);
+
+        moveBlocksTicker.stop();
+        gameLoopTicker.stop();
+
+        // app.ticker.stop (() => {
+        //     moveBlocks();
+        //     // gameLoop(players);
+        // });
     }
 }
 
+// Add a keydown event listener to the document
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'N' || event.key === 'n') {
+        resetGame();
+    }
+});
+
+// Create a function for the button's functionality
+function resetGame() {
+    console.log('Button clicked!');
+    const payLoad = {
+        "method": "reset",
+        "gameId": gameId
+    }
+    websocket.send(JSON.stringify(payLoad));
+    // removeBlocks(blocks);
+}
+
+const gameLoopTicker = new PIXI.Ticker();
+            
+gameLoopTicker.add(() => {
+    gameLoop(players);
+});
+
+const moveBlocksTicker = new PIXI.Ticker();
+            
+moveBlocksTicker.add(() => {
+    moveBlocks();
+});
