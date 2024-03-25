@@ -38,10 +38,12 @@ wss.on("request", request =>{
         if (result.method === "create") {
             const hostId= result.clientId
             const gameId = guid();
+            const appWidth = result.appWidth;
+
             games[gameId] = {
                 "id": gameId,
                 "clients": [],
-                "Xpositionen": Xpositionen=[0,700,850,1000, 1150]
+                "Xpositionen": [ appWidth * 0.35, appWidth * 0.45, appWidth * 0.55, appWidth * 0.65]
             }
             // den Host am PC den Clients hinzufügen
             games[gameId].clients.push({
@@ -113,7 +115,8 @@ wss.on("request", request =>{
             // const clientId = result.clientId;
             const gameId = result.gameId;
             const game = games[gameId];
-            game.Xpositionen = [0,700,850,1000, 1150];
+            const appWidth = result.appWidth;
+            game.Xpositionen = [ appWidth * 0.35, appWidth * 0.45, appWidth * 0.55, appWidth * 0.65]
             const payLoad = {
                 "method": "restart",
                 "game": game

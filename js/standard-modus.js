@@ -5,6 +5,8 @@ let app;
 let neustartText;
 let appWidth;
 let appHeight;
+let basicText;
+let basicText2;
 window.onload = function () {
 
     app = new PIXI.Application(
@@ -23,8 +25,9 @@ window.onload = function () {
     bg.anchor.set(0.5);
     bg.x = appWidth / 2;
     bg.y = appHeight / 2;
+
     createNeustartText();
-};
+    };
 
 // Textstyle für die PixiJs Texte festlegen
 const StandardTextStyle = new PIXI.TextStyle({
@@ -42,19 +45,6 @@ const StandardTextStyle = new PIXI.TextStyle({
     wordWrap: false, //Textumbruch
     wordWrapWidth: 440 // Breite, bei der der Text umgebrochen wird
 });
-
-// Text das alle Spieler verbunden sind
-const basicText = new PIXI.Text('Alle Spieler sind nun verbunden', StandardTextStyle);
-basicText.x = 950;
-basicText.y = 200;
-basicText.anchor.set(0.5);
-
-// Text Leertaste drücken um zu starten
-const basicText2 = new PIXI.Text('Drücken Sie die Entertaste, um das Spiel zu starten', StandardTextStyle);
-basicText2.x = 950;
-basicText2.y = 300;
-basicText2.anchor.set(0.5);
-
 
 function createNeustartText() {
     const neustartText = new PIXI.Text('Drücken Sie die Entertaste, um neu zu starten', StandardTextStyle);
@@ -99,7 +89,7 @@ function initiatePlayers(game, players) {
                 player.name = spielerName;
                 player.anchor.set(0.5);
                 player.x = game.Xpositionen[index];              
-                player.y = 800;
+                player.y = appHeight / 1.2;
                 app.stage.addChild(player);
                 players.push(player);
             }
@@ -137,7 +127,8 @@ websocket.onmessage = message => {
         console.log("Client ID erhalten: " + clientId);
         const payload = {
             "method": "create",
-            "clientId": clientId
+            "clientId": clientId,
+            "appWidth": appWidth
         }
         websocket.send(JSON.stringify(payload));
     }
@@ -173,7 +164,7 @@ websocket.onmessage = message => {
 
             qrSprite.anchor.set(0.5);
             qrSprite.x = (app.renderer.width - qrSprite.width) / 2;
-            qrSprite.y = (app.renderer.height - qrSprite.height) / 4;
+            qrSprite.y = (app.renderer.height - qrSprite.height) / 4.5;
 
             app.stage.addChild(qrSprite);
         }, 500); 
@@ -197,8 +188,18 @@ websocket.onmessage = message => {
             qrSprite = null;
 
             // Text das alle Spieler verbunden sind & man mit Enter starten kann
-            app.stage.addChild(basicText);
+            // Fontsize anpassen wegen gewinnertext
+            basicText = new PIXI.Text('Alle Spieler sind nun verbunden', StandardTextStyle);
             basicText.style.fontSize = 36;
+            basicText.x = appWidth / 2; 
+            basicText.y = appHeight / 5; 
+            basicText.anchor.set(0.5);
+        
+            basicText2 = new PIXI.Text('Drücken Sie die Entertaste, um das Spiel zu starten', StandardTextStyle);
+            basicText2.x = appWidth / 2; 
+            basicText2.y = appHeight / 3.5; 
+            basicText2.anchor.set(0.5);
+            app.stage.addChild(basicText);
             app.stage.addChild(basicText2);
 
 
@@ -311,7 +312,7 @@ function kollisionstest(player, block) {
 
 function gameLoop(players) {
     players.forEach((player, index) => {
-        player.x = Xpositionen[index + 1];
+        player.x = Xpositionen[index ];
     });
 
     players.forEach((player, playerIndex) => {
@@ -362,7 +363,8 @@ function resetGame() {
     console.log('Button clicked!');
     const payLoad = {
         "method": "reset",
-        "gameId": gameId
+        "gameId": gameId,
+        "appWidth": appWidth
     }
     websocket.send(JSON.stringify(payLoad));
     // removeBlocks(blocks);
