@@ -22,14 +22,40 @@
             </nav>
         </header>
         <main>
-            <section id="gameViewport">
-                <!-- Hier wird das Spiel angezeigt -->
-            </section>
+            <div class="flex-container">
+                <div class="flex-item card">
+                    <h2>Final Blockdown</h2>
+                    <p>Das Mehrspieler Browserspiel für bis zu fünf Spieler, die gemeinsam ein rasantes Spielerlebniss haben wollen. Der Spieler der am längsten am den Blöcken ausweichen kann gewinnt</p>
+                </div>
+                <div class="flex-item card">
+                    <h2>Spiel erstellen</h2>
+                
+                    <label for="modus">Modus:</label>
+                    <select id="modus">
+                        <option value="">--Bitte wählen--</option>
+                        <option value="modus1">Modus 1</option>
+                        <option value="modus2">Modus 2</option>
+                        <!-- Add more options as needed -->
+                    </select>
+                
+                    <label for="spieleranzahl">Spieleranzahl:</label>
+                    <select id="spieleranzahl">
+                        <option value="">--Bitte wählen--</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                
+                    <button id="createLobby">Lobby erstellen</button>
+                </div>
+            </div>
         </main>
         <footer>
             <p>Entwickelt im Laufe des Praxisprojekts und der Bachelorarbeit von Florian Berghahn an der TH Köln im Studiengang Medieninformatik. &copy; Copyright. Florian Berghahn</p>
         </footer>
     </div>
-    
+    <script src="js/homepage.js"></script>
 </body>
 </html>

@@ -76,11 +76,20 @@ canvas {
 
 /* Neues CSS */
 
+/* Farbvariablen */
+
+:root {
+    --header-footer-color: #f0f0f0;
+    --hero-background-color: #fff;
+}
+
+
 body, html {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
+    font-family: 'Arial', sans-serif;
 }
 
 #gameContainer {
@@ -90,10 +99,13 @@ body, html {
 }
 
 header {
-    background-color: #20232a;
-    color: #61dafb;
+    background-color: var(--header-footer-color);
+    color: #333;
     padding: 20px;
     text-align: center;
+    /* display: flex;
+    justify-content: space-between;
+    align-items: center; */
 }
 
 nav ul {
@@ -101,13 +113,14 @@ nav ul {
     padding: 0;
 }
 
+
 nav ul li {
     display: inline;
     margin: 0 10px;
 }
 
 nav ul li a {
-    color: #61dafb;
+    color: #333;
     text-decoration: none;
 }
 
@@ -116,18 +129,49 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #282c34;
+    background-color: var(--hero-background-color);
+    color: #333;
+    background-image: url("/images/spiel-backgroundimg2.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center center;
 }
 
-#gameViewport {
-    width: 80%;
-    height: 80%;
-    background-color: #fff;
+.flex-container {
+    display: flex;
+    flex-direction: row; /* Add this line */
+}
+
+.flex-item {
+    flex: 1;
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid black;
 }
 
 footer {
-    background-color: #20232a;
-    color: #61dafb;
+    background-color: var(--header-footer-color);
     text-align: center;
     padding: 10px;
+}
+
+p {
+    color: #666;
+}
+
+
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border-radius: 5px; 
+    padding: 20px 80px 20px 80px;
+    background-color: #fff;
+    margin: 20vh;
+    /* opacity: 0.8; */
+
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 }
