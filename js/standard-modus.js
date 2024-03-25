@@ -312,7 +312,15 @@ function kollisionstest(player, block) {
 
 function gameLoop(players) {
     players.forEach((player, index) => {
-        player.x = Xpositionen[index ];
+        player.x = Xpositionen[index + 1];
+
+        // Check if Xposition is greater than appWidth or appHeight
+        if (player.x < 0) {
+            player.x = appWidth;
+        } else if (player.x > appWidth) {
+            player.x = 0;
+        }
+
     });
 
     players.forEach((player, playerIndex) => {

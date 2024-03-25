@@ -116,7 +116,7 @@ wss.on("request", request =>{
             const gameId = result.gameId;
             const game = games[gameId];
             const appWidth = result.appWidth;
-            game.Xpositionen = [ appWidth * 0.35, appWidth * 0.45, appWidth * 0.55, appWidth * 0.65]
+            game.Xpositionen = [ 0, appWidth * 0.35, appWidth * 0.45, appWidth * 0.55, appWidth * 0.65]
             const payLoad = {
                 "method": "restart",
                 "game": game
