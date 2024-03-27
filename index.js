@@ -43,7 +43,7 @@ wss.on("request", request =>{
             games[gameId] = {
                 "id": gameId,
                 "clients": [],
-                "Xpositionen": [ appWidth * 0.35, appWidth * 0.45, appWidth * 0.55, appWidth * 0.65]
+                "Xpositionen": [ 0, appWidth * 0.35, appWidth * 0.45, appWidth * 0.55, appWidth * 0.65]
             }
             // den Host am PC den Clients hinzufügen
             games[gameId].clients.push({

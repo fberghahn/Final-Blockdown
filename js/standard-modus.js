@@ -7,6 +7,7 @@ let appWidth;
 let appHeight;
 let basicText;
 let basicText2;
+let urlParams;
 window.onload = function () {
 
     app = new PIXI.Application(
@@ -17,7 +18,21 @@ window.onload = function () {
     appWidth = app.view.width;
     appHeight = app.view.height;
 
-    const bg = PIXI.Sprite.from(`images/spiel-backgroundimg2.png`);
+    // Get the URL parameters
+    urlParams = new URLSearchParams(window.location.search);
+    const backgroundImage = urlParams.get('background');
+
+    let bg;
+
+    if (backgroundImage === "1") {
+        bg = PIXI.Sprite.from(`images/spiel-backgroundimg2.png`);
+    }
+    else if (backgroundImage === "2") {
+        bg = PIXI.Sprite.from(`images/background-img.png`);
+    }
+    else if (backgroundImage === "3") {
+        bg = PIXI.Sprite.from(`images/background-city.png`);
+    }
     bg.width = appWidth;
     bg.height = appHeight;
 
@@ -60,10 +75,9 @@ qrcanvas.style.display = "none";
 // Spieler und Blöcke erstellen
 let players = []; // Spieler array
 
-// Get the URL parameters
-const urlParams = new URLSearchParams(window.location.search);
 
 // Get the spieleranzahl parameter
+urlParams = new URLSearchParams(window.location.search);
 const spielerAnzahl = urlParams.get('spieleranzahl');
 
 let aktiveSpielerAnzahl = null;
