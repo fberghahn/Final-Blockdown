@@ -6,7 +6,7 @@ const imageSelect = document.getElementById('background');
 // Button zum Spiel erstellen
 const createLobbyButton = document.getElementById('createLobby');
 
-createLobbyButton.addEventListener('click', function() {
+createLobbyButton.addEventListener('click', function () {
     // Check the selected modus
     const selectedModus = modusSelect.value;
     const selectedSpieleranzahl = spieleranzahlSelect.value;
