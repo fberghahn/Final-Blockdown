@@ -150,8 +150,9 @@ websocket.onmessage = message => {
     if (response.method === "create") {
 
         gameId = response.game.id;
-        const lobbyUrl = "https://final-blockdown.de/mobile.html/?gameId=" + gameId;
+        const lobbyUrl = "https://final-blockdown.de/mobile.html?gameId=" + gameId;
         console.log("http://localhost:9000/mobile.html?gameId=" + gameId);
+        console.log("https://final-blockdown.de/mobile.html?gameId=" + gameId);
         // Text das alle Spieler verbunden sind
         // const basicText = new PIXI.Text("http://localhost:9000/mobile.html?gameId=" + gameId, StandardTextStyle);
         // basicText.x = 950;
