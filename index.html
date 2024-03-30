@@ -10,348 +10,58 @@
     <script src="js/pixi.min.js"></script>
 </head>
 <body>
-    <div class="mainDiv">
-        <div class="card">
-            <div class="inhalt">
-                <h1>Final Blockdown</h1>
-                <div id="qrcode"></div>
-                <div id='gameIdDisplay'></div>
-                <div id='clientIdDisplay'></div>
-                <button id='btnCreate' class="btn">Neues Spiel</button>
-                <button id="copyButtonServer" class="btn">URL kopieren</button>
-                <button id="copyButton" class="btn">Localhost Link kopieren</button>
-                <div id='divPlayers'>
-            </div>    
-        </div>
+    <div id="gameContainer">
+        <header>
+            <h1>Final Blockdown</h1>
+            <nav>
+                <ul>
+                    <li><a href="#start">Start</a></li>
+                    <li><a href="#highscores">Highscores</a></li>
+                    <li><a href="#settings">Einstellungen</a></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <div class="flex-container">
+                <div class="flex-item card">
+                    <h2>Final Blockdown</h2>
+                    <p>Das Mehrspieler Browserspiel für bis zu fünf Spieler, die gemeinsam ein rasantes Spielerlebniss haben wollen. Der Spieler der am längsten am den Blöcken ausweichen kann gewinnt</p>
+                </div>
+                <div class="flex-item card">
+                    <h2>Spiel erstellen</h2>
+                
+                    <label for="modus">Modus:</label>
+                    <select id="modus">
+                        <option value="">--Bitte wählen--</option>
+                        <option value="modus1">Modus 1</option>
+                        <option value="modus2">Modus 2</option>
+                        <!-- Add more options as needed -->
+                    </select>
+                
+                    <label for="spieleranzahl">Spieleranzahl:</label>
+                    <select id="spieleranzahl">
+                        <option value="">--Bitte wählen--</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <!-- <option value="5">5</option> -->
+                    </select>
+                    <label for="background">Hintergrundbild:</label>
+                    <select id="background">
+                        <option value="">--Bitte wählen--</option>
+                        <option value="1">Bild 1</option>
+                        <option value="2">Bild 2</option>
+                        <option value="3">Bild 3</option>
+                    </select>
+                    
+                    <button id="createLobby">Lobby erstellen</button>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <p>Entwickelt im Laufe des Praxisprojekts und der Bachelorarbeit von Florian Berghahn an der TH Köln im Studiengang Medieninformatik. &copy; Copyright. Florian Berghahn</p>
+        </footer>
     </div>
-    <script type="text/javascript">
-
-        let app;
-        const players = []; // Spieler array
-        let aktiveSpielerAnzahl = null;
-        const blocks = []; // Array für die Blöcke oder hindernisse 
-        let blockSpeed = 1; // Anfangsgeschwindigkeit der Blöcke
-        let blockInterval = 500; // Intervall, in dem neue Blöcke erzeugt werden (in Millisekunden)
-
-
-        // Grafik Library Pixi Canvas einbinden, Hintergrund Farbe setzen und canvas sich dem Fenster anpassen lassen
-        window.onload = function () {
-            app = new PIXI.Application(
-                { background: '#1B1B1B', resizeTo: window }
-            );
-
-            // Hintergrund hinzufügen weil der canvas nicht interaktiv sein kann
-            // const bg = PIXI.Sprite.from(PIXI.Texture.WHITE);
-            const bg = PIXI.Sprite.from(`images/spiel-backgroundimg2.png`);
-            bg.width = app.view.width;
-            bg.height = app.view.height;
-            bg.opacity = 0;
-            
-
-            app.stage.addChild(bg);
-            bg.anchor.set(0.5)
-            bg.x = app.view.width / 2;
-            bg.y = app.view.height / 2;
-            
-        }
-
-        // Hier wird der URL Parameter ausgelesen für Nutzer die über den QR Code kommen
-        const queryString = window.location.search;
-
-        let clientId = null;
-        let gameId = null;
-        // Gamestate ist die X-Achsen position der Spieler 
-        let Xpositionen = {};
-
-        // Verbindung zur Websocket Verbindung ändern
-        var host = location.origin.replace(/^http/, 'ws')
-        // Websocket connection erstellen
-        var websocket = new WebSocket(host);
-
-        const gameIdDisplay = document.getElementById("gameIdDisplay");
-        const clientIdDisplay = document.getElementById("clientIdDisplay"); // Das HTML-Element zur Anzeige der Client-ID
-        const btnCreate = document.getElementById("btnCreate");
-        const divPlayers = document.getElementById("divPlayers");
-        const divQRCode = document.getElementById("qrcode");
-        const card = document.getElementsByClassName("card");
-        // Button zum localhost Link kopieren
-        const copyButton = document.getElementById("copyButton");
-        copyButton.style.display = "none";
-        // Button zum Server Link kopieren
-        const copyButtonServer = document.getElementById("copyButtonServer");
-        copyButtonServer.style.display = "none";
-
-        // Textstyle für die PixiJs Texte festlegen
-        const StandardTextStyle = new PIXI.TextStyle({
-                            fontFamily: 'Arial', //Schriftart 
-                            fontSize: 36, // Größe
-                            fontWeight: 'bold', 
-                            fill: ['#ffffff', '#ff9999'], // Gradient von Weiß zu einem hellen Rot
-                            stroke: '#4a1850', // Dunkle Umrandung für besseren Kontrast
-                            strokeThickness: 5, // Dicke der Umrandung
-                            dropShadow: true, // Schatten für einen 3D-Effekt
-                            dropShadowColor: '#000000', // Schattenfarbe
-                            dropShadowBlur: 4, // Weichheit des Schattens
-                            dropShadowAngle: Math.PI / 6, // Winkel des Schattens
-                            dropShadowDistance: 6, // Abstand des Schattens
-                            wordWrap: false, //Textumbruch
-                            wordWrapWidth: 440 // Breite, bei der der Text umgebrochen wird
-                        });
-
-        // Text das alle Spieler verbunden sind
-        const basicText = new PIXI.Text('Alle Spieler sind nun verbunden', StandardTextStyle);
-        basicText.x = 950;
-        basicText.y = 200;
-        basicText.anchor.set(0.5);
-
-        // Text Leertaste drücken um zu starten
-        const basicText2 = new PIXI.Text('Drücken Sie die Entertaste, um das Spiel zu starten', StandardTextStyle);
-        basicText2.x = 950;
-        basicText2.y = 300;
-        basicText2.anchor.set(0.5);
-
-
-        // Weiterleitung von mobilen Nutzern & weitergeben des URL Parmaeters bei der Weiterleitung
-        if (screen.width <= 700) {
-        document.location = "mobile.html" + queryString;
-        }
-
-        // Spielelobby erstellen
-        btnCreate.addEventListener("click", e => {
-            const payload = {
-                "method": "create",
-                "clientId": clientId
-            }
-            // ws ist der Websocket mit dem der client und der Server verbunden sind
-            websocket.send(JSON.stringify(payload));
-        })
-
-        // Hier wird eine random position innerhalb des app views auf der xachse erzeugt
-        function getRandomXPosition() {
-            return Math.random() * app.view.width;
-        }
-        // 
-        function createBlock() {
-        const block = PIXI.Sprite.from(`images/block.png`);
-        block.anchor.set(0.5);
-        block.x = getRandomXPosition(); // Zufällige X-Position für den Block
-        block.y = -50; // Startposition oben außerhalb des Sichtbereichs
-        app.stage.addChild(block);
-        blocks.push(block);
-        }
-        function moveBlocks() {
-            blocks.forEach(block => {
-                block.y += blockSpeed;
-                if (block.y > app.view.height) {
-                    // Block außerhalb des Sichtbereichs, entfernen
-                    app.stage.removeChild(block);
-                    const index = blocks.indexOf(block);
-                    if (index !== -1) {
-                        blocks.splice(index, 1);
-                    }
-                }
-            });
-            // Blockgeschwindigkeit erhöhen
-            blockSpeed += 0.005;
-        }
-
-        // Kolisionserkennungsfunktion gibt true oder false zurück
-        function kollisionstest(player, block) {
-            let playerBox = player.getBounds();
-            let blockBox = block.getBounds();
-                return playerBox.x + playerBox.width > blockBox.x &&
-                        playerBox.x < blockBox.x + blockBox.width &&
-                        playerBox.y + playerBox.height > blockBox.y &&
-                        playerBox.y < blockBox.y + blockBox.height;
-        }
-
-        // Tastatur input 
-        function handleEntertaste(event) {
-            // Wenn Enter gedrückt wird soll das Spiel starten
-            if (event.keyCode === 13 || event.key === " ") {
-                const payload = {
-                    "method": "start",
-                    "clientId": clientId
-                }
-                websocket.send(JSON.stringify(payload));
-                console.log("Enter wurde gedrückt!");
-                // Text zum starten entfernen
-                app.stage.removeChild(basicText);
-                app.stage.removeChild(basicText2);
-                const block = PIXI.Sprite.from(`images/block.png`);
-                block.anchor.set(0.5);
-                block.x = 700;              
-                block.y = 200;
-                app.stage.addChild(block);
-                blocks.push(block);
-                // ab hier wird der ticker zum generieren und bewegen der Blöcke hinzugefügt
-                app.ticker.add(() => {
-                        moveBlocks(); // Blöcke bewegen
-                    });
-                setInterval(createBlock, blockInterval);
-                }
-            }
-        
-        // Gameloop der alle Spieler durchgeht und die X-Positionen der Spieler festlegt und die Kollisionen erkennt
-        // wird gestartet sobald alle Spieler der Lobby beigetreten sind
-        function gameLoop(players) {
-            players.forEach((player, index) => {
-                player.x = Xpositionen[index + 1];
-            });
-
-            players.forEach((player, playerIndex) => {
-                blocks.forEach(block => {
-                    if (kollisionstest(player, block)) {
-                        console.log("Kollision erkannt zwischen Spieler und Block!");
-                        app.stage.removeChild(player);
-                        player.kollidiert = true;
-                    }
-                });
-            });
-
-            // Entfernen kollidierter Spieler und Gewinnerermittlung
-            const aktiveSpieler = players.filter(player => !player.kollidiert);
-            aktiveSpielerAnzahl = aktiveSpieler.length;
-
-            // wenn nnur noch ein Spieler übrig ist, ist dieser der Gewinner
-            if (aktiveSpielerAnzahl === 1) {
-                const gewinner = aktiveSpieler[0];
-                const gewinnerText = new PIXI.Text('Der Sieger ist ' + gewinner.name, StandardTextStyle);
-                gewinnerText.style.fontSize = 80;
-                gewinnerText.x = app.view.width / 2;
-                gewinnerText.y = (app.view.height / 2) - 300;
-                gewinnerText.anchor.set(0.5);
-                app.ticker.stop (() => {
-                            gameLoop(players);
-                            moveBlocks();
-                        });
-                app.stage.addChild(gewinnerText);
-                console.log("Der Gewinner ist: ", gewinner.name);
-            }
-        }
-    
-        document.addEventListener("keydown", handleEntertaste);
-
-        //Nachrichten des Servers verarbeiten
-        websocket.onmessage = message => {
-
-            // Nachricht des Servers in ein JSON Objekt umwandeln
-            const response = JSON.parse(message.data);
-
-            // connection -> GameId vom Websocketserver erhalten
-            if (response.method === "connect") {
-                clientId = response.clientId;
-                // Anzeige der Client-ID auf der Seite
-                clientIdDisplay.textContent = "Erfolgreich mit dem Server verbunden";
-            }
-            // Lobby wird erstellt
-            if (response.method === "create") {
-                gameId = response.game.id;
-                Xpositionen = response.game.Xpositionen;
-                const lobbyUrl = "https://florian-berghahn.de/?gameId=" + gameId;
-                // Button zum localhost Link kopieren sichtbar machen
-                copyButton.style.display = "block";
-                // Bei Klick die URL in Clipboard kopieren
-                copyButton.addEventListener("click", function() {
-                    var copyText = document.createElement("textarea");
-                    copyText.value = "http://localhost:9000/?gameId=" + gameId;
-                    document.body.appendChild(copyText);
-                    copyText.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(copyText);
-                    copyButton.setAttribute('title', "Localhost Link kopiert " + copyText.value);
-                });
-                // Button zum ServerURL kopieren sichtbar machen
-                copyButtonServer.style.display = "block";
-                // Bei Klick die URL in Clipboard kopieren
-                copyButtonServer.addEventListener("click", function() {
-                    var copyText = document.createElement("textarea");
-                    copyText.value = lobbyUrl;
-                    document.body.appendChild(copyText);
-                    copyText.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(copyText);
-                    copyButtonServer.setAttribute('title', "URL kopiert " + copyText.value);
-                })
-                ;
-                //Qr Code erstellen über qrcodejs
-                var qrcode = new QRCode(document.getElementById("qrcode"), {
-                    text: lobbyUrl,
-                    width: 256,
-                    height: 256,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
-                });
-                console.log(lobbyUrl);
-            }
-
-            // wenn spieler beitreten 
-            if (response.method === "join") {
-                const game = response.game;
-                const PlayerIndex = response.index;
-
-                game.clients.forEach((client, index) => {
-                    if (index != 0) {
-                        const spielerName = "Spieler " + index;
-                        let player = app.stage.children.find(c => c.name === spielerName);
-
-                        if (!player) {
-                            player = PIXI.Sprite.from(`images/player${index}.png`);
-                            player.name = spielerName;
-                            player.anchor.set(0.5);
-                            player.x = game.Xpositionen[index];              
-                            player.y = 800;
-                            app.stage.addChild(player);
-                            players.push(player);
-                        }
-                    }
-                });
-                // Hier wird die Zahl der aktiven Spieler festgelegt, wichtig für die Sieger bestimmung
-                aktiveSpielerAnzahl = players.length;
-                // Text der stage hinzufügen
-                app.stage.addChild(basicText);
-                app.stage.addChild(basicText2);
-            }
-
-            // Lobbystatus und Game state updaten 
-            if (response.method === "update"){
-                const game = response.game;
-                console.log(game)
-                Xpositionen = game.Xpositionen;
-
-                while(divPlayers.firstChild)
-                    divPlayers.removeChild(divPlayers.firstChild)
-                game.clients.forEach( c => {
-                    const d = document.createElement("div");
-                    d.style.width= "200px";
-                    d.style.height= "40px";
-                    d.style.marginTop = "20px";
-                    d.style.background = c.color;
-                    d.textContent = "Spieler " + c.index;
-                    // So wird der PC als Host nicht angezeigt
-                    if (c.index != 0) divPlayers.appendChild(d);
-                })                 
-
-                // Wenn die Lobby voll ist, hier wird Spieleranzahl festgelegt
-                if (response.game.clients.length >= 3) {
-                        
-                    // Navigate to the new page
-                    window.location.assign('/gamePage.html');
-                    // Alle HTML Elemente verschwinden lassen
-                    // divQRCode.style.display = "none";
-                    // btnCreate.style.display = "none";
-                    // divPlayers.style.display = "none";
-                    // card[0].style.display= "none";
-                    // document.body.appendChild(app.view);
-
-                    // // Den Gameloop starten
-                    // app.ticker.add(() => {
-                    //     gameLoop(players);
-                    // });
-            }           
-        }
-    }
-    </script>
+    <script src="js/homepage.js"></script>
 </body>
 </html>
