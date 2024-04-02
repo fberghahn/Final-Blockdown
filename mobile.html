@@ -12,7 +12,11 @@
     <div id='vorherDiv' class="zentrieren-container">
         <div class="card">
             <p class="lobbyText">Sie sind mit der Spielelobby verbunden, über den Button treten Sie bei</p>
-            <input type="text" id="PlayerName" placeholder="Namen eingeben">
+            <!-- <input type="text" id="PlayerName" placeholder="Namen eingeben"> -->
+            <div class="form__group field">
+                <input type="text" class="form__field" placeholder="Spielername" name="name" id='PlayerName' required maxlength="25"/>
+                <label for="name" class="form__label">Spielername</label>
+            </div>
             <p id="error" style="color: red;"></p>
             <!-- <button id='btnJoin' class="btn">Spiel beitreten</button> -->
             <span id="start-btn" class='start-btn'>START </span>
@@ -96,7 +100,7 @@
                     d.style.height= "5vh";
                     d.style.margin = "5vh";
                     d.style.background = playerColor;
-                    d.textContent = "Du bist Spieler " + index;
+                    d.textContent = playerName + "hat die Farbe " + playerColor;
                     divPlayers.appendChild(d);
 
             while(divBoard.firstChild)

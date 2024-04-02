@@ -14,8 +14,6 @@
     background-color: #fff;
     opacity: 0.9;
     margin-top:5vh;
-    /* transform: rotate(90deg); */
-
 }
 
 body {
@@ -30,42 +28,11 @@ body {
     touch-action: manipulation;
 }
 
-
 .lobbyText{
     text-align: center;
     font-size: 20px;
     margin-bottom: 10px
 }
-
-.btn{
-font-family: Roboto, sans-serif;
-font-weight: 600;
-font-size: 14px;
-color: #fff;
-background-color: #0066CC;
-padding: 10px 30px;
-border: 2px solid #0066cc;
-box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
-border-radius: 50px;
-transition : 1000ms;
-transform: translateY(0);
-/* display: flex;
-flex-direction: row; */
-align-items: center;
-cursor: pointer;
-text-transform: uppercase;
-}
-
-.btn:hover{
-transition : 1000ms;
-padding: 8px 30px;
-transform : translateY(-0px);
-background-color: #fff;
-color: #0066cc;
-border: solid 2px #0066cc;
-
-}
-
 
 .start-btn{
     text-align: center;
@@ -97,4 +64,72 @@ border: solid 2px #0066cc;
     width: 30vh;
     height: 30vh;
     opacity: 0.9;
+}
+
+.form__group {
+    position: relative;
+    padding: 15px 0 0;
+    margin-top: 10px;
+    position: relative;
+    /* padding: 15px 0 0; */
+    /* width: 50%; */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form__field {
+    font-family: Roboto, sans-serif;
+    font-family: inherit;
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid gray;
+    outline: 0;
+    font-size: 1.3rem;
+    color: rgb(17, 17, 17);
+    padding: 7px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+}
+
+.form__field::placeholder {
+    color: transparent;
+}
+
+.form__field:placeholder-shown + .form__label {
+    font-size: 1.3rem;
+    cursor: text;
+    top: 20px;
+}
+
+.form__label {
+    font-family: Roboto, sans-serif;
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 1rem;
+    color: gray;
+}
+
+.form__field:focus {
+    padding-bottom: 6px;
+    font-weight: 700;
+    border-width: 3px;
+    border-image: linear-gradient(to right, primary, secondary);
+    border-image-slice: 1;
+}
+
+.form__field:focus + .form__label {
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 1rem;
+    color: primary;
+    font-weight: 700;
+}
+
+.form__field:required,
+.form__field:invalid {
+    box-shadow: none;
 }
