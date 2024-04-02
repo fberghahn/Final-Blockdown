@@ -1,6 +1,8 @@
 canvas {
-    margin: auto;
+    /* margin: auto; */
     display: block;
+    margin-top: -0.7vh;
+    margin-left: -0.7vh;
 }
 body {
     overflow: hidden;
