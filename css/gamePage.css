@@ -2,3 +2,6 @@ canvas {
     margin: auto;
     display: block;
 }
+body {
+    overflow: hidden;
+}
