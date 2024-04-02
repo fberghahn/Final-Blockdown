@@ -28,6 +28,8 @@ const clients = {};
 //JSON-Objekt für alle Spiele
 const games = {};
 
+let appWidth;
+
 wss.on("request", request =>{
     const connection = request.accept(null, request.origin);
     connection.on("message", message => {
@@ -38,7 +40,7 @@ wss.on("request", request =>{
         if (result.method === "create") {
             const hostId= result.clientId
             const gameId = guid();
-            const appWidth = result.appWidth;
+            appWidth = result.appWidth;
 
             games[gameId] = {
                 "id": gameId,
@@ -100,14 +102,25 @@ wss.on("request", request =>{
             const game = games[gameId];
 
             // soweit soll sich der spieler mit einem buttonklick auf dem handy in die gewählte Richtung bewegen
-            const bewegungsvariable = 50;
+            const bewegungsvariable = 48;
 
             // Gamestate je nach Handy input verändern
-            // Hier wird geschaut in welche richtung der spieler sich beweget
+            // Hier wird geschaut in welche richtung der spieler sich beweget und die Position des Spielers geändert wenn er das Feld verlässt
+            // Hier ist zu beachten, dass die XPoistionen der Spieler am linken Rand des Spielers sind, daher wird bei der appwidth (der rechten Grenze) die Bewegungsvariable abgezogen
             if (result.richtung==="links") {
                 game.Xpositionen[index] -= bewegungsvariable;
+                if (game.Xpositionen[index] < 0) {
+                    game.Xpositionen[index] = appWidth - bewegungsvariable;
+                } else if (game.Xpositionen[index] > appWidth- bewegungsvariable) {
+                    game.Xpositionen[index] = 0;
+                }
             } else {
                 game.Xpositionen[index] += bewegungsvariable;
+                if (game.Xpositionen[index] < 0) {
+                    game.Xpositionen[index] = appWidth - bewegungsvariable;
+                } else if (game.Xpositionen[index] >  appWidth- bewegungsvariable) {
+                    game.Xpositionen[index] = 0;
+                }
             };
             updateGameState();
         }

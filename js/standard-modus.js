@@ -106,7 +106,7 @@ function initiatePlayers(game, players) {
             if (!player) {
                 player = PIXI.Sprite.from(`images/player${index}.png`);
                 player.name = spielerName;
-                player.anchor.set(0.5);
+                player.anchor.set(0);
                 player.x = game.Xpositionen[index];              
                 player.y = appHeight / 1.2;
                 app.stage.addChild(player);
@@ -203,7 +203,7 @@ websocket.onmessage = message => {
             qrSprite = null;
 
             // Text das alle Spieler verbunden sind & man mit Enter starten kann
-            // Fontsize anpassen wegen gewinnertext und checken ob die Texte schon da sind, da die Update Funktion vor spielbeginn oft aufgerufen wird
+            // Fontsize anpassen wegen gewinnertext und checken ob die Texte schon da sind, da die Update Response vor Spielbeginn wiederholt aufgerufen wird
             if (!app.stage.children.includes(basicText)) {
                 basicText = new PIXI.Text('Alle Spieler sind nun verbunden', StandardTextStyle);
                 basicText.style.fontSize = 36;
@@ -220,8 +220,6 @@ websocket.onmessage = message => {
                 basicText2.anchor.set(0.5);
                 app.stage.addChild(basicText2);
             }
-
-
         }  
     };
     if (response.method === "restart"){
@@ -320,17 +318,10 @@ function kollisionstest(player, block) {
                 playerBox.y < blockBox.y + blockBox.height;
 }
 
+// Game Loop Funktion in der die Spielerpositionen aktualisiert werden, wird dem Ticker hinzugefügt und gestartet sobald der erste Spieler beitritt
 function gameLoop(players) {
     players.forEach((player, index) => {
         player.x = Xpositionen[index + 1];
-
-        // Check if Xposition is greater than appWidth or appHeight
-        if (player.x < 0) {
-            player.x = appWidth;
-        } else if (player.x > appWidth) {
-            player.x = 0;
-        }
-
     });
 }
 
