@@ -46,6 +46,31 @@ window.onload = function () {
     bg.x = appWidth / 2;
     bg.y = appHeight / 2;
 
+    // Load the mute icon
+    let muteIcon = PIXI.Sprite.from('/images/mute-icon.png');
+    // Get the audio element
+    let audioElement = document.getElementById("audio");
+
+    // Set the position of the mute icon
+    muteIcon.x = appWidth - 100; // Adjust as needed
+    muteIcon.y = appWidth * 0.02; 
+    muteIcon.scale.set(0.1); 
+
+    // Enable interactivity and button mode
+    muteIcon.interactive = true;
+    muteIcon.buttonMode = true;
+
+    // Add a click event handler
+    muteIcon.on('pointerdown', () => {
+
+        // Toggle mute
+        audioElement.muted = !audioElement.muted;
+    });
+
+    // Add the mute icon to the stage
+    app.stage.addChild(muteIcon);
+
+
     createNeustartText();
     };
 
