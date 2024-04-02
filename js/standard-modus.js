@@ -17,6 +17,11 @@ window.onload = function () {
 
     appWidth = app.view.width;
     appHeight = app.view.height;
+    console.log("App width: ", appWidth);
+
+    // Grid erstellen 
+    const playerWidth = 48;
+    const gridWidth = appWidth / playerWidth;
 
     // Get the URL parameters
     urlParams = new URLSearchParams(window.location.search);
@@ -153,12 +158,6 @@ websocket.onmessage = message => {
         const lobbyUrl = "https://final-blockdown.de/mobile.html?gameId=" + gameId;
         console.log("http://localhost:9000/mobile.html?gameId=" + gameId);
         console.log("https://final-blockdown.de/mobile.html?gameId=" + gameId);
-        // Text das alle Spieler verbunden sind
-        // const basicText = new PIXI.Text("http://localhost:9000/mobile.html?gameId=" + gameId, StandardTextStyle);
-        // basicText.x = 950;
-        // basicText.y = 200;
-        // basicText.anchor.set(0.5);
-        // app.stage.addChild(basicText);
 
         var qrcode = new QRious({
             element: document.getElementById("qrcode"),
@@ -189,6 +188,7 @@ websocket.onmessage = message => {
     if (response.method === "join") {
         const game = response.game;
         initiatePlayers(game, players);
+        gameLoopTicker.start();
     };
 
     // Lobbystatus und Game state updaten 
@@ -203,26 +203,25 @@ websocket.onmessage = message => {
             qrSprite = null;
 
             // Text das alle Spieler verbunden sind & man mit Enter starten kann
-            // Fontsize anpassen wegen gewinnertext
-            basicText = new PIXI.Text('Alle Spieler sind nun verbunden', StandardTextStyle);
-            basicText.style.fontSize = 36;
-            basicText.x = appWidth / 2; 
-            basicText.y = appHeight / 5; 
-            basicText.anchor.set(0.5);
-        
-            basicText2 = new PIXI.Text('Drücken Sie die Entertaste, um das Spiel zu starten', StandardTextStyle);
-            basicText2.x = appWidth / 2; 
-            basicText2.y = appHeight / 3.5; 
-            basicText2.anchor.set(0.5);
-            app.stage.addChild(basicText);
-            app.stage.addChild(basicText2);
+            // Fontsize anpassen wegen gewinnertext und checken ob die Texte schon da sind, da die Update Funktion vor spielbeginn oft aufgerufen wird
+            if (!app.stage.children.includes(basicText)) {
+                basicText = new PIXI.Text('Alle Spieler sind nun verbunden', StandardTextStyle);
+                basicText.style.fontSize = 36;
+                basicText.x = appWidth / 2; 
+                basicText.y = appHeight / 5; 
+                basicText.anchor.set(0.5);
+                app.stage.addChild(basicText);
+            }
+            
+            if (!app.stage.children.includes(basicText2)) {
+                basicText2 = new PIXI.Text('Drücken Sie die Entertaste, um das Spiel zu starten', StandardTextStyle);
+                basicText2.x = appWidth / 2; 
+                basicText2.y = appHeight / 3.5; 
+                basicText2.anchor.set(0.5);
+                app.stage.addChild(basicText2);
+            }
 
 
-            // Den Gameloop starten
-            // app.ticker.add (() => {
-            //     gameLoop(players);
-            // });
-            gameLoopTicker.start();
         }  
     };
     if (response.method === "restart"){
@@ -256,9 +255,6 @@ websocket.onmessage = message => {
         // Spielstatus zurücksetzen
         isGameStarted = false;
         gameLoopTicker.start();
-        // app.ticker.start (() => {
-        //     gameLoop(players);
-        // });
     };
 };
 
@@ -275,11 +271,10 @@ function handleEntertaste(event) {
     if ((event.keyCode === 13 || event.key === " ") && currentPlayerCount === Number(spielerAnzahl) && !isGameStarted) {
         app.stage.removeChild(basicText);
         app.stage.removeChild(basicText2);
+        basicText2.updateText();
         blocks=[];
         clearInterval(intervalId);
-        // app.ticker.add(() => {
-        //     moveBlocks(); // Blöcke bewegen
-        // });
+        collisionAndWinnerTicker.start();
         moveBlocksTicker.start();
         intervalId =  setInterval(createBlock, blockInterval);
         isGameStarted = true; // Spielstatus auf gestartet setzen
@@ -337,41 +332,6 @@ function gameLoop(players) {
         }
 
     });
-
-    players.forEach((player, playerIndex) => {
-        blocks.forEach(block => {
-            if (kollisionstest(player, block)) {
-                console.log("Kollision erkannt zwischen Spieler und Block!");
-                app.stage.removeChild(player);
-                player.kollidiert = true;
-            }
-        });
-    });
-
-
-    // Entfernen kollidierter Spieler und Gewinnerermittlung
-    const aktiveSpieler = players.filter(player => !player.kollidiert);
-    aktiveSpielerAnzahl = aktiveSpieler.length;
-
-    // wenn nnur noch ein Spieler übrig ist, ist dieser der Gewinner
-    if (aktiveSpielerAnzahl === 1) {
-        const gewinner = aktiveSpieler[0];
-        const gewinnerText = new PIXI.Text('Der Sieger ist ' + gewinner.name, StandardTextStyle);
-        gewinnerText.style.fontSize = 80;
-        gewinnerText.x = app.view.width / 2;
-        gewinnerText.y = (app.view.height / 2) - 300;
-        gewinnerText.anchor.set(0.5);
-        app.stage.addChild(gewinnerText);
-        console.log("Der Gewinner ist: ", gewinner.name);
-
-        moveBlocksTicker.stop();
-        gameLoopTicker.stop();
-
-        // app.ticker.stop (() => {
-        //     moveBlocks();
-        //     // gameLoop(players);
-        // });
-    }
 }
 
 // Add a keydown event listener to the document
@@ -403,4 +363,39 @@ const moveBlocksTicker = new PIXI.Ticker();
             
 moveBlocksTicker.add(() => {
     moveBlocks();
+});
+
+const collisionAndWinnerTicker = new PIXI.Ticker();
+
+collisionAndWinnerTicker.add(() => {
+    // Collision test and player removal
+    players.forEach((player, playerIndex) => {
+        blocks.forEach(block => {
+            if (kollisionstest(player, block)) {
+                console.log("Kollision erkannt zwischen Spieler und Block!");
+                app.stage.removeChild(player);
+                player.kollidiert = true;
+            }
+        });
+    });
+
+    // Winner determination
+    const aktiveSpieler = players.filter(player => !player.kollidiert);
+    aktiveSpielerAnzahl = aktiveSpieler.length;
+
+    // If only one player is left, they are the winner
+    if (aktiveSpielerAnzahl === 1) {
+        const gewinner = aktiveSpieler[0];
+        const gewinnerText = new PIXI.Text('Der Sieger ist ' + gewinner.name, StandardTextStyle);
+        gewinnerText.style.fontSize = 80;
+        gewinnerText.x = app.view.width / 2;
+        gewinnerText.y = (app.view.height / 2) - 300;
+        gewinnerText.anchor.set(0.5);
+        app.stage.addChild(gewinnerText);
+        console.log("Der Gewinner ist: ", gewinner.name);
+
+        moveBlocksTicker.stop();
+        gameLoopTicker.stop();
+        collisionAndWinnerTicker.stop();
+    }
 });
