@@ -108,6 +108,8 @@ const StandardTextStyle = new PIXI.TextStyle({
     wordWrapWidth: 440 // Breite, bei der der Text umgebrochen wird
 });
 
+const StandardTextStyle2 = StandardTextStyle.clone();
+
 function createNeustartText() {
     const neustartText = new PIXI.Text('Drücken Sie die Entertaste, um neu zu starten', StandardTextStyle);
     neustartText.x = app.view.width / 2;
@@ -134,10 +136,10 @@ let blockInterval = 500; // Intervall, in dem neue Blöcke erzeugt werden (in Mi
 
 let hearts = []; // Array für die Herzen
 
-function removeBlocks(blocks) {
-    for (let i = blocks.length - 1; i >= 0; i--) {
-        const block = blocks[i];
-        app.stage.removeChild(block);
+function removeObjects(objects) {
+    for (let i = objects.length - 1; i >= 0; i--) {
+        const object = objects[i];
+        app.stage.removeChild(object);
     }
 }
 
@@ -153,6 +155,7 @@ function initiatePlayers(game, players) {
                 player.anchor.set(0);
                 player.x = game.Xpositionen[index];              
                 player.y = appHeight / 1.2;
+                player.score = 0;
                 app.stage.addChild(player);
                 players.push(player);
             }
@@ -177,6 +180,12 @@ var host = location.origin.replace(/^http/, 'ws')
 var websocket = new WebSocket(host);
 
 let qrSprite;
+
+// Create a new PIXI.Text object
+let scoreText = new PIXI.Text('', StandardTextStyle2);
+scoreText.style.fontSize = 24;
+scoreText.x = 10;
+scoreText.y = 10;
 
 //Nachrichten des Servers verarbeiten
 websocket.onmessage = message => {
@@ -231,6 +240,8 @@ websocket.onmessage = message => {
     if (response.method === "join") {
         const game = response.game;
         initiatePlayers(game, players);
+        // Add the text to the stage
+        app.stage.addChild(scoreText);
         gameLoopTicker.start();
     };
 
@@ -269,7 +280,8 @@ websocket.onmessage = message => {
         const game = response.game;
         console.log("Spiel wird neugestartet");
         // Alle Blöcke entfernen
-        removeBlocks(blocks);
+        removeObjects(blocks);
+        removeObjects(hearts);
         blockSpeed = 1;
         blockInterval = 500;
         blocks=[];
@@ -299,7 +311,8 @@ websocket.onmessage = message => {
     };
 };
 
-let intervalId; // Store the interval ID
+let intervalIdBlocks; // Store the interval ID
+let intervalIdHearts; // Store the interval ID
 
 // Tastatur input 
 document.addEventListener("keydown", handleEntertaste);
@@ -313,11 +326,13 @@ function handleEntertaste(event) {
         app.stage.removeChild(basicText2);
         basicText2.updateText();
         blocks=[];
-        clearInterval(intervalId);
+        hearts=[];
+        clearInterval(intervalIdBlocks);
+        clearInterval(intervalIdHearts);
         collisionAndWinnerTicker.start();
         moveBlocksTicker.start();
-        intervalId =  setInterval(createBlock, blockInterval);
-        intervalId =  setInterval(createHearts, blockInterval * 5);
+        intervalIdBlocks =  setInterval(createBlock, blockInterval);
+        intervalIdHearts =  setInterval(createHearts, blockInterval * 5);
         isGameStarted = true; // Spielstatus auf gestartet setzen
     }
 }
@@ -389,6 +404,8 @@ function gameLoop(players) {
     players.forEach((player, index) => {
         player.x = Xpositionen[index + 1];
     });
+    scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.score}`).join('\n');
+    app.stage.setChildIndex(scoreText, app.stage.children.length - 1);
 }
 
 // Add a keydown event listener to the document
@@ -440,7 +457,7 @@ collisionAndWinnerTicker.add(() => {
     hearts.forEach((heart, heartIndex) => {
         players.forEach(player => {
             if (kollisionstest(player, heart)) {
-                console.log("Collision detected between player and heart!");
+                player.score += 1;
                 app.stage.removeChild(heart);
                 const index = hearts.indexOf(heart);
                 if (index !== -1) {

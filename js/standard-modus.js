@@ -17,6 +17,11 @@ window.onload = function () {
 
     appWidth = app.view.width;
     appHeight = app.view.height;
+    console.log("App width: ", appWidth);
+
+    // Grid erstellen 
+    const playerWidth = 48;
+    const gridWidth = appWidth / playerWidth;
 
     // Get the URL parameters
     urlParams = new URLSearchParams(window.location.search);
@@ -81,11 +86,10 @@ window.onload = function () {
     });
 
     // Add the mute icon to the stage
-    app.stage.addChild(muteIcon);   
+    app.stage.addChild(muteIcon); 
 
     createNeustartText();
     };
-
 
 // Textstyle für die PixiJs Texte festlegen
 const StandardTextStyle = new PIXI.TextStyle({
@@ -103,6 +107,8 @@ const StandardTextStyle = new PIXI.TextStyle({
     wordWrap: false, //Textumbruch
     wordWrapWidth: 440 // Breite, bei der der Text umgebrochen wird
 });
+
+const StandardTextStyle2 = StandardTextStyle.clone();
 
 function createNeustartText() {
     const neustartText = new PIXI.Text('Drücken Sie die Entertaste, um neu zu starten', StandardTextStyle);
@@ -128,10 +134,12 @@ let blocks = []; // Array für die Blöcke oder hindernisse
 let blockSpeed = 1; // Anfangsgeschwindigkeit der Blöcke
 let blockInterval = 500; // Intervall, in dem neue Blöcke erzeugt werden (in Millisekunden)
 
-function removeBlocks(blocks) {
-    for (let i = blocks.length - 1; i >= 0; i--) {
-        const block = blocks[i];
-        app.stage.removeChild(block);
+let hearts = []; // Array für die Herzen
+
+function removeObjects(objects) {
+    for (let i = objects.length - 1; i >= 0; i--) {
+        const object = objects[i];
+        app.stage.removeChild(object);
     }
 }
 
@@ -139,7 +147,6 @@ function initiatePlayers(game, players) {
     game.clients.forEach((client, index) => {
         if (index != 0) {
             const spielerName = client.playerName;
-            console.log("Spielername: ", spielerName);
             let player = app.stage.children.find(c => c.name === spielerName);
 
             if (!player) {
@@ -148,6 +155,7 @@ function initiatePlayers(game, players) {
                 player.anchor.set(0);
                 player.x = game.Xpositionen[index];              
                 player.y = appHeight / 1.2;
+                player.score = 0;
                 app.stage.addChild(player);
                 players.push(player);
             }
@@ -172,6 +180,12 @@ var host = location.origin.replace(/^http/, 'ws')
 var websocket = new WebSocket(host);
 
 let qrSprite;
+
+// Create a new PIXI.Text object
+let scoreText = new PIXI.Text('', StandardTextStyle2);
+scoreText.style.fontSize = 24;
+scoreText.x = 10;
+scoreText.y = 10;
 
 //Nachrichten des Servers verarbeiten
 websocket.onmessage = message => {
@@ -226,6 +240,8 @@ websocket.onmessage = message => {
     if (response.method === "join") {
         const game = response.game;
         initiatePlayers(game, players);
+        // Add the text to the stage
+        app.stage.addChild(scoreText);
         gameLoopTicker.start();
     };
 
@@ -264,7 +280,8 @@ websocket.onmessage = message => {
         const game = response.game;
         console.log("Spiel wird neugestartet");
         // Alle Blöcke entfernen
-        removeBlocks(blocks);
+        removeObjects(blocks);
+        removeObjects(hearts);
         blockSpeed = 1;
         blockInterval = 500;
         blocks=[];
@@ -294,7 +311,8 @@ websocket.onmessage = message => {
     };
 };
 
-let intervalId; // Store the interval ID
+let intervalIdBlocks; // Store the interval ID
+let intervalIdHearts; // Store the interval ID
 
 // Tastatur input 
 document.addEventListener("keydown", handleEntertaste);
@@ -308,10 +326,13 @@ function handleEntertaste(event) {
         app.stage.removeChild(basicText2);
         basicText2.updateText();
         blocks=[];
-        clearInterval(intervalId);
+        hearts=[];
+        clearInterval(intervalIdBlocks);
+        clearInterval(intervalIdHearts);
         collisionAndWinnerTicker.start();
         moveBlocksTicker.start();
-        intervalId =  setInterval(createBlock, blockInterval);
+        intervalIdBlocks =  setInterval(createBlock, blockInterval);
+        intervalIdHearts =  setInterval(createHearts, blockInterval * 5);
         isGameStarted = true; // Spielstatus auf gestartet setzen
     }
 }
@@ -345,6 +366,29 @@ function moveBlocks() {
     blockSpeed += 0.005;
 }
 
+function createHearts() {
+    const heart = PIXI.Sprite.from(`/images/heart-block.png`);
+    heart.anchor.set(0.5);
+    heart.x = getRandomXPosition(); // Random X position for the heart
+    heart.y = -50; // Start position above the visible area
+    app.stage.addChild(heart);
+    hearts.push(heart);
+}
+
+function moveHearts() {
+    hearts.forEach(heart => {
+        heart.y += blockSpeed;
+        if (heart.y > app.view.height) {
+            // Heart is out of the visible area, remove it
+            app.stage.removeChild(heart);
+            const index = hearts.indexOf(heart);
+            if (index !== -1) {
+                hearts.splice(index, 1);
+            }
+        }
+    });
+}
+
 // Kolisionserkennungsfunktion gibt true oder false zurück
 function kollisionstest(player, block) {
     let playerBox = player.getBounds();
@@ -360,6 +404,8 @@ function gameLoop(players) {
     players.forEach((player, index) => {
         player.x = Xpositionen[index + 1];
     });
+    scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.score}`).join('\n');
+    app.stage.setChildIndex(scoreText, app.stage.children.length - 1);
 }
 
 // Add a keydown event listener to the document
@@ -391,6 +437,7 @@ const moveBlocksTicker = new PIXI.Ticker();
             
 moveBlocksTicker.add(() => {
     moveBlocks();
+    moveHearts();
 });
 
 const collisionAndWinnerTicker = new PIXI.Ticker();
@@ -403,6 +450,19 @@ collisionAndWinnerTicker.add(() => {
                 console.log("Kollision erkannt zwischen Spieler und Block!");
                 app.stage.removeChild(player);
                 player.kollidiert = true;
+            }
+        });
+    });
+
+    hearts.forEach((heart, heartIndex) => {
+        players.forEach(player => {
+            if (kollisionstest(player, heart)) {
+                player.score += 1;
+                app.stage.removeChild(heart);
+                const index = hearts.indexOf(heart);
+                if (index !== -1) {
+                    hearts.splice(index, 1);
+                }
             }
         });
     });
