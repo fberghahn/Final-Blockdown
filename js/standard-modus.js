@@ -19,10 +19,6 @@ window.onload = function () {
     appHeight = app.view.height;
     console.log("App width: ", appWidth);
 
-    // Grid erstellen 
-    const playerWidth = 48;
-    const gridWidth = appWidth / playerWidth;
-
     // Get the URL parameters
     urlParams = new URLSearchParams(window.location.search);
     const backgroundImage = urlParams.get('background');
@@ -46,10 +42,24 @@ window.onload = function () {
     bg.x = appWidth / 2;
     bg.y = appHeight / 2;
 
+    // Create a new audio element using createElement
+    let audioElement = document.createElement("audio");
+
+    // Set the source, type, and other attributes
+    let sourceElement = document.createElement("source");
+    sourceElement.src = "/soundFiles/Powerful-Trap-(chosic.com).mp3";
+    sourceElement.type = "audio/mp3";
+
+    audioElement.appendChild(sourceElement);
+    audioElement.id = "audio";
+    audioElement.loop = true;
+    audioElement.muted = true;
+    audioElement.preload = "auto";
+
+    // Append the audio element to the body (or any other container element)
+    document.body.appendChild(audioElement);
     // Load the mute icon
     let muteIcon = PIXI.Sprite.from('/images/mute-icon.png');
-    // Get the audio element
-    let audioElement = document.getElementById("audio");
 
     // Set the position of the mute icon
     muteIcon.x = appWidth - 100; // Adjust as needed
@@ -62,17 +72,21 @@ window.onload = function () {
 
     // Add a click event handler
     muteIcon.on('pointerdown', () => {
-
-        // Toggle mute
+        // Toggle mute state
         audioElement.muted = !audioElement.muted;
+    
+        // Explicitly attempt to play the audio
+        if (!audioElement.muted) {
+            audioElement.play()
+        }
     });
 
     // Add the mute icon to the stage
-    app.stage.addChild(muteIcon);
-
+    app.stage.addChild(muteIcon);   
 
     createNeustartText();
     };
+
 
 // Textstyle für die PixiJs Texte festlegen
 const StandardTextStyle = new PIXI.TextStyle({
@@ -288,7 +302,6 @@ document.addEventListener("keydown", handleEntertaste);
 function handleEntertaste(event) {
     // Get the current player count
     const currentPlayerCount = players.length;
-    console.log("Current player count: ", currentPlayerCount);
 
     // Wenn Enter gedrückt wird und die gewünschte Spieleranzahl erreicht ist, soll das Spiel starten
     if ((event.keyCode === 13 || event.key === " ") && currentPlayerCount === Number(spielerAnzahl) && !isGameStarted) {

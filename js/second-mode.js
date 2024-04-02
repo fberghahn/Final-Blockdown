@@ -46,10 +46,24 @@ window.onload = function () {
     bg.x = appWidth / 2;
     bg.y = appHeight / 2;
 
+    // Create a new audio element using createElement
+    let audioElement = document.createElement("audio");
+
+    // Set the source, type, and other attributes
+    let sourceElement = document.createElement("source");
+    sourceElement.src = "/soundFiles/Powerful-Trap-(chosic.com).mp3";
+    sourceElement.type = "audio/mp3";
+
+    audioElement.appendChild(sourceElement);
+    audioElement.id = "audio";
+    audioElement.loop = true;
+    audioElement.muted = true;
+    audioElement.preload = "auto";
+
+    // Append the audio element to the body (or any other container element)
+    document.body.appendChild(audioElement);
     // Load the mute icon
     let muteIcon = PIXI.Sprite.from('/images/mute-icon.png');
-    // Get the audio element
-    let audioElement = document.getElementById("audio");
 
     // Set the position of the mute icon
     muteIcon.x = appWidth - 100; // Adjust as needed
@@ -62,13 +76,17 @@ window.onload = function () {
 
     // Add a click event handler
     muteIcon.on('pointerdown', () => {
-
-        // Toggle mute
+        // Toggle mute state
         audioElement.muted = !audioElement.muted;
+    
+        // Explicitly attempt to play the audio
+        if (!audioElement.muted) {
+            audioElement.play()
+        }
     });
 
     // Add the mute icon to the stage
-    app.stage.addChild(muteIcon);
+    app.stage.addChild(muteIcon); 
 
     createNeustartText();
     };
@@ -113,6 +131,8 @@ let aktiveSpielerAnzahl = null;
 let blocks = []; // Array für die Blöcke oder hindernisse 
 let blockSpeed = 1; // Anfangsgeschwindigkeit der Blöcke
 let blockInterval = 500; // Intervall, in dem neue Blöcke erzeugt werden (in Millisekunden)
+
+let hearts = []; // Array für die Herzen
 
 function removeBlocks(blocks) {
     for (let i = blocks.length - 1; i >= 0; i--) {
@@ -287,7 +307,6 @@ document.addEventListener("keydown", handleEntertaste);
 function handleEntertaste(event) {
     // Get the current player count
     const currentPlayerCount = players.length;
-    console.log("Current player count: ", currentPlayerCount);
 
     // Wenn Enter gedrückt wird und die gewünschte Spieleranzahl erreicht ist, soll das Spiel starten
     if ((event.keyCode === 13 || event.key === " ") && currentPlayerCount === Number(spielerAnzahl) && !isGameStarted) {
@@ -299,6 +318,7 @@ function handleEntertaste(event) {
         collisionAndWinnerTicker.start();
         moveBlocksTicker.start();
         intervalId =  setInterval(createBlock, blockInterval);
+        intervalId =  setInterval(createHearts, blockInterval * 5);
         isGameStarted = true; // Spielstatus auf gestartet setzen
     }
 }
@@ -330,6 +350,29 @@ function moveBlocks() {
     });
     // Blockgeschwindigkeit erhöhen
     blockSpeed += 0.005;
+}
+
+function createHearts() {
+    const heart = PIXI.Sprite.from(`/images/heart-block.png`);
+    heart.anchor.set(0.5);
+    heart.x = getRandomXPosition(); // Random X position for the heart
+    heart.y = -50; // Start position above the visible area
+    app.stage.addChild(heart);
+    hearts.push(heart);
+}
+
+function moveHearts() {
+    hearts.forEach(heart => {
+        heart.y += blockSpeed;
+        if (heart.y > app.view.height) {
+            // Heart is out of the visible area, remove it
+            app.stage.removeChild(heart);
+            const index = hearts.indexOf(heart);
+            if (index !== -1) {
+                hearts.splice(index, 1);
+            }
+        }
+    });
 }
 
 // Kolisionserkennungsfunktion gibt true oder false zurück
@@ -378,6 +421,7 @@ const moveBlocksTicker = new PIXI.Ticker();
             
 moveBlocksTicker.add(() => {
     moveBlocks();
+    moveHearts();
 });
 
 const collisionAndWinnerTicker = new PIXI.Ticker();
