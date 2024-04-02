@@ -139,7 +139,8 @@ function removeBlocks(blocks) {
 function initiatePlayers(game, players) {
     game.clients.forEach((client, index) => {
         if (index != 0) {
-            const spielerName = "Spieler " + index;
+            const spielerName = client.playerName;
+            console.log("Spielername: ", spielerName);
             let player = app.stage.children.find(c => c.name === spielerName);
 
             if (!player) {

@@ -12,6 +12,8 @@
     <div id='vorherDiv' class="zentrieren-container">
         <div class="card">
             <p class="lobbyText">Sie sind mit der Spielelobby verbunden, über den Button treten Sie bei</p>
+            <input type="text" id="PlayerName" placeholder="Namen eingeben">
+            <p id="error" style="color: red;"></p>
             <!-- <button id='btnJoin' class="btn">Spiel beitreten</button> -->
             <span id="start-btn" class='start-btn'>START </span>
         </div>
@@ -37,6 +39,15 @@
         const divBoard = document.getElementById("divBoard");
         const vorherDiv = document.getElementById("vorherDiv");
         const startBtn = document.getElementById("start-btn");
+        let playerNameInput = document.getElementById("PlayerName");
+        let errorElement = document.getElementById("error");
+
+        let playerName = playerNameInput.value;
+        // Get the player's name from the text input
+        playerNameInput.addEventListener('input', function() {
+            playerName = this.value;
+        });
+
 
         // gameid über URL Parameter abrufen
         const urlParams = new URLSearchParams(queryString);
@@ -45,15 +56,20 @@
         //Button um der Gamelobby Beitreten Button
 
         startBtn.addEventListener("click", e => {
+        if (playerName.trim() === "") {
+            // Display error message
+            errorElement.textContent = "Please enter a player name.";
+        } else {
             const payload = {
                 "method": "join",
                 "clientId": clientId,
-                "gameId": gameId
+                "gameId": gameId,
+                "playerName": playerName
             }
             ws.send(JSON.stringify(payload));
             vorherDiv.style.display = "none";
-        })
-
+            }
+        });
         ws.onmessage = message => {
             // message.data
             const response = JSON.parse(message.data);

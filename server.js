@@ -64,6 +64,7 @@ wss.on("request", request =>{
             const clientId= result.clientId;
             const gameId = result.gameId;
             const game = games[gameId];
+            const playerName = result.playerName;
             if (game.clients.length >= 5) 
             {
                 //Maximale Spieleranzahl erreicht
@@ -75,7 +76,8 @@ wss.on("request", request =>{
             game.clients.push({
                 "clientId" :clientId,
                 "color" : color,
-                "index" : index
+                "index" : index,
+                "playerName": playerName
             })
             const payLoad = {
                 "method": "join",
