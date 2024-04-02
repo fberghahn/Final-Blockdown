@@ -17,7 +17,6 @@ window.onload = function () {
 
     appWidth = app.view.width;
     appHeight = app.view.height;
-    console.log("App width: ", appWidth);
 
     // Get the URL parameters
     urlParams = new URLSearchParams(window.location.search);
@@ -183,7 +182,6 @@ websocket.onmessage = message => {
     // connection -> GameId vom Websocketserver erhalten
     if (response.method === "connect") {
         clientId = response.clientId;
-        console.log("Client ID erhalten: " + clientId);
         const payload = {
             "method": "create",
             "clientId": clientId,

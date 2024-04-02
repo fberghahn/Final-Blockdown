@@ -64,11 +64,15 @@ wss.on("request", request =>{
             const clientId= result.clientId;
             const gameId = result.gameId;
             const game = games[gameId];
-            const playerName = result.playerName;
+            let playerName = result.playerName;
             if (game.clients.length >= 5) 
             {
                 //Maximale Spieleranzahl erreicht
                 return;
+            }
+            // Spielername eindeutig machen
+            if (game.clients.some(client => client.playerName === playerName)) {
+                playerName += "(1)";
             }
             // Farben den spieler beim beitreten zuweisen, 0 ist immer der PC/Host
             const index = game.clients.length;

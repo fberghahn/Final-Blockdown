@@ -187,7 +187,6 @@ websocket.onmessage = message => {
     // connection -> GameId vom Websocketserver erhalten
     if (response.method === "connect") {
         clientId = response.clientId;
-        console.log("Client ID erhalten: " + clientId);
         const payload = {
             "method": "create",
             "clientId": clientId,
@@ -434,6 +433,19 @@ collisionAndWinnerTicker.add(() => {
                 console.log("Kollision erkannt zwischen Spieler und Block!");
                 app.stage.removeChild(player);
                 player.kollidiert = true;
+            }
+        });
+    });
+
+    hearts.forEach((heart, heartIndex) => {
+        players.forEach(player => {
+            if (kollisionstest(player, heart)) {
+                console.log("Collision detected between player and heart!");
+                app.stage.removeChild(heart);
+                const index = hearts.indexOf(heart);
+                if (index !== -1) {
+                    hearts.splice(index, 1);
+                }
             }
         });
     });
