@@ -19,9 +19,9 @@ createLobbyButton.addEventListener('click', function () {
 
     // Redirect based on the selected modus
     if (selectedModus === 'modus1') {
-        window.location.href = '/gamePage.html?' + params.toString();
+        window.location.href = '/gamePages/firstGamePage.html?' + params.toString();
     } else if (selectedModus === 'modus2') {
-        window.location.href = '/unterseite2?' + params.toString();
+        window.location.href = '/gamePages/secondGamePage.html?' + params.toString();
     } else {
         console.log('Bitte wählen Sie einen Modus aus.');
     }
