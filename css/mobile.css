@@ -1,3 +1,9 @@
+:root {
+    --primary: 78, 137, 176, 1;
+    --secondary: 115, 192, 85, 1;
+  }
+
+
 .zentrieren-container {
     display: flex;
     justify-content: center;
@@ -12,7 +18,7 @@
     border-radius: 5px; 
     padding: 20px 40px 20px 40px;
     background-color: #fff;
-    opacity: 0.9;
+    /* opacity: 0.9; */
     margin-top:5vh;
 }
 
@@ -63,7 +69,8 @@ body {
 .playBtns {
     width: 30vh;
     height: 30vh;
-    opacity: 0.9;
+    /* opacity: 0.9; */
+    touch-action: manipulation;
 }
 
 .form__group {
@@ -85,7 +92,7 @@ body {
     border-bottom: 2px solid gray;
     outline: 0;
     font-size: 1.3rem;
-    color: rgb(17, 17, 17);
+    color: var(--primary);
     padding: 7px 0;
     background: transparent;
     transition: border-color 0.2s;
@@ -115,7 +122,7 @@ body {
     padding-bottom: 6px;
     font-weight: 700;
     border-width: 3px;
-    border-image: linear-gradient(to right, primary, secondary);
+    border-image: linear-gradient(90deg, rgba(var(--secondary)) 0%, rgba(var(--primary)) 100%);
     border-image-slice: 1;
 }
 
