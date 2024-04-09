@@ -1,5 +1,10 @@
 // Standard Modus des Spiels
 
+
+// Modul Imports
+import { createObject, moveObjects, removeObjects, kollisionstest, initiatePlayers } from './gameUtils.js';
+import { StandardTextStyle, StandardTextStyle2 } from './pixiTextStyles.js';
+
 // PixiJS-App erstellen
 let app;
 let neustartText;
@@ -18,10 +23,6 @@ window.onload = function () {
     appWidth = app.view.width;
     appHeight = app.view.height;
     console.log("App width: ", appWidth);
-
-    // Grid erstellen 
-    const playerWidth = 48;
-    const gridWidth = appWidth / playerWidth;
 
     // Get the URL parameters
     urlParams = new URLSearchParams(window.location.search);
@@ -91,24 +92,7 @@ window.onload = function () {
     createNeustartText();
     };
 
-// Textstyle für die PixiJs Texte festlegen
-const StandardTextStyle = new PIXI.TextStyle({
-    fontFamily: 'Arial', //Schriftart 
-    fontSize: 36, // Größe
-    fontWeight: 'bold', 
-    fill: ['#ffffff', '#ff9999'], // Gradient von Weiß zu einem hellen Rot
-    stroke: '#4a1850', // Dunkle Umrandung für besseren Kontrast
-    strokeThickness: 5, // Dicke der Umrandung
-    dropShadow: true, // Schatten für einen 3D-Effekt
-    dropShadowColor: '#000000', // Schattenfarbe
-    dropShadowBlur: 4, // Weichheit des Schattens
-    dropShadowAngle: Math.PI / 6, // Winkel des Schattens
-    dropShadowDistance: 6, // Abstand des Schattens
-    wordWrap: false, //Textumbruch
-    wordWrapWidth: 440 // Breite, bei der der Text umgebrochen wird
-});
 
-const StandardTextStyle2 = StandardTextStyle.clone();
 
 function createNeustartText() {
     const neustartText = new PIXI.Text('Drücken Sie die Entertaste, um neu zu starten', StandardTextStyle);
@@ -124,46 +108,38 @@ qrcanvas.style.display = "none";
 // Spieler und Blöcke erstellen
 let players = []; // Spieler array
 
-
 // Get the spieleranzahl parameter
 urlParams = new URLSearchParams(window.location.search);
 const spielerAnzahl = urlParams.get('spieleranzahl');
 
 let aktiveSpielerAnzahl = null;
-let blocks = []; // Array für die Blöcke oder hindernisse 
-let blockSpeed = 1; // Anfangsgeschwindigkeit der Blöcke
+let blocks = []; // Array für die Blöcke oder hindernisse
+export let blockSpeed = 1; // Anfangsgeschwindigkeit der Blöcke
 let blockInterval = 500; // Intervall, in dem neue Blöcke erzeugt werden (in Millisekunden)
 
 let hearts = []; // Array für die Herzen
 
-function removeObjects(objects) {
-    for (let i = objects.length - 1; i >= 0; i--) {
-        const object = objects[i];
-        app.stage.removeChild(object);
-    }
-}
+// function initiatePlayers(game, players) {
+//     game.clients.forEach((client, index) => {
+//         if (index != 0) {
+//             const spielerName = client.playerName;
+//             let player = app.stage.children.find(c => c.name === spielerName);
 
-function initiatePlayers(game, players) {
-    game.clients.forEach((client, index) => {
-        if (index != 0) {
-            const spielerName = client.playerName;
-            let player = app.stage.children.find(c => c.name === spielerName);
-
-            if (!player) {
-                player = PIXI.Sprite.from(`/images/player${index}.png`);
-                player.name = spielerName;
-                player.anchor.set(0);
-                player.x = game.Xpositionen[index];              
-                player.y = appHeight / 1.2;
-                player.score = 0;
-                app.stage.addChild(player);
-                players.push(player);
-            }
-        }
-    });
-    // Here the number of active players is set, important for determining the winner
-    aktiveSpielerAnzahl = players.length;
-}
+//             if (!player) {
+//                 player = PIXI.Sprite.from(`/images/player${index}.png`);
+//                 player.name = spielerName;
+//                 player.anchor.set(0);
+//                 player.x = game.Xpositionen[index];              
+//                 player.y = app.view.height / 1.2;
+//                 player.score = 0;
+//                 app.stage.addChild(player);
+//                 players.push(player);
+//             }
+//         }
+//     });
+//     // Here the number of active players is set, important for determining the winner
+//     aktiveSpielerAnzahl = players.length;
+// }
 
 
 // Websocketverbindung zum Server herstellen
@@ -239,7 +215,8 @@ websocket.onmessage = message => {
     // wenn spieler beitreten 
     if (response.method === "join") {
         const game = response.game;
-        initiatePlayers(game, players);
+        // initiatePlayers(game, players);
+        aktiveSpielerAnzahl = initiatePlayers(game, app, players);
         // Add the text to the stage
         app.stage.addChild(scoreText);
         gameLoopTicker.start();
@@ -280,8 +257,8 @@ websocket.onmessage = message => {
         const game = response.game;
         console.log("Spiel wird neugestartet");
         // Alle Blöcke entfernen
-        removeObjects(blocks);
-        removeObjects(hearts);
+        removeObjects(blocks, app);
+        removeObjects(hearts, app);
         blockSpeed = 1;
         blockInterval = 500;
         blocks=[];
@@ -302,9 +279,8 @@ websocket.onmessage = message => {
             }
         }
         app.stage.removeChild(neustartText);
-        // app.stage.addChild(basicText2);
-        // basicText2.updateText();
-        initiatePlayers(game, players);
+        // Spieler neu initialisieren und aktive Spieleranzahl setzen
+        aktiveSpielerAnzahl = initiatePlayers(game, app, players);
         // Spielstatus zurücksetzen
         isGameStarted = false;
         gameLoopTicker.start();
@@ -331,72 +307,14 @@ function handleEntertaste(event) {
         clearInterval(intervalIdHearts);
         collisionAndWinnerTicker.start();
         moveBlocksTicker.start();
-        intervalIdBlocks =  setInterval(createBlock, blockInterval);
-        intervalIdHearts =  setInterval(createHearts, blockInterval * 5);
+        intervalIdBlocks = setInterval(function() {
+            createObject(`/images/block.png`, blocks, app);
+        }, blockInterval);
+        intervalIdHearts = setInterval(function() {
+            createObject(`/images/heart-block.png`, hearts, app);
+        }, blockInterval * 5);
         isGameStarted = true; // Spielstatus auf gestartet setzen
     }
-}
-
-// Hier wird eine random position innerhalb des app views auf der xachse erzeugt
-function getRandomXPosition() {
-    return Math.random() * app.view.width;
-}
-// 
-function createBlock() {
-const block = PIXI.Sprite.from(`/images/block.png`);
-block.anchor.set(0.5);
-block.x = getRandomXPosition(); // Zufällige X-Position für den Block
-block.y = -50; // Startposition oben außerhalb des Sichtbereichs
-app.stage.addChild(block);
-blocks.push(block);
-}
-function moveBlocks() {
-    blocks.forEach(block => {
-        block.y += blockSpeed;
-        if (block.y > app.view.height) {
-            // Block außerhalb des Sichtbereichs, entfernen
-            app.stage.removeChild(block);
-            const index = blocks.indexOf(block);
-            if (index !== -1) {
-                blocks.splice(index, 1);
-            }
-        }
-    });
-    // Blockgeschwindigkeit erhöhen
-    blockSpeed += 0.005;
-}
-
-function createHearts() {
-    const heart = PIXI.Sprite.from(`/images/heart-block.png`);
-    heart.anchor.set(0.5);
-    heart.x = getRandomXPosition(); // Random X position for the heart
-    heart.y = -50; // Start position above the visible area
-    app.stage.addChild(heart);
-    hearts.push(heart);
-}
-
-function moveHearts() {
-    hearts.forEach(heart => {
-        heart.y += blockSpeed;
-        if (heart.y > app.view.height) {
-            // Heart is out of the visible area, remove it
-            app.stage.removeChild(heart);
-            const index = hearts.indexOf(heart);
-            if (index !== -1) {
-                hearts.splice(index, 1);
-            }
-        }
-    });
-}
-
-// Kolisionserkennungsfunktion gibt true oder false zurück
-function kollisionstest(player, block) {
-    let playerBox = player.getBounds();
-    let blockBox = block.getBounds();
-        return playerBox.x + playerBox.width > blockBox.x &&
-                playerBox.x < blockBox.x + blockBox.width &&
-                playerBox.y + playerBox.height > blockBox.y &&
-                playerBox.y < blockBox.y + blockBox.height;
 }
 
 // Game Loop Funktion in der die Spielerpositionen aktualisiert werden, wird dem Ticker hinzugefügt und gestartet sobald der erste Spieler beitritt
@@ -436,8 +354,9 @@ gameLoopTicker.add(() => {
 const moveBlocksTicker = new PIXI.Ticker();
             
 moveBlocksTicker.add(() => {
-    moveBlocks();
-    moveHearts();
+    // Den Blockspeed hier auf diese Weise setzen, damit die Funktion aus der gameUtils.js den Wert zurückgeben kann und er hier verwendet wird
+    moveObjects(blocks, app, blockSpeed );
+    blockSpeed = moveObjects(hearts, app, blockSpeed );
 });
 
 const collisionAndWinnerTicker = new PIXI.Ticker();
