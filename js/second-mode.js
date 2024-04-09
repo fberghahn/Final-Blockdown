@@ -329,22 +329,16 @@ function gameLoop(players) {
 // Add a keydown event listener to the document
 document.addEventListener('keydown', function(event) {
     if (event.key === 'N' || event.key === 'n') {
-        resetGame();
+        const payLoad = {
+            "method": "reset",
+            "gameId": gameId,
+            "appWidth": appWidth
+        }
+        websocket.send(JSON.stringify(payLoad));
     }
 });
 
-// Create a function for the button's functionality
-function resetGame() {
-    console.log('Button clicked!');
-    const payLoad = {
-        "method": "reset",
-        "gameId": gameId,
-        "appWidth": appWidth
-    }
-    websocket.send(JSON.stringify(payLoad));
-    // removeBlocks(blocks);
-}
-
+// Ticker zur Spielerbewegung, getrennt von der Bewegung der anderen Objekte, da Spieler sich vorm Satrt schon bewegen können
 const gameLoopTicker = new PIXI.Ticker();
             
 gameLoopTicker.add(() => {
