@@ -12,6 +12,7 @@ let appWidth;
 let appHeight;
 let basicText;
 let basicText2;
+let gewinnerText;
 let urlParams;
 window.onload = function () {
 
@@ -118,29 +119,6 @@ export let blockSpeed = 1; // Anfangsgeschwindigkeit der Blöcke
 let blockInterval = 500; // Intervall, in dem neue Blöcke erzeugt werden (in Millisekunden)
 
 let hearts = []; // Array für die Herzen
-
-// function initiatePlayers(game, players) {
-//     game.clients.forEach((client, index) => {
-//         if (index != 0) {
-//             const spielerName = client.playerName;
-//             let player = app.stage.children.find(c => c.name === spielerName);
-
-//             if (!player) {
-//                 player = PIXI.Sprite.from(`/images/player${index}.png`);
-//                 player.name = spielerName;
-//                 player.anchor.set(0);
-//                 player.x = game.Xpositionen[index];              
-//                 player.y = app.view.height / 1.2;
-//                 player.score = 0;
-//                 app.stage.addChild(player);
-//                 players.push(player);
-//             }
-//         }
-//     });
-//     // Here the number of active players is set, important for determining the winner
-//     aktiveSpielerAnzahl = players.length;
-// }
-
 
 // Websocketverbindung zum Server herstellen
 let clientId = null;
@@ -267,22 +245,11 @@ websocket.onmessage = message => {
             app.stage.removeChild(player);
         });
         players = [];
-
-        // get the winner text and remove it, done with for() because the name of the winner cant be defined beforehand
-        for (let i = app.stage.children.length - 1; i >= 0; i--) {
-            const child = app.stage.children[i];
-            // Check if the child's text starts with 'Der Sieger ist'
-            if (child.text && child.text.startsWith('Der Sieger ist')) {
-                const gewinnerText = child;
-                app.stage.removeChild(gewinnerText);
-                break; // Exit the loop once the text is found and removed
-            }
-        }
+        app.stage.removeChild(gewinnerText);
         app.stage.removeChild(neustartText);
         // Spieler neu initialisieren und aktive Spieleranzahl setzen
         aktiveSpielerAnzahl = initiatePlayers(game, app, players);
         // Spielstatus zurücksetzen
-        isGameStarted = false;
         gameLoopTicker.start();
     };
 };
@@ -328,7 +295,7 @@ function gameLoop(players) {
 
 // Add a keydown event listener to the document
 document.addEventListener('keydown', function(event) {
-    if (event.key === 'N' || event.key === 'n') {
+    if ((event.key === 'N' || event.key === 'n') && !isGameStarted) {
         const payLoad = {
             "method": "reset",
             "gameId": gameId,
@@ -387,7 +354,7 @@ collisionAndWinnerTicker.add(() => {
     // If only one player is left, they are the winner
     if (aktiveSpielerAnzahl === 1) {
         const gewinner = aktiveSpieler[0];
-        const gewinnerText = new PIXI.Text('Der Sieger ist ' + gewinner.name, StandardTextStyle);
+        gewinnerText = new PIXI.Text('Der Sieger ist ' + gewinner.name, StandardTextStyle);
         gewinnerText.style.fontSize = 80;
         gewinnerText.x = app.view.width / 2;
         gewinnerText.y = (app.view.height / 2) - 300;
@@ -398,5 +365,6 @@ collisionAndWinnerTicker.add(() => {
         moveBlocksTicker.stop();
         gameLoopTicker.stop();
         collisionAndWinnerTicker.stop();
+        isGameStarted = false;
     }
 });
