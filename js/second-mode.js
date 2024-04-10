@@ -38,7 +38,7 @@ window.onload = function () {
         bg = PIXI.Sprite.from(`/images/background-img.png`);
     }
     else if (backgroundImage === "3") {
-        bg = PIXI.Sprite.from(`/images/background-city.png`);
+        bg = PIXI.Sprite.from(`/images/hintergrund-img2.png`);
     }
     bg.width = appWidth;
     bg.height = appHeight;
@@ -351,8 +351,8 @@ collisionAndWinnerTicker.add(() => {
     const aktiveSpieler = players.filter(player => !player.kollidiert);
     aktiveSpielerAnzahl = aktiveSpieler.length;
 
-    // If only one player is left, they are the winner
-    if (aktiveSpielerAnzahl === 0) {
+    // Spiel beenden, wenn keine Spieler mehr aktiv sind
+    if (aktiveSpielerAnzahl === 0 ) {
 
         const highestScore = Math.max(...players.map(player => player.score));
         const topPlayers = players.filter(player => player.score === highestScore);
@@ -360,7 +360,7 @@ collisionAndWinnerTicker.add(() => {
         if (topPlayers.length > 1) {
             gewinnerText = new PIXI.Text('Unentschieden', StandardTextStyle);
           } else {
-            gewinnerText = new PIXI.Text('Der Sieger der Herzen ist ' + topPlayers[0].name + '\n meinem Score von ' + topPlayers[0].score, StandardTextStyle);
+            gewinnerText = new PIXI.Text('Der Sieger der Herzen ist ' + topPlayers[0].name + '\n  mit einem Score von ' + topPlayers[0].score, StandardTextStyle);
         }
         gewinnerText.style.fontSize = 80;
         gewinnerText.x = app.view.width / 2;

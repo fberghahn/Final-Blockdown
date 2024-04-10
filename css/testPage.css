@@ -49,7 +49,7 @@ html, body, .page {
     -webkit-transform: translateX(-190%);
     -moz-transform: translateX(-190%)!important;
     -o-transform: translateX(-190%);
-    transition-delay: .1s !important;
+    /* transition-delay: .01s !important; */
   }
   
   #t2:target #p1, 
@@ -207,7 +207,7 @@ h2 {
   padding: 10px 20px;
   text-decoration: none;
   transition: background-color 0.3s ease;
-  border-radius: 12px; /* Fügt abgerundete Ecken hinzu */
+  border-radius: 12px; /* For rounded corners*/
 }
 
 .btn:hover {
@@ -226,7 +226,7 @@ h2 {
     -webkit-transform: translateX(0) !important;
     -moz-transform: translateX(0) !important;
     -o-transform: translateX(0) !important;
-    transition-delay: 1s;
+    transition-delay: 0.5s;
   }
 
   ul li {
