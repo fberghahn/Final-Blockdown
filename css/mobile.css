@@ -71,6 +71,7 @@ body {
     height: 30vh;
     /* opacity: 0.9; */
     touch-action: manipulation;
+    outline: none;
 }
 
 .form__group {
