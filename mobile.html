@@ -107,8 +107,8 @@
             divBoard.removeChild(divBoard.firstChild)
                 
             //Buttons for controlling player movement
-            const buttonleft = document.createElement("button");
-            buttonleft.className = "playBtns";
+            const buttonLeft = document.createElement("button");
+            buttonLeft.className = "playBtns";
 
             // Create an img element
             const arrowLeft = document.createElement("img");
@@ -117,11 +117,13 @@
             arrowLeft.style.height = "100%";
             arrowLeft.oncontextmenu = () => false; // Prevent copy image menu when held down
             arrowLeft.draggable = false; // Prevent dragging the image
+            
+            const pressDownSpeed = 300; // Adjust the speed as needed
 
             // Append the img to the button
-            buttonleft.appendChild(arrowLeft);
-            divBoard.appendChild(buttonleft);
-            buttonleft.addEventListener('touchstart', function(e) {
+            buttonLeft.appendChild(arrowLeft);
+            divBoard.appendChild(buttonLeft);
+            buttonLeft.addEventListener('touchstart', function(e) {
                 // Function to send payload
                 const sendPayload = () => {
                     const payload = {
@@ -132,19 +134,44 @@
                         "richtung": "links",
                     };
                     ws.send(JSON.stringify(payload));
-                    console.log(index);
                 };
             
                 // Call sendPayload immediately
                 sendPayload();
             
                 // Set an interval to keep sending payload while button is held down
-                const intervalId = setInterval(sendPayload, 100); // Adjust the 100ms rate as needed
+                const intervalId = setInterval(sendPayload, pressDownSpeed); // Adjust the 100ms rate as needed
             
                 // Add touchend event to stop sending on button release
-                buttonleft.addEventListener('touchend', function stopSending() {
+                buttonLeft.addEventListener('touchend', function stopSending() {
                     clearInterval(intervalId);
-                    buttonleft.removeEventListener('touchend', stopSending);
+                    buttonLeft.removeEventListener('touchend', stopSending);
+                });
+            });
+
+            buttonLeft.addEventListener('mousedown', function(e) {
+                // Function to send payload
+                const sendPayload = () => {
+                    const payload = {
+                        "method": "play",
+                        "clientId": clientId,
+                        "gameId": gameId,
+                        "index": index,
+                        "richtung": "links",
+                    };
+                    ws.send(JSON.stringify(payload));
+                };
+            
+                // Call sendPayload immediately
+                sendPayload();
+            
+                // Set an interval to keep sending payload while button is held down
+                const intervalId = setInterval(sendPayload, pressDownSpeed); // Adjust the 100ms rate as needed
+            
+                // Add touchend event to stop sending on button release
+                buttonLeft.addEventListener('mouseup', function stopSending() {
+                    clearInterval(intervalId);
+                    buttonLeft.removeEventListener('mouseup', stopSending);
                 });
             });
 
@@ -163,7 +190,54 @@
             // Append the img to the button
             buttonRight.appendChild(arrowRight);
             divBoard.appendChild(buttonRight);
+            let timeoutId = 0;
+
             buttonRight.addEventListener('touchstart', function(e) {
+                // Start a timeout
+                timeoutId = setTimeout(function() {
+                    // Code to execute when button is held down
+                    const sendPayload = () => {
+                        const payload = {
+                            "method": "play",
+                            "clientId": clientId,
+                            "gameId": gameId,
+                            "index": index,
+                            "richtung": "rechts",
+                        };
+                        ws.send(JSON.stringify(payload));
+                    };
+
+                    // Call sendPayload immediately
+                    sendPayload();
+
+                    // Set an interval to keep sending payload while button is held down
+                    const intervalId = setInterval(sendPayload, pressDownSpeed); // Adjust the 100ms rate as needed
+
+                    // Add touchend event to stop sending on button release
+                    buttonRight.addEventListener('touchend', function stopSending() {
+                        clearInterval(intervalId);
+                        buttonRight.removeEventListener('touchend', stopSending);
+                    });
+                }, 500); // Adjust the 500ms delay as needed
+            });
+
+            buttonRight.addEventListener('touchend', function(e) {
+                // If the timeout has not yet run, it was a fast tap
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+
+                    // Code to execute on a fast tap
+                    const payload = {
+                        "method": "play",
+                        "clientId": clientId,
+                        "gameId": gameId,
+                        "index": index,
+                        "richtung": "rechts",
+                    };
+                    ws.send(JSON.stringify(payload));
+                }
+            });
+            buttonRight.addEventListener('mousedown', function(e) {
                 // Function to send payload
                 const sendPayload = () => {
                     const payload = {
@@ -174,19 +248,18 @@
                         "richtung": "rechts",
                     };
                     ws.send(JSON.stringify(payload));
-                    console.log(index);
                 };
             
                 // Call sendPayload immediately
                 sendPayload();
             
                 // Set an interval to keep sending payload while button is held down
-                const intervalId = setInterval(sendPayload, 100); // Adjust the 100ms rate as needed
+                const intervalId = setInterval(sendPayload, pressDownSpeed); // Adjust the 100ms rate as needed
             
                 // Add touchend event to stop sending on button release
-                buttonRight.addEventListener('touchend', function stopSending() {
+                buttonRight.addEventListener('mouseup', function stopSending() {
                     clearInterval(intervalId);
-                    buttonRight.removeEventListener('touchend', stopSending);
+                    buttonRight.removeEventListener('mouseup', stopSending);
                 });
             });
         }

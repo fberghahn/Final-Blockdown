@@ -13,6 +13,7 @@ export function initiatePlayers(game, app, players) {
                 player.x = game.Xpositionen[index];              
                 player.y = app.view.height / 1.2;
                 player.score = 0;
+                player.lives = 0;
                 app.stage.addChild(player);
                 players.push(player);
             }

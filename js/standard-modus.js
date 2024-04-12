@@ -198,7 +198,6 @@ websocket.onmessage = message => {
 // Updates the state of the game by setting thew new X-positions of the players and checking if the game can be started
     if (response.method === "update"){
         const game = response.game;
-        console.log(game)
         Xpositions = game.Xpositionen;              
         //If the lobby is full, the game can be started. For this, the number of players must be reached and the game must not have started yet
         if (activePlayerCount >= Number(spielerAnzahl) && !isGameStarted ) {
@@ -316,20 +315,34 @@ const collisionAndWinnerTicker = new PIXI.Ticker();
 
 collisionAndWinnerTicker.add(() => {
     // Collision test and player removal
-    players.forEach((player, playerIndex) => {
+    players.forEach((player) => {
+        // If the player is on cooldown, decrement the cooldown and skip the collision check
+        if (player.cooldown > 0) {
+            player.cooldown -= 1;
+            return;
+        }
+
         blocks.forEach(block => {
             if (kollisionstest(player, block)) {
-                console.log("Kollision erkannt zwischen Spieler und Block!");
-                app.stage.removeChild(player);
-                player.kollidiert = true;
+                if (player.lives >= 1) {
+                    player.lives -= 1; // Remove a life
+                    player.cooldown = 60; // Set the cooldown to 60 frames (1 second at 60 FPS)
+                } else {
+                    app.stage.removeChild(player);
+                    player.kollidiert = true;
+                }
             }
         });
     });
 
-    hearts.forEach((heart, heartIndex) => {
+    hearts.forEach((heart) => {
         players.forEach(player => {
             if (kollisionstest(player, heart)) {
                 player.score += 1;
+                if (player.score === 2) {
+                    player.lives += 1; // Add an extra life
+                    console.log(player.lives);
+                }
                 app.stage.removeChild(heart);
                 const index = hearts.indexOf(heart);
                 if (index !== -1) {
