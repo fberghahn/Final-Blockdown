@@ -3,65 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/desktop.css">
-    <link rel="icon" type="image/png" href="images\favicon.png">
+    <link rel="stylesheet" href="css/desktop.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Press+Start+2P">
+    <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/images/favicon.png">
     <title>Final Blockdown</title>
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-    <script src="js/pixi.min.js"></script>
 </head>
 <body>
-    <div id="gameContainer">
-        <header>
-            <h1>Final Blockdown</h1>
-            <nav>
-                <ul>
-                    <li><a href="#start">Start</a></li>
-                    <li><a href="#highscores">Highscores</a></li>
-                    <li><a href="#settings">Einstellungen</a></li>
-                </ul>
-            </nav>
-        </header>
-        <main>
-            <div class="flex-container">
-                <div class="flex-item card">
-                    <h2>Final Blockdown</h2>
-                    <p>Das Mehrspieler Browserspiel für bis zu fünf Spieler, die gemeinsam ein rasantes Spielerlebniss haben wollen. Der Spieler der am längsten am den Blöcken ausweichen kann gewinnt</p>
+<div class="ct" id="t1">
+    <div class="ct" id="t2">
+      <div class="ct" id="t3">
+        <div class="ct" id="t4">
+            <ul id="menu">
+                <a href="#t1"><li class="icon fa fa-cubes" id="uno"></li></a>
+                <a href="#t2"><li class="icon fa fa-gamepad" id="dos"></li></a>
+                <a href="#t3"><li class="icon fa fa-rocket" id="tres"></li></a>
+                <a href="#t4"><li class="icon fa fa-info" id="cuatro"></li></a>
+            </ul>
+            <div class="page" id="p1">
+              <section class="icon"> 
+                <div class="flex-container">
+                  <div class="flex-item">
+                    <img src="/images/logo-freigestellt2.png" alt="Finalblockdown Logo" style="width: 90vh; height: auto;margin-top: -5vh;">
+                  </div>
+                  <div class="flex-item">
+                    <p class="hint text-shadow"> The gripping browser game: Use your phone 📱 as a controller 🎮 to escape the blocks longer than your friends.</p>
+                  </div>
+                  <div class="flex-item">
+                    <p class="hint text-shadow">Click here to hop in!</p>
+                    <a href="#t2" class="start-btn" style="font-size: 3rem;">Play now</a>
+                  </div>
                 </div>
-                <div class="flex-item card">
-                    <h2>Spiel erstellen</h2>
-                
-                    <label for="modus">Modus:</label>
-                    <select id="modus">
-                        <option value="">--Bitte wählen--</option>
-                        <option value="modus1">Modus 1</option>
-                        <option value="modus2">Modus 2</option>
-                        <!-- Add more options as needed -->
-                    </select>
-                
-                    <label for="spieleranzahl">Spieleranzahl:</label>
-                    <select id="spieleranzahl">
-                        <option value="">--Bitte wählen--</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <!-- <option value="5">5</option> -->
-                    </select>
-                    <label for="background">Hintergrundbild:</label>
-                    <select id="background">
-                        <option value="">--Bitte wählen--</option>
-                        <option value="1">Bild 1</option>
-                        <option value="2">Bild 2</option>
-                        <option value="3">Bild 3</option>
-                    </select>
-                    
-                    <button id="createLobby">Lobby erstellen</button>
-                </div>
+              </section> 
             </div>
-        </main>
-        <footer>
-            <p>Entwickelt im Laufe des Praxisprojekts und der Bachelorarbeit von Florian Berghahn an der TH Köln im Studiengang Medieninformatik. &copy; Copyright. Florian Berghahn</p>
-        </footer>
+            <div class="page" id="p2">
+                <section class="icon">
+                    <div class="flex-container">
+                        <h2><i class="fa fa-gamepad"></i> <span>Create a Lobby</span></h2>
+                        <div class="flex-row">
+                          <div class="flex-item">
+                              <p class="p2-text2">Customize your </p>
+                              <p class="p2-text2">gameplay experience!</p>
+                              <img src="/images/settings-icon.png" alt="settings-icon" width="50%" height="auto">
+                          </div>
+                          <div class="flex-item" >                      
+                              <div class="select-container">
+                                <label class="p2-text" for="modus">Mode:</label>
+                                <div class="select-wrapper">
+                                  <select id="modus">
+                                    <option value="">Please choose</option>
+                                    <option value="modus1">Survival</option>
+                                    <option value="modus2">Collect hearts</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="select-container">
+                                <label class="p2-text" for="spieleranzahl">Number of Players:</label>
+                                <div class="select-wrapper">
+                                  <select id="spieleranzahl">
+                                    <option value="">Please choose</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <!-- <option value="5">5</option> -->
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="select-container">
+                                <label class="p2-text" for="background">Background:</label>
+                                <div class="select-wrapper">
+                                  <select id="background">
+                                    <option value="">Please choose</option>
+                                    <option value="1">Bild 1</option>
+                                    <option value="2">Bild 2</option>
+                                    <option value="3">Bild 3</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <button id="createLobby" class="start-btn" style="margin-top: 2vh;">Start Game!</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </section>
+            </div>  
+            <div class="page" id="p3">
+                <section class="icon fa fa-rocket"><span class="title">Rocket</span></section>
+            </div>
+            <div class="page" id="p4">
+                <section class="icon fa fa-info">
+                <span class="title">Dribbble</span>
+                <p class="hint">
+                    <a href="https://dribbble.com/hrtzt" target="_blank">Im ready to play, <span class="hint line-trough">invite me </span> find me</a>
+                </p>
+                <p class="hint">Already invited by <a href="http://www.dribbble.com/mrpeters" target="_blank">Stan Peters</a></p>
+                </section>
+            </div> 
+          </div>
+        </div>
+      </div>
     </div>
-    <script src="js/homepage.js"></script>
+  </div>
+  <script src="js/homepage.js"></script>
 </body>
+<footer>
+  <p>Entwickelt im Laufe des Praxisprojekts und der Bachelorarbeit von Florian Berghahn an der TH Köln im Studiengang Medieninformatik. &copy; Copyright. Florian Berghahn</p>  
+</footer> 
 </html>

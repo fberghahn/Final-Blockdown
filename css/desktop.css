@@ -1,177 +1,363 @@
-/* .mainDiv {
-    width:45%;
-    margin-left:auto;
-    margin-right:auto;
-}
-
-.card {
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    transition: 0.3s;
-    border-radius: 5px; 
-    padding: 20px 40px 20px 40px;
-    background-color: #fff;
-    opacity: 0.8;
-    margin-top:5vh;
-
-}
-
-.card:hover {
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-}
-
-.container {
-    padding: 2px 16px;
-}
-
-.inhalt{
-    opacity: 1.0 !important;
-}
-
-body {
-    background-color: rgb(59, 77, 241);
-    background-image: url("/images/spiel-backgroundimg2.png");
-    background-color: #cccccc;
-    height: 100vh;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: fixed;
-    background-position: center center;
-}
-
-
-canvas {
-    margin: 0 auto;
-    display: block;
-}
-
-.btn{
-    font-family: Roboto, sans-serif;
-    font-weight: 600;
-    font-size: 14px;
-    color: #fff;
-    background-color: #0066CC;
-    padding: 10px 30px;
-    border: 2px solid #0066cc;
-    box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
-    border-radius: 50px;
-    transition : 1000ms;
-    transform: translateY(0);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    cursor: pointer;
-    text-transform: uppercase;
-    margin-top: 10px;
-    }
-    
-    .btn:hover{
-    transition : 1000ms;
-    padding: 8px 30px;
-    transform : translateY(-0px);
-    background-color: #fff;
-    color: #0066cc;
-    border: solid 2px #0066cc;
-    
-    } */
-
-/* Neues CSS */
-
-/* Farbvariablen */
-
-:root {
-    --header-footer-color: #f0f0f0;
-    --hero-background-color: #fff;
-}
-
-
-body, html {
-    margin: 0;
-    padding: 0;
+html, body, .page {
     width: 100%;
     height: 100%;
-    font-family: 'Arial', sans-serif;
-}
-
-#gameContainer {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-header {
-    background-color: var(--header-footer-color);
-    color: #333;
-    padding: 20px;
-    text-align: center;
-    /* display: flex;
-    justify-content: space-between;
-    align-items: center; */
-}
-
-nav ul {
-    list-style-type: none;
+    margin: 0;
     padding: 0;
-}
-
-
-nav ul li {
-    display: inline;
-    margin: 0 10px;
-}
-
-nav ul li a {
-    color: #333;
-    text-decoration: none;
-}
-
-main {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--hero-background-color);
-    color: #333;
-    background-image: url("/images/spiel-backgroundimg2.png");
+    transition: all .8s cubic-bezier(0.54, 0.35, 0.29, 0.99);
+    -webkit-transition: all .8s cubic-bezier(0.54, 0.35, 0.29, 0.99);
+    -moz-transition: all .8s cubic-bezier(0.54, 0.35, 0.29, 0.99);
+    -o-transition: all .8s cubic-bezier(0.54, 0.35, 0.29, 0.99);  
+    color: #fff;
+    overflow: hidden; 
+  }
+  
+  * {
+    font-family: 'open sans', 'lato', 'helvetica', sans-serif;
+  }
+  
+  .page {
+    position: absolute;
+  }
+  
+  #p1 {
+    left: 0;
+  }
+  
+  #p2, #p3, #p4, #p5 {
+    left: 200%;
+  }
+  
+  #p1 {     
+    background-color: black;
+    background-image: url("/images/hintergrund-img7.png");
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
-    background-position: center center;
+    background-position: right center; 
+    float: right;
+}
+  #p2 { background: tomato; }
+  #p3 { background: gold; }
+  #p4 { background: deeppink; }
+  #p5 { background: rebeccapurple; }
+  
+  #t2:target #p2,
+  #t3:target #p3,
+  #t4:target #p4,
+  #t5:target #p5 {
+    transform: translateX(-190%)!important;
+    -webkit-transform: translateX(-190%);
+    -moz-transform: translateX(-190%)!important;
+    -o-transform: translateX(-190%);
+    /* transition-delay: .01s !important; */
+  }
+  
+  #t2:target #p1, 
+  #t3:target #p1,
+  #t4:target #p1,
+  #t5:target #p1{
+    background-image: url("/images/hintergrund-img7.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: right center; 
+    /* background-color: black; */
+ }
+  
+  #t2:target #p1 .icon, 
+  #t3:target #p1 .icon,
+  #t4:target #p1 .icon,
+  #t5:target #p1 .icon {
+    -webkit-filter: blur(3px);
+    filter: blur(3px);
+  }
+  
+  .icon {
+    color: #fff;
+    font-size: 5vh;
+    display: block;
+    padding-bottom: 3vh;
+  }
+  
+  ul .icon:hover {
+    opacity: 0.5;
+  }
+  
+  .page .icon .title {
+    line-height: 2;
+  }
+  
+  #t2:target ul .icon,
+  #t3:target ul .icon,
+  #t4:target ul .icon,
+  #t5:target ul .icon{
+    transform: scale(.6);
+    -webkit-transform: scale(.6);
+    -moz-transform: scale(.6);
+    -o-transform: scale(.6);
+    transition-delay: .25s;
+  }
+  
+  #t2:target #dos,
+  #t3:target #tres,
+  #t4:target #cuatro,
+  #t4:target #cinco {
+    transform: scale(1.2) !important;
+    -webkit-transform: scale(1.2) !important;
+    -moz-transform: scale(1.2) !important;
+    -o-transform: scale(1.2) !important;
+  }
+  
+  ul {
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    height: 50vh;
+    width: 10%;
+    padding: 0;
+    text-align: center;
+   }
+  
+  #menu .icon {
+    margin: 30px 0;
+    transition: all .5s ease-out !important;
+    -webkit-transition: all .5s ease-out;
+    -moz-transition: all .5s ease-out;
+    -o-transition: all .5s ease-out;
+  }
+  
+  a {
+    text-decoration: none;
+  }
+  
+  #p4 .hint {
+    display: inherit !important;
+  }
+  
+  .hint a {
+    color: yellow;
+    transition: all 250ms ease-out;
+    -webkit-transition: all 250ms ease-out;
+    -moz-transition: all 250ms ease-out;
+    -o-transition: all 250ms ease-out;
+  }
+  
+  .hint a:hover {
+    color: #FFF;
+  }
+  
+  .line-trough {
+    text-decoration: line-through;
+  }
+  
+.page .icon {
+    position: absolute;
+    top: 0;
+    bottom: 20%;
+    right: 10%;
+    left: 0;
+    width: 75vw;
+    height: 60vh;
+    margin: auto;
+    text-align: center;
+    line-height: 1.3;
+    transform: translateX(360%)!important;
+    -webkit-transform: translateX(360%);
+    -moz-transform: translateX(360%);
+    -o-transform: translateX(360%);
+    transition: all .5s cubic-bezier(.25, 1, .5, 1.25);
+    -webkit-transition: all .5s cubic-bezier(.25, 1, .5, 1.25);
+    -moz-transition: all .5s cubic-bezier(.25, 1, .5, 1.25);
+    -o-transition: all .5s cubic-bezier(.25, 1, .5, 1.25);
+}
+.page#p1 .icon {
+  transform: translateX(10%) !important;
+}
+  
+#t2:target .page#p2 .icon,
+#t3:target .page#p3 .icon,
+#t4:target .page#p4 .icon,
+#t5:target .page#p5 .icon {
+  transform: translateX(0) !important;
+  -webkit-transform: translateX(0) !important;
+  -moz-transform: translateX(0) !important;
+  -o-transform: translateX(0) !important;
+  transition-delay: 0.5s;
 }
 
+ul li {
+  display: block !important;
+}
+
+h2 {
+  font-family: "Play", sans-serif;
+  font-size: 5rem;
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 10px; 
+}
+
+h2 span {
+  font-family: "Play", sans-serif !important;
+}
+h2 i {
+  font-family: "Font Awesome 5 Free" !important;
+  font-weight: 900; 
+}
+
+
 .flex-container {
-    display: flex;
-    flex-direction: row; /* Add this line */
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  flex: 2;
 }
 
 .flex-item {
-    flex: 1;
-    padding: 10px;
-    margin: 10px;
-    border: 1px solid black;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2vh;
+  margin-bottom: -3vh;
+  margin-left: 2vh;
 }
 
 footer {
-    background-color: var(--header-footer-color);
-    text-align: center;
-    padding: 10px;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: black;
+  color: white;
+  text-align: center;
 }
 
-p {
-    color: #666;
+.hint {
+  font-family: "Play", sans-serif;
+  font-size: 3rem;
+  color: #ffffff;
+  -webkit-text-stroke: 1px rgb(255, 255, 255); /* Add text stroke */
+  padding: 10px; 
+  text-align: center;
+}
+.text-shadow {
+  text-shadow: 2px 2px 4px #ee3131;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+}
+
+/* Second Page for Lobby creation */
+
+select {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  width: 100%;
+  height: 4.8vh;
+  -moz-padding-start: calc(10px - 3px);
+  padding-left: 1vw;
+  background: url(fff-0-2.png) repeat;
+  color: #fff;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.5rem;
+  box-shadow: 2px 2px 5px 1px rgba(0,0,0,0.3);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+select option {
+  color: #666;
+  background-color: transparent;
+}
+
+select::-ms-expand {
+  display: none;
+}
+select:focus::-ms-value {
+  background-color: transparent;
+}
+
+.select-wrapper {
+  width: 16vw;
+  position: relative;
+}
+
+.select-wrapper::before {
+  font-family: "Font Awesome 5 Free"; 
+  content: "\f0d7";
+  font-size: 2rem;
+  position: absolute;
+  right: 15px;
+  top: 2vh;
+  color: #fff;
+  pointer-events: none;
+  font-weight: 900;
+}
+
+.select-container {
+  display: flex;
+  justify-content: space-between;
 }
 
 
-.card {
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    transition: 0.3s;
-    border-radius: 5px; 
-    padding: 20px 80px 20px 80px;
-    background-color: #fff;
-    margin: 20vh;
-    /* opacity: 0.8; */
+.p2-text {
+  font-family: "Play", sans-serif;
+  font-size: 2.5rem;
+  color: #ffffff;
+  text-align: center;
+  margin: 2.5vh 0;
+}
+
+.p2-text2 {
+  font-family: "Play", sans-serif;
+  font-size: 3rem;
+  color: #ffffff;
+  text-align: center;
+  margin: 2.5vh 0;
 
 }
 
-.card:hover {
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+/* Not used at the moment: */
+.p2-gametext {
+  font-family: 'Press Start 2P', fantasy; /* This is a pixelated font, similar to those used in old video games */
+  color: #ffffff; /* This is a bright orange color, which can give a playful and energetic feel */
+  text-shadow: 2px 2px #000; /* This adds a shadow to the text, making it more readable against bright backgrounds */
+  font-size: 2rem; /* This makes the text larger */
+  text-align: center; /* This centers the text */
+  margin: 2.5vh 0;
+}
+
+.start-btn{
+  font-family: 'Press Start 2P', cursive;
+  text-align: center;
+  align-items: center;
+  font-weight: bold;
+  padding: 1vh 1vw 1vh 1vw;
+  background-color: lightgray;
+  text-shadow: -1px -1px black, 1px 1px white;
+  color: gray;
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  -o-border-radius: 7px;
+  border-radius: 7px;
+  box-shadow: 0 .2em gray; 
+  cursor: pointer;
+  font-size: 2rem;
+}
+.start-btn:active {
+box-shadow: none;
+position: relative;
+top: .2em;
 }
