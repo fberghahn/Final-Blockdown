@@ -316,8 +316,8 @@ function gameLoop(players) {
         player.x = Xpositions[index + 1];
     });
 
-    scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.score}`).join('\n');
-    app.stage.setChildIndex(scoreText, app.stage.children.length - 1);
+scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.score}, Lives: ${player.lives}`).join('\n');
+app.stage.setChildIndex(scoreText, app.stage.children.length - 1);
 }
 
 // Add a keydown for "N" event listener to the document
