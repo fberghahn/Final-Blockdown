@@ -12,6 +12,7 @@ let basicText;
 let basicText2;
 let winnerText;
 let urlParams;
+let YPositions;
 window.onload = function () {
 
     app = new PIXI.Application(
@@ -21,6 +22,10 @@ window.onload = function () {
 
     appWidth = app.view.width;
     appHeight = app.view.height;
+
+    //  Standard Y-Positions for the players
+    const startYPosition = app.view.height / 1.2;
+    YPositions = [ startYPosition, startYPosition, startYPosition, startYPosition, startYPosition];
 
     // Get the URL parameters
     urlParams = new URLSearchParams(window.location.search);

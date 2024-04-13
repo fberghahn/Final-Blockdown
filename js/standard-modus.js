@@ -23,6 +23,7 @@ window.onload = function () {
 
     appWidth = app.view.width;
     appHeight = app.view.height;
+    
     //  Standard Y-Positions for the players
     const startYPosition = app.view.height / 1.2;
     YPositions = [ startYPosition, startYPosition, startYPosition, startYPosition, startYPosition];
@@ -357,12 +358,15 @@ collisionAndWinnerTicker.add(() => {
             player.cooldown -= 1;
             return;
         }
-
+        if (player.cooldown === 0) {
+            player.alpha = 1; // Reset the player's opacity
+        }
         blocks.forEach(block => {
             if (kollisionstest(player, block)) {
                 if (player.lives >= 1) {
                     player.lives -= 1; // Remove a life
                     player.cooldown = 60; // Set the cooldown to 60 frames (1 second at 60 FPS)
+                    player.alpha = 0.5; // Decrease the player's opacity
                 } else {
                     app.stage.removeChild(player);
                     player.kollidiert = true;
@@ -375,7 +379,7 @@ collisionAndWinnerTicker.add(() => {
         players.forEach(player => {
             if (kollisionstest(player, heart)) {
                 player.score += 1;
-                if (player.score === 2) {
+                if (player.score % 2) {
                     player.lives += 1; // Add an extra life
                     console.log(player.lives);
                 }
