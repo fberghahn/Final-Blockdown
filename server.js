@@ -4,11 +4,11 @@ var express = require("express")
 var app = express()
 
 // Port für den Vserver
-// var port = process.env.PORT || 8081
+var port = process.env.PORT || 8081
 
 // Port für lokale Ausführung da auf 8081 Postgres den Port belegt
 // Hier kann der Port falls nötig geändert werden
-var port = process.env.PORT || 9000
+// var port = process.env.PORT || 9000
 
 app.use(express.static(__dirname + "/"))
 
@@ -130,6 +130,19 @@ wss.on("request", request =>{
             };
             updateGameState();
         }
+        // jump Methode einbauen
+        if(result.method === "jump"){
+            const game = games[result.gameId];
+            const firstClient = game.clients[0];
+            const payLoad = {
+                "method": "jump",
+                "game": game,
+                "index": result.index,
+            }
+
+            firstClient.connection.send(JSON.stringify(payLoad));
+        }
+
         if (result.method === "reset") {
             // const clientId = result.clientId;
             const gameId = result.gameId;
@@ -141,7 +154,7 @@ wss.on("request", request =>{
                 "game": game
             }
             const firstClient = game.clients[0];
-            clients[firstClient.clientId].connection.send(JSON.stringify(payLoad));
+            firstClient.connection.send(JSON.stringify(payLoad));
             updateGameState();
         }
     })
