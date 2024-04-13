@@ -13,6 +13,7 @@ let basicText;
 let basicText2;
 let winnerText;
 let urlParams;
+let YPositions;
 window.onload = function () {
 
     app = new PIXI.Application(
@@ -22,6 +23,9 @@ window.onload = function () {
 
     appWidth = app.view.width;
     appHeight = app.view.height;
+    //  Standard Y-Positions for the players
+    const startYPosition = app.view.height / 1.2;
+    YPositions = [ startYPosition, startYPosition, startYPosition, startYPosition, startYPosition];
 
     // Get the URL parameters
     urlParams = new URLSearchParams(window.location.search);
@@ -125,9 +129,6 @@ let isGameStarted = false; // Gamestate if blocks and hearts are moving
 
 // Gamestate for the positions of the players
 let Xpositions = {};
-//  Standard Y-Positions for the players
-// const startYPosition = appHeight / 1.2;
-// let YPositions = { startYPosition, startYPosition, startYPosition, startYPosition, startYPosition };
 
 // Create the host websocket connection
 var host = location.origin.replace(/^http/, 'ws')
@@ -232,14 +233,16 @@ websocket.onmessage = message => {
         let index = response.index;
         // Minus 1 because the index is adjusted on the serverside for having the host at index 0, but thats not the case for the  players array
         const player = players[index-1];
-        const originalY = player.y;
-        // Move player up
-        player.y = player.y - appHeight * 0.2;
-
+        player.jumping = true;
+        
+        // Old unused jump function  
+        // const originalY = player.y;
+        // // Move player up
+        // player.y = player.y - appHeight * 0.2;
         // After a delay, move player back down
-        setTimeout(function() {
-            player.y = originalY;
-        }, 500); // Adjust the 500ms delay as needed
+        // setTimeout(function() {
+        //     player.y = originalY;
+        // }, 500); // Adjust the 500ms delay as needed
     }
     // Restart the game, on server request
     if (response.method === "restart"){
@@ -293,10 +296,26 @@ function handleEnterKey(event) {
 
 // Game loop function where the player positions are updated, is added to the ticker and started as soon as the first player joins.
 function gameLoop(players) {
+    const jumpHeight = app.view.height * 0.2; // The height of the jump as 20% of the app height
+    const jumpSpeed = 5; // The speed of the jump in pixels per frame
+
     players.forEach((player, index) => {
+        // If the player is jumping, move them up until they reach the peak of their jump
+        if (player.jumping && player.y > YPositions[index + 1] - jumpHeight) {
+            player.y -= jumpSpeed;
+        }
+        // If the player has reached the peak of their jump, move them back down
+        else if (player.jumping && player.y <= YPositions[index + 1] - jumpHeight) {
+            player.jumping = false;
+        }
+        // If the player is not jumping and they are not on the ground, move them down
+        else if (!player.jumping && player.y < YPositions[index + 1]) {
+            player.y += jumpSpeed;
+        }
+
         player.x = Xpositions[index + 1];
-        // player.y = YPositions[index + 1];
     });
+
     scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.score}`).join('\n');
     app.stage.setChildIndex(scoreText, app.stage.children.length - 1);
 }
