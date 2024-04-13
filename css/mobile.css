@@ -80,6 +80,16 @@ body {
     user-select: none !important;
 }
 
+.cooldown {
+    animation: fadein 3s;
+}
+
+@keyframes fadein {
+    from { opacity: 0.5; }
+    to   { opacity: 1; }
+}
+
+
 .form__group {
     position: relative;
     padding: 15px 0 0;

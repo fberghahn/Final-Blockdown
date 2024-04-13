@@ -125,6 +125,9 @@ let isGameStarted = false; // Gamestate if blocks and hearts are moving
 
 // Gamestate for the positions of the players
 let Xpositions = {};
+//  Standard Y-Positions for the players
+// const startYPosition = appHeight / 1.2;
+// let YPositions = { startYPosition, startYPosition, startYPosition, startYPosition, startYPosition };
 
 // Create the host websocket connection
 var host = location.origin.replace(/^http/, 'ws')
@@ -225,6 +228,19 @@ websocket.onmessage = message => {
             }
         }  
     };
+    if (response.method === "jump") {
+        let index = response.index;
+        // Minus 1 because the index is adjusted on the serverside for having the host at index 0, but thats not the case for the  players array
+        const player = players[index-1];
+        const originalY = player.y;
+        // Move player up
+        player.y = player.y - appHeight * 0.2;
+
+        // After a delay, move player back down
+        setTimeout(function() {
+            player.y = originalY;
+        }, 500); // Adjust the 500ms delay as needed
+    }
     // Restart the game, on server request
     if (response.method === "restart"){
         const game = response.game;
@@ -279,6 +295,7 @@ function handleEnterKey(event) {
 function gameLoop(players) {
     players.forEach((player, index) => {
         player.x = Xpositions[index + 1];
+        // player.y = YPositions[index + 1];
     });
     scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.score}`).join('\n');
     app.stage.setChildIndex(scoreText, app.stage.children.length - 1);

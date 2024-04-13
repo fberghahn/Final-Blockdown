@@ -226,6 +226,20 @@ websocket.onmessage = message => {
             }
         }  
     };
+    if (response.method === "jump") {
+        let index = response.index;
+        // Minus 1 because the index is adjusted on the serverside for having the host at index 0, but thats not the case for the  players array
+        const player = players[index-1];
+        const originalY = player.y;
+
+        // Move player up
+        player.y = player.y - appHeight * 0.2;
+
+        // After a delay, move player back down
+        setTimeout(function() {
+            player.y = originalY;
+        }, 500); // Adjust the 500ms delay as needed
+    }
     // Restart the game, on server request
     if (response.method === "restart"){
         const game = response.game;

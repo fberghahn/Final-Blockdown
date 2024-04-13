@@ -133,14 +133,15 @@ wss.on("request", request =>{
         // jump Methode einbauen
         if(result.method === "jump"){
             const game = games[result.gameId];
-            const firstClient = game.clients[0];
+            // Pass on the index of the player who jumped to the host
             const payLoad = {
                 "method": "jump",
                 "game": game,
                 "index": result.index,
             }
-
-            firstClient.connection.send(JSON.stringify(payLoad));
+            // Only send this to the Host because the other players dont need this payLoad
+            const hostClient = game.clients[0];
+            clients[hostClient.clientId].connection.send(JSON.stringify(payLoad));
         }
 
         if (result.method === "reset") {
@@ -148,17 +149,19 @@ wss.on("request", request =>{
             const gameId = result.gameId;
             const game = games[gameId];
             const appWidth = result.appWidth;
+            // reset the Xpositions of the players
             game.Xpositionen = [ 0, appWidth * 0.35, appWidth * 0.45, appWidth * 0.55, appWidth * 0.65]
             const payLoad = {
                 "method": "restart",
                 "game": game
             }
-            const firstClient = game.clients[0];
-            firstClient.connection.send(JSON.stringify(payLoad));
+            // Only send this to the Host because the other players dont need this payLoad
+            const hostClient = game.clients[0];
+            clients[hostClient.clientId].connection.send(JSON.stringify(payLoad));
             updateGameState();
         }
     })
-    // neue client id erzeugen
+    // Create a new client and send the clientId back to the client
     const clientId= guid();
     clients[clientId] = {
         "connection": connection
@@ -168,7 +171,7 @@ wss.on("request", request =>{
         "method" : "connect",
         "clientId" :clientId
     }
-    // client connect antwort senden
+    // send client the connect answer 
     connection.send(JSON.stringify(payload))
 })
 
@@ -186,16 +189,16 @@ function updateGameState () {
             clients[c.clientId].connection.send(JSON.stringify(payload))
         })
     }
-    // Hier könnte man festlegen wie oft der Gamestate pro Sekunde geupdated wird, aktuell wird er bei jedem Input der mobilen Endgeräte updated
+    //Here you could specify how often the game state is updated per second, currently it is updated with every input from the mobile devices.
     // setTimeout(updateGameState, 500);
 }
 
-// Funktionen zur Random Id erstellung für Client- und Gameids  
+// Functions for creating random IDs for client and game IDs.
 
 function S4() {
     return (((1+Math.random())*0x10000)|0).toString(16).substring(1); 
 }
  
-// Guid erstellen indem man die S4 Funktion 4 mal aufruft und mit - verbindet und in Kleinbuchstaben umwandelt,
-// so wird eine 32 Zeichen lange großenteils zufällige Id erstellt
+// Create a GUID by calling the S4 function four times, connecting with a hyphen, and converting to lowercase,
+// This creates a 32-character, mostly random ID
 const guid = () => (S4() + S4() + "-" + S4() + "-4" + S4().substr(0,3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();

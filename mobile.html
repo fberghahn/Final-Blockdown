@@ -111,16 +111,16 @@
                 }})
 
             
-            //     const d = document.createElement("div");
-            //         d.style.width= "70vw";
-            //         d.style.height= "5vh";
-            //         d.style.margin = "5vh";
-            //         d.style.background = playerColor;
-            //         d.textContent = playerName + " is the colour " + playerColor;
-            //         divPlayers.appendChild(d);
+                // const d = document.createElement("div");
+                //     d.style.width= "70vw";
+                //     d.style.height= "5vh";
+                //     d.style.margin = "5vh";
+                //     d.style.background = playerColor;
+                //     d.textContent = playerName + " is the colour " + playerColor;
+                //     divPlayers.appendChild(d);
 
-            // while(divBoard.firstChild)
-            // divBoard.removeChild(divBoard.firstChild)
+            while(divBoard.firstChild)
+            divBoard.removeChild(divBoard.firstChild)
                 
             //Buttons for controlling player movement
             const buttonLeft = document.createElement("button");
@@ -250,6 +250,18 @@
             // Append the button to the divBoard
             divBoard.appendChild(buttonSvg);
             buttonSvg.addEventListener('click', function() {
+                // Add the cooldown class to start the animation
+                buttonSvg.classList.add('cooldown');
+            
+                // Disable the button
+                buttonSvg.disabled = true;
+            
+                // After 3 seconds, enable the button and remove the cooldown class
+                setTimeout(function() {
+                    buttonSvg.disabled = false;
+                    buttonSvg.classList.remove('cooldown');
+                }, 3000);
+            
                 const payload = {
                     "method": "jump",
                     "clientId": clientId,
@@ -258,7 +270,6 @@
                 };
                 ws.send(JSON.stringify(payload));
             });
-
 
             const buttonRight = document.createElement("button");
             buttonRight.className = "playBtns";
