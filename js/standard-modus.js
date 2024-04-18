@@ -251,6 +251,7 @@ websocket.onmessage = message => {
         // Remove blocks and hearts
         removeObjects(blocks, app);
         removeObjects(hearts, app);
+        // Reset the Speed and Spwan Interval
         blockSpeed = 1;
         blockInterval = 500;
         blocks=[];
@@ -321,7 +322,7 @@ scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.s
 app.stage.setChildIndex(scoreText, app.stage.children.length - 1);
 }
 
-// Add a keydown for "N" event listener to the document
+// Add a keydown for "N" event listener for sending the reset message to the server
 document.addEventListener('keydown', function(event) {
     if ((event.key === 'N' || event.key === 'n') && !isGameStarted) {
         const payLoad = {
