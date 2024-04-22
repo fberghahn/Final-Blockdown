@@ -37,6 +37,22 @@ body {
     overflow: hidden;
 }
 
+/* To fix the issue for players that have screen rotation turned on */
+ @media (orientation: landscape) {
+    body {
+        /* width: 100vh;
+        height: 100vw;  */
+        transform: rotate(-90deg); 
+        /* top: 50%;
+        left: 50%;  */
+     }
+     /* Done seperatley to avoid scaling in the nameinput screen */
+     #divBoard {
+        transform: scale(2);
+    }
+}  
+
+
 .lobbyText{
     text-align: center;
     font-size: 20px;

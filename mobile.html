@@ -26,18 +26,7 @@
     <div id='divPlayers'></div>
     <div id='divBoard' style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
     </div>
-    <script>
-        function adjustHeight() {
-        // Set the height of the body to the window's innerHeight
-            document.body.style.height = window.innerHeight + 'px';
-        }
-
-        window.addEventListener('resize', adjustHeight);
-        window.addEventListener('orientationchange', adjustHeight);
-
-        // Initial adjustment
-        adjustHeight();
-
+    <script>        
         function isMobile() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         }

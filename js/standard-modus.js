@@ -109,6 +109,7 @@ function createRestartText() {
 var qrcanvas = document.getElementById("qrcode");
 qrcanvas.style.display = "none";
 let qrSprite;
+let backgroundQr;
 
 // Get the spieleranzahl parameter
 urlParams = new URLSearchParams(window.location.search);
@@ -189,7 +190,7 @@ websocket.onmessage = message => {
             
             // Create a white background behind the Qr-Code, so that the code can be scanned better on dark backgrounds
             // the height and widht of the background is 270px, because the QR-Code is 256px 
-            var backgroundQr = new PIXI.Graphics();
+            backgroundQr = new PIXI.Graphics();
             backgroundQr.beginFill(0xFFFFFF) // White color
                 .drawRect((app.renderer.width / 2) -140, (app.renderer.height/4.5)-140 , 270 , 270)
                 .endFill();
@@ -217,6 +218,7 @@ websocket.onmessage = message => {
         if (activePlayerCount >= Number(spielerAnzahl) && !isGameStarted ) {
             // remove QR-Code
             app.stage.removeChild(qrSprite);
+            app.stage.removeChild(backgroundQr);
             qrSprite = null;
 
              // Text that all players are connected & can start with Enter
