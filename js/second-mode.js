@@ -177,18 +177,29 @@ websocket.onmessage = message => {
             size: 256,
             value: lobbyUrl
         });
+
         // Wait till the QR-Code is generated and then convert it to an image and display it with PixiJS
         setTimeout(function () {
             var base64 = qrcanvas.toDataURL("image/png");
-            var texture = PIXI.Texture.from(base64);
+            var baseTexture = PIXI.BaseTexture.from(base64);
+            var texture = new PIXI.Texture(baseTexture);
             qrSprite = new PIXI.Sprite(texture);
 
             qrSprite.anchor.set(0.5);
             qrSprite.x = (app.renderer.width - qrSprite.width) / 2;
             qrSprite.y = (app.renderer.height - qrSprite.height) / 4.5;
 
+            // Create a white background behind the Qr-Code, so that the code can be scanned better on dark backgrounds
+            // the height and widht of the background is 270px, because the QR-Code is 256px 
+            var backgroundQr = new PIXI.Graphics();
+            backgroundQr.beginFill(0xFFFFFF) // White color
+                .drawRect((app.renderer.width / 2) -140, (app.renderer.height/4.5)-140 , 270 , 270)
+                .endFill();
+
+            // Add the background, border and QR code to the stage
+            app.stage.addChild(backgroundQr);
             app.stage.addChild(qrSprite);
-        }, 500); 
+        }, 500);
     };
     
     // when a player joins the game 
@@ -354,6 +365,10 @@ const collisionAndWinnerTicker = new PIXI.Ticker();
 collisionAndWinnerTicker.add(() => {
     // Collision test and player removal
     players.forEach((player, playerIndex) => {
+        // If the player has collided, skip the collision check
+        if (player.kollidiert) {
+            return;
+        }
         blocks.forEach(block => {
             if (kollisionstest(player, block)) {
                 app.stage.removeChild(player);
@@ -364,6 +379,10 @@ collisionAndWinnerTicker.add(() => {
 
     hearts.forEach((heart, heartIndex) => {
         players.forEach(player => {
+            // If the player has collided, skip the collision check
+            if (player.kollidiert) {
+                return;
+            }
             if (kollisionstest(player, heart)) {
                 player.score += 1;
                 app.stage.removeChild(heart);

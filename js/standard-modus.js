@@ -185,8 +185,17 @@ websocket.onmessage = message => {
 
             qrSprite.anchor.set(0.5);
             qrSprite.x = (app.renderer.width - qrSprite.width) / 2;
-            qrSprite.y = (app.renderer.height - qrSprite.height) / 4.5;
+            qrSprite.y = (app.renderer.height - qrSprite.height) / 4.5;            
+            
+            // Create a white background behind the Qr-Code, so that the code can be scanned better on dark backgrounds
+            // the height and widht of the background is 270px, because the QR-Code is 256px 
+            var backgroundQr = new PIXI.Graphics();
+            backgroundQr.beginFill(0xFFFFFF) // White color
+                .drawRect((app.renderer.width / 2) -140, (app.renderer.height/4.5)-140 , 270 , 270)
+                .endFill();
 
+            // Add the background, border and QR code to the stage
+            app.stage.addChild(backgroundQr);
             app.stage.addChild(qrSprite);
         }, 500); 
     };
@@ -354,6 +363,10 @@ const collisionAndWinnerTicker = new PIXI.Ticker();
 collisionAndWinnerTicker.add(() => {
     // Collision test and player removal
     players.forEach((player) => {
+        // If the player has collided, skip the collision check
+        if (player.kollidiert) {
+            return;
+        }
         // If the player is on cooldown, decrement the cooldown and skip the collision check
         if (player.cooldown > 0) {
             player.cooldown -= 1;
@@ -378,6 +391,10 @@ collisionAndWinnerTicker.add(() => {
 
     hearts.forEach((heart) => {
         players.forEach(player => {
+            // If the player has collided, skip the collision check
+            if (player.kollidiert) {
+                return;
+            }
             if (kollisionstest(player, heart)) {
                 player.score += 1;
                 if (player.score % 2) {
