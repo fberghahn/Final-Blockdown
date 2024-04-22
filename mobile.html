@@ -191,33 +191,33 @@
                 if (timeoutIdLeft) clearTimeout(timeoutIdLeft);
                 if (intervalIdLeft) clearInterval(intervalIdLeft);
             });
-            // if (!isMobile()) {
-            //     buttonLeft.addEventListener('mousedown', function(e) {
-            //         // Function to send payload
-            //         const sendPayload = () => {
-            //             const payload = {
-            //                 "method": "play",
-            //                 "clientId": clientId,
-            //                 "gameId": gameId,
-            //                 "index": index,
-            //                 "richtung": "links",
-            //             };
-            //             ws.send(JSON.stringify(payload));
-            //         };
+            if (!isMobile()) {
+                buttonLeft.addEventListener('mousedown', function(e) {
+                    // Function to send payload
+                    const sendPayload = () => {
+                        const payload = {
+                            "method": "play",
+                            "clientId": clientId,
+                            "gameId": gameId,
+                            "index": index,
+                            "richtung": "links",
+                        };
+                        ws.send(JSON.stringify(payload));
+                    };
                 
-            //         // Call sendPayload immediately
-            //         sendPayload();
+                    // Call sendPayload immediately
+                    sendPayload();
                 
-            //         // Set an interval to keep sending payload while button is held down
-            //         const intervalId = setInterval(sendPayload, pressDownSpeed); // Adjust the 100ms rate as needed
+                    // Set an interval to keep sending payload while button is held down
+                    const intervalId = setInterval(sendPayload, pressDownSpeed); // Adjust the 100ms rate as needed
                 
-            //         // Add touchend event to stop sending on button release
-            //         buttonLeft.addEventListener('mouseup', function stopSending() {
-            //             clearInterval(intervalId);
-            //             buttonLeft.removeEventListener('mouseup', stopSending);
-            //         });
-            //     });
-            // }
+                    // Add touchend event to stop sending on button release
+                    buttonLeft.addEventListener('mouseup', function stopSending() {
+                        clearInterval(intervalId);
+                        buttonLeft.removeEventListener('mouseup', stopSending);
+                    });
+                });
+            }
 
             // crerate button for up jumping
             const buttonSvg = document.createElement("button");
@@ -329,33 +329,33 @@
                 if (timeoutIdRight) clearTimeout(timeoutIdRight);
                 if (intervalIdRight) clearInterval(intervalIdRight);
             });
-        //     if (!isMobile()) {
-        //     buttonRight.addEventListener('mousedown', function(e) {
-        //         // Function to send payload
-        //         const sendPayload = () => {
-        //             const payload = {
-        //                 "method": "play",
-        //                 "clientId": clientId,
-        //                 "gameId": gameId,
-        //                 "index": index,
-        //                 "richtung": "rechts",
-        //             };
-        //             ws.send(JSON.stringify(payload));
-        //         };
+            if (!isMobile()) {
+            buttonRight.addEventListener('mousedown', function(e) {
+                // Function to send payload
+                const sendPayload = () => {
+                    const payload = {
+                        "method": "play",
+                        "clientId": clientId,
+                        "gameId": gameId,
+                        "index": index,
+                        "richtung": "rechts",
+                    };
+                    ws.send(JSON.stringify(payload));
+                };
             
-        //         // Call sendPayload immediately
-        //         sendPayload();
+                // Call sendPayload immediately
+                sendPayload();
             
-        //         // Set an interval to keep sending payload while button is held down
-        //         const intervalId = setInterval(sendPayload, pressDownSpeed); // Adjust the 100ms rate as needed
+                // Set an interval to keep sending payload while button is held down
+                const intervalId = setInterval(sendPayload, pressDownSpeed); // Adjust the 100ms rate as needed
             
-        //         // Add touchend event to stop sending on button release
-        //         buttonRight.addEventListener('mouseup', function stopSending() {
-        //             clearInterval(intervalId);
-        //             buttonRight.removeEventListener('mouseup', stopSending);
-        //         });
-        //     });
-        // }
+                // Add touchend event to stop sending on button release
+                buttonRight.addEventListener('mouseup', function stopSending() {
+                    clearInterval(intervalId);
+                    buttonRight.removeEventListener('mouseup', stopSending);
+                });
+            });
+        }
         }
     }
     </script>

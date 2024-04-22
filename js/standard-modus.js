@@ -398,7 +398,7 @@ collisionAndWinnerTicker.add(() => {
     activePlayerCount = activePlayers.length;
 
     // If only one player is left, they are the winner
-    if (activePlayerCount === 1) {
+    if (activePlayerCount <= 1) {
         const gewinner = activePlayers[0];
         winnerText = new PIXI.Text('The winner is ' + gewinner.name, StandardTextStyle);
         winnerText.style.fontSize = 80;

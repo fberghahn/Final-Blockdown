@@ -386,13 +386,16 @@ collisionAndWinnerTicker.add(() => {
         const topPlayers = players.filter(player => player.score === highestScore);
 
         if (topPlayers.length > 1) {
-            winnerText = new PIXI.Text('Thats a draw', StandardTextStyle);
+            winnerText = new PIXI.Text("That's a draw", StandardTextStyle);
           } else {
             winnerText = new PIXI.Text('The winner of hearts ❤ is ' + topPlayers[0].name + '\n  with a score of ' + topPlayers[0].score, StandardTextStyle);
         }
         winnerText.style.fontSize = 80;
+        winnerText.style.align = 'center';
+        winnerText.style.wordWrap = true;
+        winnerText.style.wordWrapWidth = app.view.width - 100;
         winnerText.x = app.view.width / 2;
-        winnerText.y = (app.view.height / 2) - 300;
+        winnerText.y = (app.view.height / 2) - 200;
         winnerText.anchor.set(0.5);
         app.stage.addChild(winnerText);
 
