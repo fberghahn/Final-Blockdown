@@ -247,14 +247,6 @@ websocket.onmessage = message => {
         const player = players[index-1];
         player.jumping = true;
         
-        // Old unused jump function  
-        // const originalY = player.y;
-        // // Move player up
-        // player.y = player.y - appHeight * 0.2;
-        // After a delay, move player back down
-        // setTimeout(function() {
-        //     player.y = originalY;
-        // }, 500); // Adjust the 500ms delay as needed
     }
     // Restart the game, on server request
     if (response.method === "restart"){

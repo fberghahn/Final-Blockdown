@@ -25,12 +25,19 @@ export function initiatePlayers(game, app, players) {
 
 // Hier wird eine random position innerhalb des app views auf der xachse erzeugt
 export function getRandomXPosition(app) {
-    return Math.random() * app.view.width;
+    // Get the maximum multiple of 48 that fits within app.view.width
+    var maxMultiple = Math.floor(app.view.width / 48);
+
+    // Get a random multiple of 48
+    var randomMultiple = Math.floor(Math.random() * maxMultiple);
+
+    // Return the random multiple of 48
+    return randomMultiple * 48;
 }
 // 
 export function createObject(imagePath, array, app) {
     const object = PIXI.Sprite.from(imagePath);
-    object.anchor.set(0.5);
+    object.anchor.set(0);
     object.x = getRandomXPosition(app);
     object.y = -50;
     app.stage.addChild(object);
