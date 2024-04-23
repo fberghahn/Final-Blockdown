@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Florian Michel Berghahn <florianberghahn@gmail.com>",
+  "license": "MIT",
   "dependencies": {
     "es5-ext": "^0.10.64",
     "express": "^4.18.2",
