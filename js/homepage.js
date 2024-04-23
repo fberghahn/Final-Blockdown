@@ -22,6 +22,8 @@ createLobbyButton.addEventListener('click', function () {
         window.location.href = '/gamePages/firstGamePage.html?' + params.toString();
     } else if (selectedModus === 'modus2') {
         window.location.href = '/gamePages/secondGamePage.html?' + params.toString();
+    }  else if (selectedModus === 'modus3') {
+        window.location.href = '/gamePages/thirdGamePage.html?' + params.toString();
     } else {
         console.log('Bitte wählen Sie einen Modus aus.');
     }
