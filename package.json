@@ -1,7 +1,7 @@
 {
   "name": "finalblockdown",
   "version": "1.0.0",
-  "description": "",
+  "description": "Finalblockdown - An open-source multiplayer cross-platform web game, where every player controls a block and needs to dodge incoming blocks or collect items. The game is played on a host PC, where the players move their blocks using their mobile device as controller. The game is built with Node.js, Express.js, PixiJS and Websockets.",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -25,7 +25,7 @@
   "license": "MIT",
   "dependencies": {
     "es5-ext": "^0.10.64",
-    "express": "^4.18.2",
+    "express": "^4.19.2",
     "websocket": "^1.0.34"
   }
 }
