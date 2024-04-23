@@ -7,7 +7,21 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "Florian Michel Berghahn <florianberghahn@gmail.com>",
+  "author": {
+    "name": "Florian Michel Berghahn",
+    "email": "florianberghahn@gmail.com",
+    "url": "https://github.com/fberghahn"
+  },
+  "contributors": [
+    {"name":"Robert Klein","url":"https://github.com/robertKlein02"},
+    {"name":"Ylli Loshaj ","url":"https://github.com/yloshaj"},
+    {"name":"Richard Semrau"},
+    {"name":"Simon Jigalin","url":"https://github.com/copilot-ss"},
+    {"name":"Karl Goering","url":"https://github.com/KarlCJ"},
+    {"name":"Maximilian Feldmann","url":"https://github.com/MaximilianFeldmann"},
+    {"name":"Can Attila Gabes"},
+    {"name":"Elias Muradi"}
+  ],
   "license": "MIT",
   "dependencies": {
     "es5-ext": "^0.10.64",
