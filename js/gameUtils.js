@@ -1,5 +1,7 @@
 // File description: This file contains the functions that are used in the game to create objects, move them, remove them and detect collisions.
 
+import {SpatialHashmap} from './SpatialHashmap.js';
+
 export function initiatePlayers(game, app, players, gameState) {
     game.clients.forEach((client, index) => {
         if (index != 0) {
@@ -14,10 +16,11 @@ export function initiatePlayers(game, app, players, gameState) {
                 player.y = app.view.height / 1.2;
                 player.score = 0;
                 player.lives = 0;
+                player.type = 'player';
                 app.stage.addChild(player);
                 players.push(player);
                 // Add the player's position to the game state
-                gameState.set(player.name, { x: player.x, y: player.y });
+                gameState.addObject(player);
             }
         }
     });
@@ -37,7 +40,7 @@ export function getRandomXPosition(app) {
     return randomMultiple * 48;
 }
 
-export function createObject(imagePath, array, app,gameState) {
+export function createObject(imagePath, array, app, gameState) {
     const object = PIXI.Sprite.from(imagePath);
     object.anchor.set(0);
     object.x = getRandomXPosition(app);
@@ -57,6 +60,7 @@ export function createBlocks(imagePath, blocks, app,gameState) {
     object.anchor.set(0);
     object.x = getRandomXPosition(app);
     object.y = -50;
+    object.type = 'block';
     app.stage.addChild(object);
     // Key for the hashmap and name of the object
     let key = 'block' + blockCounter;
@@ -65,7 +69,7 @@ export function createBlocks(imagePath, blocks, app,gameState) {
     blocks.push(object);
 
     // Add the object's position to the game state
-    gameState.set(key, { x: object.x, y: object.y });
+    gameState.addObject(object);
 }
 let heartCounter = 0;
 export function createHearts(imagePath, hearts, app, gameState) {
@@ -73,6 +77,7 @@ export function createHearts(imagePath, hearts, app, gameState) {
     object.anchor.set(0);
     object.x = getRandomXPosition(app);
     object.y = -50;
+    object.type = 'heart';
     app.stage.addChild(object);
     // Use the name of the array plus its length as the key
     let key = 'heart' + heartCounter;
@@ -80,28 +85,26 @@ export function createHearts(imagePath, hearts, app, gameState) {
     heartCounter++;
     hearts.push(object);
     // Add the object's position to the game state
-    gameState.set(key, { x: object.x, y: object.y });
+    gameState.addObject(object);
 }
 
 
 
 export function moveObjects(array, app, blockSpeed, gameState) {
     array.forEach(object => {
+        let oldX = object.x;
+        let oldY = object.y;
         object.y += blockSpeed;
-
-        // Update the object's position in the game state
-        if (gameState.has(object.name)) {
-            gameState.set(object.name, { x: object.x, y: object.y });
-        }
+        gameState.updateObjectPosition(object, oldX, oldY, gameState);
 
         if (object.y > app.view.height) {
             app.stage.removeChild(object);
+            //Remove the object from the game state
+            gameState.removeObject(object);
             const index = array.indexOf(object);
             if (index !== -1) {
                 array.splice(index, 1);
             }
-            //Remove the object from the game state
-            gameState.delete(object.name);
         }
     });
     blockSpeed += 0.0025;
@@ -113,11 +116,7 @@ export function removeObjects(objects, app, gameState) {
     for (let i = objects.length - 1; i >= 0; i--) {
         const object = objects[i];
         app.stage.removeChild(object);
-
-        // Remove the object from the game state
-        if (gameState.has(object.name)) {
-            gameState.delete(object.name);
-        }
+        gameState.removeObject(object);
     }
 }
 
