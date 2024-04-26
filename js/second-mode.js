@@ -1,7 +1,8 @@
 // This is the second game mode of the game Finalbockdown
 // Modul Imports
-import { createObject, moveObjects, removeObjects, kollisionstest, initiatePlayers } from './gameUtils.js';
+import { createObject, createBlocks,createHearts, moveObjects, removeObjects, kollisionstest, initiatePlayers, collisionTest } from './gameUtils.js';
 import { StandardTextStyle, StandardTextStyle2 } from './pixiTextStyles.js';
+import {SpatialHashmap} from './SpatialHashmap.js';
 
 // PixiJS-App erstellen
 let app;
@@ -121,6 +122,9 @@ let activePlayerCount = null;
 let hearts = []; // Array für die Herzen
 let blocks = []; // Array für die Blöcke oder hindernisse
 
+// Create a new SpatialHasmap to store the game objects and improve collsion detection
+let gameState = new SpatialHashmap(50);
+
 // Set the initial block speed and interval (Blockspeed also counts as the speed of the hearts)
 let blockSpeed = 1; // Speed with which the blocks and hearts move
 let blockInterval = 500; // Interval at which new blocks are generated (in milliseconds)
@@ -206,7 +210,7 @@ websocket.onmessage = message => {
     // when a player joins the game 
     if (response.method === "join") {
         const game = response.game;
-        activePlayerCount = initiatePlayers(game, app, players);
+        activePlayerCount = initiatePlayers(game, app, players,gameState);
         // Add the score text to the stage
         app.stage.addChild(scoreText);
         gameLoopTicker.start();
@@ -254,8 +258,10 @@ websocket.onmessage = message => {
     if (response.method === "restart"){
         const game = response.game;
         // Remove blocks and hearts
-        removeObjects(blocks, app);
-        removeObjects(hearts, app);
+        removeObjects(blocks, app,gameState);
+        removeObjects(hearts, app,gameState);
+        gameState = new SpatialHashmap(50);
+        // Reset the Speed and Spwan Interval
         blockSpeed = 1;
         blockInterval = 500;
         blocks=[];
@@ -264,11 +270,10 @@ websocket.onmessage = message => {
             app.stage.removeChild(player);
         });
         players = [];
-
-        app.stage.removeChild(neustartText);
         app.stage.removeChild(winnerText);
+        app.stage.removeChild(neustartText);
         // initiate the players again and set the active player count
-        activePlayerCount = initiatePlayers(game, app, players);
+        activePlayerCount = initiatePlayers(game, app, players,gameState);
         gameLoopTicker.start();
     };
 };
@@ -291,10 +296,10 @@ function handleEnterKey(event) {
         collisionAndWinnerTicker.start();
         moveBlocksTicker.start();
         intervalIdBlocks = setInterval(function() {
-            createObject(`/images/block.png`, blocks, app);
+            createBlocks(`/images/block.png`, blocks, app, gameState);
         }, blockInterval);
         intervalIdHearts = setInterval(function() {
-            createObject(`/images/heart-block.png`, hearts, app);
+            createHearts(`/images/heart-block.png`, hearts, app, gameState);
         }, blockInterval * 5);
         isGameStarted = true; //  Set the game state to started
     }
@@ -318,12 +323,15 @@ function gameLoop(players) {
         else if (!player.jumping && player.y < YPositions[index + 1]) {
             player.y += jumpSpeed;
         }
-
+        let oldX = player.x;
+        let oldY = player.y;
         player.x = Xpositions[index + 1];
+        // Update the player's position in the game state
+        gameState.updateObjectPosition(player, oldX, oldY);
     });
 
-    scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.score}`).join('\n');
-    app.stage.setChildIndex(scoreText, app.stage.children.length - 1);
+scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.score}, Lives: ${player.lives}`).join('\n');
+app.stage.setChildIndex(scoreText, app.stage.children.length - 1);
 }
 
 // Add a keydown for "N" event listener to the document
@@ -349,8 +357,8 @@ const moveBlocksTicker = new PIXI.Ticker();
             
 moveBlocksTicker.add(() => {
     // Set the block speed in this way here, so that the function from gameUtils.js can return the value and it can be used here
-    moveObjects(blocks, app, blockSpeed );
-    blockSpeed = moveObjects(hearts, app, blockSpeed );
+    moveObjects(blocks, app, blockSpeed, gameState );
+    blockSpeed = moveObjects(hearts, app, blockSpeed, gameState );
 });
 
 const collisionAndWinnerTicker = new PIXI.Ticker();
@@ -362,21 +370,23 @@ collisionAndWinnerTicker.add(() => {
         if (player.kollidiert) {
             return;
         }
-        blocks.forEach(block => {
+        // Retrieve potential collisions from the spatial hashmap
+        const potentialCollisions = gameState.getPotentialCollisions(player);
+
+        // Separate potential collisions into blocks and hearts
+        const potentialBlocks = potentialCollisions.filter(object => object.type === 'block');
+        const potentialHearts = potentialCollisions.filter(object => object.type === 'heart');
+        potentialBlocks.forEach(block => {
             if (kollisionstest(player, block)) {
                 app.stage.removeChild(player);
                 player.kollidiert = true;
+                gameState.removeObject(player);
             }
         });
-    });
 
-    hearts.forEach((heart, heartIndex) => {
-        players.forEach(player => {
-            // If the player has collided, skip the collision check
-            if (player.kollidiert) {
-                return;
-            }
+        potentialHearts.forEach(heart => {
             if (kollisionstest(player, heart)) {
+                gameState.removeObject(heart);
                 player.score += 1;
                 app.stage.removeChild(heart);
                 const index = hearts.indexOf(heart);
