@@ -1,7 +1,7 @@
 // Standard Mode for the game Final Blockdown 
 
 // Modul Imports
-import { createObject, createBlocks,createHearts, moveObjects, removeObjects, kollisionstest, initiatePlayers, collisionTest } from './gameUtils.js';
+import {  createBlocks,createHearts, moveObjects, removeObjects, kollisionstest, initiatePlayers } from './gameUtils.js';
 import { StandardTextStyle, StandardTextStyle2 } from './pixiTextStyles.js';
 import {SpatialHashmap} from './SpatialHashmap.js';
 
@@ -14,7 +14,6 @@ let basicText;
 let basicText2;
 let winnerText;
 let urlParams;
-let YPositions;
 window.onload = function () {
 
     app = new PIXI.Application(
@@ -25,10 +24,6 @@ window.onload = function () {
     appWidth = app.view.width;
     appHeight = app.view.height;
     
-    //  Standard Y-Positions for the players
-    const startYPosition = app.view.height / 1.2;
-    YPositions = [ startYPosition, startYPosition, startYPosition, startYPosition, startYPosition];
-
     // Get the URL parameters
     urlParams = new URLSearchParams(window.location.search);
     const backgroundImage = urlParams.get('background');
@@ -310,29 +305,31 @@ function handleEnterKey(event) {
 function gameLoop(players) {
     const jumpHeight = app.view.height * 0.2; // The height of the jump as 20% of the app height
     const jumpSpeed = 5; // The speed of the jump in pixels per frame
+    //  Standard Y-Positions for the players
+    const startYPosition = app.view.height / 1.2;
 
     players.forEach((player, index) => {
+        let oldX = player.x;
+        let oldY = player.y;
         // If the player is jumping, move them up until they reach the peak of their jump
-        if (player.jumping && player.y > YPositions[index + 1] - jumpHeight) {
+        if (player.jumping && player.y > startYPosition - jumpHeight) {
             player.y -= jumpSpeed;
         }
         // If the player has reached the peak of their jump, move them back down
-        else if (player.jumping && player.y <= YPositions[index + 1] - jumpHeight) {
+        else if (player.jumping && player.y <= startYPosition - jumpHeight) {
             player.jumping = false;
         }
         // If the player is not jumping and they are not on the ground, move them down
-        else if (!player.jumping && player.y < YPositions[index + 1]) {
+        else if (!player.jumping && player.y < startYPosition) {
             player.y += jumpSpeed;
         }
-        let oldX = player.x;
-        let oldY = player.y;
         player.x = Xpositions[index + 1];
         // Update the player's position in the game state
         gameState.updateObjectPosition(player, oldX, oldY);
     });
 
-scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.score}, Lives: ${player.lives}`).join('\n');
-app.stage.setChildIndex(scoreText, app.stage.children.length - 1);
+    scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.score}, Lives: ${player.lives}`).join('\n');
+    app.stage.setChildIndex(scoreText, app.stage.children.length - 1);
 }
 
 // Add a keydown for "N" event listener for sending the reset message to the server
