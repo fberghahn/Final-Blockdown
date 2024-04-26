@@ -1,6 +1,6 @@
 // This is the second game mode of the game Finalbockdown
 // Modul Imports
-import { createObject, createBlocks,createHearts, moveObjects, removeObjects, kollisionstest, initiatePlayers, collisionTest } from './gameUtils.js';
+import { createStars, createBlocks,createHearts, moveObjects, removeObjects, kollisionstest, initiatePlayers, collisionTest } from './gameUtils.js';
 import { StandardTextStyle, StandardTextStyle2 } from './pixiTextStyles.js';
 import {SpatialHashmap} from './SpatialHashmap.js';
 
@@ -112,10 +112,11 @@ const spielerAnzahl = urlParams.get('spieleranzahl');
 
 
 // Create the arrays for the players, hearts and blocks 
-let players = []; // Spieler array
+let players = []; // Player array
 let activePlayerCount = null;
-let hearts = []; // Array für die Herzen
-let blocks = []; // Array für die Blöcke oder hindernisse
+let hearts = []; // Array for the heart objects
+let blocks = []; // Array for the block objects
+let stars = []; // Array for the  star objects
 
 // Create a new SpatialHasmap to store the game objects and improve collsion detection
 let gameState = new SpatialHashmap(50);
@@ -255,11 +256,14 @@ websocket.onmessage = message => {
         // Remove blocks and hearts
         removeObjects(blocks, app,gameState);
         removeObjects(hearts, app,gameState);
+        removeObjects(stars, app,gameState);
         gameState = new SpatialHashmap(50);
         // Reset the Speed and Spwan Interval
         blockSpeed = 1;
         blockInterval = 500;
         blocks=[];
+        stars = [];
+        hearts=[];
         // Remove the players
         players.forEach(player => {
             app.stage.removeChild(player);
@@ -275,6 +279,7 @@ websocket.onmessage = message => {
 
 let intervalIdBlocks; // Store the interval ID
 let intervalIdHearts; // Store the interval ID
+let intervalIdStars; // Store the interval ID
 
 // Keyboard input for the Enter key to start the game 
 document.addEventListener("keydown", handleEnterKey);
@@ -288,6 +293,7 @@ function handleEnterKey(event) {
         hearts=[];
         clearInterval(intervalIdBlocks);
         clearInterval(intervalIdHearts);
+        clearInterval(intervalIdStars);
         collisionAndWinnerTicker.start();
         moveBlocksTicker.start();
         intervalIdBlocks = setInterval(function() {
@@ -296,6 +302,9 @@ function handleEnterKey(event) {
         intervalIdHearts = setInterval(function() {
             createHearts(`/images/heart-block.png`, hearts, app, gameState);
         }, blockInterval * 5);
+        intervalIdStars = setInterval(function() {
+            createStars(`/images/star-block.png`, stars, app, gameState);
+        }, blockInterval * 20);
         isGameStarted = true; //  Set the game state to started
     }
 }
@@ -304,8 +313,7 @@ function handleEnterKey(event) {
 function gameLoop(players) {
     const jumpHeight = app.view.height * 0.2; // The height of the jump as 20% of the app height
     const jumpSpeed = 5; // The speed of the jump in pixels per frame
-    //  Standard Y-Positions for the players
-    const startYPosition = app.view.height / 1.2;
+    const startYPosition = app.view.height / 1.2; //  Standard Y-Positions for the players
 
     players.forEach((player, index) => {
         let oldX = player.x;
@@ -357,39 +365,51 @@ moveBlocksTicker.add(() => {
     // Set the block speed in this way here, so that the function from gameUtils.js can return the value and it can be used here
     moveObjects(blocks, app, blockSpeed, gameState );
     blockSpeed = moveObjects(hearts, app, blockSpeed, gameState );
+    moveObjects(stars, app, blockSpeed, gameState);
 });
 
 const collisionAndWinnerTicker = new PIXI.Ticker();
 
 collisionAndWinnerTicker.add(() => {
     // Collision test and player removal
-    players.forEach((player, playerIndex) => {
+    players.forEach((player) => {
         // If the player has collided, skip the collision check
         if (player.kollidiert) {
             return;
         }
+        if (player.cooldown > 0) {
+            player.cooldown -= 1; // Decrease the player's cooldown
+        }
+        if (player.cooldown === 0) {
+            player.alpha = 1; // Reset the player's opacity
+        }
         // Retrieve potential collisions from the spatial hashmap
         const potentialCollisions = gameState.getPotentialCollisions(player);
 
-        // Separate potential collisions into blocks and hearts
-        const potentialBlocks = potentialCollisions.filter(object => object.type === 'block');
-        const potentialHearts = potentialCollisions.filter(object => object.type === 'heart');
-        potentialBlocks.forEach(block => {
-            if (kollisionstest(player, block)) {
-                app.stage.removeChild(player);
-                player.kollidiert = true;
-                gameState.removeObject(player);
-            }
-        });
-
-        potentialHearts.forEach(heart => {
-            if (kollisionstest(player, heart)) {
-                gameState.removeObject(heart);
-                player.score += 1;
-                app.stage.removeChild(heart);
-                const index = hearts.indexOf(heart);
-                if (index !== -1) {
-                    hearts.splice(index, 1);
+        // Check for collisions
+        potentialCollisions.forEach(object => {
+            if (kollisionstest(player, object)) {
+                if (object.type === 'block') {
+                    app.stage.removeChild(player);
+                    player.kollidiert = true;
+                    gameState.removeObject(player);
+                } else if (object.type === 'heart') {
+                    gameState.removeObject(object);
+                    player.score += 1;
+                    app.stage.removeChild(object);
+                    const index = hearts.indexOf(object);
+                    if (index !== -1) {
+                        hearts.splice(index, 1);
+                    }
+                } else if (object.type === 'star') {
+                    gameState.removeObject(object);
+                    app.stage.removeChild(object);
+                    player.cooldown = 120; // Set cooldown to 120
+                    player.alpha = 0.5; // Decrease opacity
+                    const index = stars.indexOf(object);
+                    if (index !== -1) {
+                        stars.splice(index, 1);
+                    }
                 }
             }
         });

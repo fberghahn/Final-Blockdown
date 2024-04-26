@@ -1,7 +1,7 @@
 // Standard Mode for the game Final Blockdown 
 
 // Modul Imports
-import {  createBlocks,createHearts, moveObjects, removeObjects, kollisionstest, initiatePlayers } from './gameUtils.js';
+import {  createBlocks,createHearts, moveObjects, removeObjects, kollisionstest, initiatePlayers, createStars } from './gameUtils.js';
 import { StandardTextStyle, StandardTextStyle2 } from './pixiTextStyles.js';
 import {SpatialHashmap} from './SpatialHashmap.js';
 
@@ -117,6 +117,7 @@ let activePlayerCount = null;
 
 let hearts = []; // Array for the hearts
 let blocks = []; // Array for the blocks or obstacles
+let stars = []; // Array for the stars
 
 // Create a new Map to store the game state
 let gameState = new SpatialHashmap(50);
@@ -255,6 +256,7 @@ websocket.onmessage = message => {
         // Remove blocks and hearts
         removeObjects(blocks, app,gameState);
         removeObjects(hearts, app,gameState);
+        removeObjects(stars, app,gameState);
         gameState = new SpatialHashmap(50);
         // Reset the Speed and Spwan Interval
         blockSpeed = 1;
@@ -275,6 +277,7 @@ websocket.onmessage = message => {
 
 let intervalIdBlocks; // Store the interval ID
 let intervalIdHearts; // Store the interval ID
+let intervalIdStars; // Store the interval ID
 
 // Keyboard input for the Enter key to start the game 
 document.addEventListener("keydown", handleEnterKey);
@@ -287,8 +290,10 @@ function handleEnterKey(event) {
         basicText2.updateText();
         blocks=[];
         hearts=[];
+        stars=[];
         clearInterval(intervalIdBlocks);
         clearInterval(intervalIdHearts);
+        clearInterval(intervalIdStars);
         collisionAndWinnerTicker.start();
         moveBlocksTicker.start();
         intervalIdBlocks = setInterval(function() {
@@ -297,6 +302,9 @@ function handleEnterKey(event) {
         intervalIdHearts = setInterval(function() {
             createHearts(`/images/heart-block.png`, hearts, app, gameState);
         }, blockInterval * 5);
+        intervalIdStars = setInterval(function() {
+            createStars(`/images/star-block.png`, stars, app, gameState);
+        }, blockInterval * 20);
         isGameStarted = true; // Set the game state to started
     }
 }
@@ -357,6 +365,7 @@ moveBlocksTicker.add(() => {
     // Set the block speed in this way here, so that the function from gameUtils.js can return the value and it can be used here
     moveObjects(blocks, app, blockSpeed, gameState);
     blockSpeed = moveObjects(hearts, app, blockSpeed, gameState);
+    moveObjects(stars, app, blockSpeed, gameState);
 });
 
 const collisionAndWinnerTicker = new PIXI.Ticker();
@@ -369,7 +378,7 @@ collisionAndWinnerTicker.add(() => {
             return;
         }
         if (player.cooldown > 0) {
-            player.cooldown -= 1;
+            player.cooldown -= 1; // Decrease the cooldown
             return;
         }
         if (player.cooldown === 0) {
@@ -378,38 +387,42 @@ collisionAndWinnerTicker.add(() => {
     
         // Retrieve potential collisions from the spatial hashmap
         const potentialCollisions = gameState.getPotentialCollisions(player);
-    
-        // Separate potential collisions into blocks and hearts
-        const potentialBlocks = potentialCollisions.filter(object => object.type === 'block');
-        const potentialHearts = potentialCollisions.filter(object => object.type === 'heart');
-    
-        // Check for collisions with blocks
-        potentialBlocks.forEach(block => {
-            if (kollisionstest(player, block)) {
-                if (player.lives > 0) {
-                    player.lives -= 1; // Remove a life
-                    player.cooldown = 60; // Set cooldown
+
+        // Check for collisions
+        potentialCollisions.forEach(object => {
+            if (kollisionstest(player, object)) {
+                if (object.type === 'block') {
+                    if (player.lives > 0) {
+                        player.lives -= 1; // Remove a life
+                        player.cooldown = 60; // Set cooldown
+                        player.alpha = 0.5; // Decrease opacity
+                    } else {
+                        app.stage.removeChild(player);
+                        player.kollidiert = true;
+                        gameState.removeObject(player);
+                    }
+                } 
+                if (object.type === 'heart') {
+                    gameState.removeObject(object);
+                    player.score += 1;
+                    if (player.score % 2 === 0) {
+                        player.lives += 1; // Add a life if the new score is even
+                    }
+                    app.stage.removeChild(object);
+                    const index = hearts.indexOf(object);
+                    if (index !== -1) {
+                        hearts.splice(index, 1);
+                    }
+                }
+                if (object.type === 'star') {
+                    gameState.removeObject(object);
+                    app.stage.removeChild(object);
+                    player.cooldown = 120; // Set cooldown to 120
                     player.alpha = 0.5; // Decrease opacity
-                } else {
-                    app.stage.removeChild(player);
-                    player.kollidiert = true;
-                    gameState.removeObject(player);
-                }
-            }
-        });
-    
-        // Check for collisions with hearts
-        potentialHearts.forEach(heart => {
-            if (kollisionstest(player, heart)) {
-                gameState.removeObject(heart);
-                player.score += 1;
-                if (player.score % 2 === 0) {
-                    player.lives += 1; // Add a life if the new score is even
-                }
-                app.stage.removeChild(heart);
-                const index = hearts.indexOf(heart);
-                if (index !== -1) {
-                    hearts.splice(index, 1);
+                    const index = stars.indexOf(object);
+                    if (index !== -1) {
+                        stars.splice(index, 1);
+                    }
                 }
             }
         });

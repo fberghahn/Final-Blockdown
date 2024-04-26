@@ -89,6 +89,24 @@ export function createHearts(imagePath, hearts, app, gameState) {
 }
 
 
+let starCounter = 0;
+export function createStars(imagePath, stars, app, gameState) {
+    const object = PIXI.Sprite.from(imagePath);
+    object.anchor.set(0);
+    object.x = getRandomXPosition(app);
+    object.y = -50;
+    object.type = 'star';
+    app.stage.addChild(object);
+    // Use the name of the array plus its length as the key
+    let key = 'star' + heartCounter;
+    object.name = key;
+    starCounter++;
+    stars.push(object);
+    // Add the object's position to the game state
+    gameState.addObject(object);
+}
+
+
 
 export function moveObjects(array, app, blockSpeed, gameState) {
     array.forEach(object => {

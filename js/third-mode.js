@@ -1,8 +1,9 @@
 // Standard Mode for the game Final Blockdown 
 
 // Modul Imports
-import { createObject, moveObjects, removeObjects, kollisionstest, initiatePlayers } from './gameUtils.js';
+import {  createBlocks,createHearts, moveObjects, removeObjects, kollisionstest, initiatePlayers, createStars } from './gameUtils.js';
 import { StandardTextStyle, StandardTextStyle2 } from './pixiTextStyles.js';
+import {SpatialHashmap} from './SpatialHashmap.js';
 
 // PixiJS-App erstellen
 let app;
@@ -13,7 +14,6 @@ let basicText;
 let basicText2;
 let winnerText;
 let urlParams;
-let YPositions;
 window.onload = function () {
 
     app = new PIXI.Application(
@@ -24,10 +24,6 @@ window.onload = function () {
     appWidth = app.view.width;
     appHeight = app.view.height;
     
-    //  Standard Y-Positions for the players
-    const startYPosition = app.view.height / 1.2;
-    YPositions = [ startYPosition, startYPosition, startYPosition, startYPosition, startYPosition];
-
     // Get the URL parameters
     urlParams = new URLSearchParams(window.location.search);
     const backgroundImage = urlParams.get('background');
@@ -118,9 +114,13 @@ const spielerAnzahl = urlParams.get('spieleranzahl');
 // Spieler und Blöcke erstellen
 let players = []; // Spieler array
 let activePlayerCount = null;
-let hearts = []; // initiate Array for the hears
-let blocks = []; // initiate Array for the blocks
-let stars = []; // initiate Array for the stars
+
+let hearts = []; // Array for the hearts
+let blocks = []; // Array for the blocks or obstacles
+let stars = []; // Array for the stars
+
+// Create a new Map to store the game state
+let gameState = new SpatialHashmap(50);
 
 // Set the initial block speed and interval (Blockspeed also counts as the speed of the hearts)
 let blockSpeed = 1; // Speed with which the blocks and hearts move
@@ -205,7 +205,7 @@ websocket.onmessage = message => {
     // when a player joins the game 
     if (response.method === "join") {
         const game = response.game;
-        activePlayerCount = initiatePlayers(game, app, players);
+        activePlayerCount = initiatePlayers(game, app, players,gameState);
         // Add the score text to the stage
         app.stage.addChild(scoreText);
         gameLoopTicker.start();
@@ -214,7 +214,8 @@ websocket.onmessage = message => {
 // Updates the state of the game by setting thew new X-positions of the players and checking if the game can be started
     if (response.method === "update"){
         const game = response.game;
-        Xpositions = game.Xpositionen;              
+        Xpositions = game.Xpositionen;
+        console.log(gameState);
         //If the lobby is full, the game can be started. For this, the number of players must be reached and the game must not have started yet
         if (activePlayerCount >= Number(spielerAnzahl) && !isGameStarted ) {
             // remove QR-Code
@@ -253,9 +254,10 @@ websocket.onmessage = message => {
     if (response.method === "restart"){
         const game = response.game;
         // Remove blocks and hearts
-        removeObjects(blocks, app);
-        removeObjects(hearts, app);
-        removeObjects(stars, app);
+        removeObjects(blocks, app,gameState);
+        removeObjects(hearts, app,gameState);
+        removeObjects(stars, app,gameState);
+        gameState = new SpatialHashmap(50);
         // Reset the Speed and Spwan Interval
         blockSpeed = 1;
         blockInterval = 500;
@@ -268,7 +270,7 @@ websocket.onmessage = message => {
         app.stage.removeChild(winnerText);
         app.stage.removeChild(neustartText);
         // initiate the players again and set the active player count
-        activePlayerCount = initiatePlayers(game, app, players);
+        activePlayerCount = initiatePlayers(game, app, players,gameState);
         gameLoopTicker.start();
     };
 };
@@ -280,6 +282,7 @@ let intervalIdStars; // Store the interval ID
 // Keyboard input for the Enter key to start the game 
 document.addEventListener("keydown", handleEnterKey);
 function handleEnterKey(event) {
+
     // When Enter is pressed and the desired number of players is reached, the game starts
     if ((event.keyCode === 13 || event.key === " ") && activePlayerCount === Number(spielerAnzahl) && !isGameStarted) {
         app.stage.removeChild(basicText);
@@ -294,14 +297,14 @@ function handleEnterKey(event) {
         collisionAndWinnerTicker.start();
         moveBlocksTicker.start();
         intervalIdBlocks = setInterval(function() {
-            createObject(`/images/block.png`, blocks, app);
+            createBlocks(`/images/block.png`, blocks, app, gameState);
         }, blockInterval);
         intervalIdHearts = setInterval(function() {
-            createObject(`/images/heart-block.png`, hearts, app);
+            createHearts(`/images/heart-block.png`, hearts, app, gameState);
         }, blockInterval * 5);
         intervalIdStars = setInterval(function() {
-            createObject(`/images/star-block.png`, stars, app);
-        }, blockInterval * 10);
+            createStars(`/images/star-block.png`, stars, app, gameState);
+        }, blockInterval * 20);
         isGameStarted = true; // Set the game state to started
     }
 }
@@ -310,26 +313,31 @@ function handleEnterKey(event) {
 function gameLoop(players) {
     const jumpHeight = app.view.height * 0.2; // The height of the jump as 20% of the app height
     const jumpSpeed = 5; // The speed of the jump in pixels per frame
+    //  Standard Y-Positions for the players
+    const startYPosition = app.view.height / 1.2;
 
     players.forEach((player, index) => {
+        let oldX = player.x;
+        let oldY = player.y;
         // If the player is jumping, move them up until they reach the peak of their jump
-        if (player.jumping && player.y > YPositions[index + 1] - jumpHeight) {
+        if (player.jumping && player.y > startYPosition - jumpHeight) {
             player.y -= jumpSpeed;
         }
         // If the player has reached the peak of their jump, move them back down
-        else if (player.jumping && player.y <= YPositions[index + 1] - jumpHeight) {
+        else if (player.jumping && player.y <= startYPosition - jumpHeight) {
             player.jumping = false;
         }
         // If the player is not jumping and they are not on the ground, move them down
-        else if (!player.jumping && player.y < YPositions[index + 1]) {
+        else if (!player.jumping && player.y < startYPosition) {
             player.y += jumpSpeed;
         }
-
         player.x = Xpositions[index + 1];
+        // Update the player's position in the game state
+        gameState.updateObjectPosition(player, oldX, oldY);
     });
 
-scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.score}, Lives: ${player.lives}`).join('\n');
-app.stage.setChildIndex(scoreText, app.stage.children.length - 1);
+    scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.score}, Lives: ${player.lives}`).join('\n');
+    app.stage.setChildIndex(scoreText, app.stage.children.length - 1);
 }
 
 // Add a keydown for "N" event listener for sending the reset message to the server
@@ -355,8 +363,9 @@ const moveBlocksTicker = new PIXI.Ticker();
             
 moveBlocksTicker.add(() => {
     // Set the block speed in this way here, so that the function from gameUtils.js can return the value and it can be used here
-    moveObjects(blocks, app, blockSpeed );
-    blockSpeed = moveObjects(hearts, app, blockSpeed );
+    moveObjects(blocks, app, blockSpeed, gameState);
+    blockSpeed = moveObjects(hearts, app, blockSpeed, gameState);
+    moveObjects(stars, app, blockSpeed, gameState);
 });
 
 const collisionAndWinnerTicker = new PIXI.Ticker();
@@ -364,48 +373,53 @@ const collisionAndWinnerTicker = new PIXI.Ticker();
 collisionAndWinnerTicker.add(() => {
     // Collision test and player removal
     players.forEach((player) => {
-        // If the player has collided, skip the collision check
+        // Skip collision checks if the player has already collided or is on cooldown
         if (player.kollidiert) {
             return;
         }
-        // If the player is on cooldown, decrement the cooldown and skip the collision check
         if (player.cooldown > 0) {
-            player.cooldown -= 1;
-            return;
+            player.cooldown -= 1; // Decrease the cooldown
         }
         if (player.cooldown === 0) {
             player.alpha = 1; // Reset the player's opacity
         }
-        blocks.forEach(block => {
-            if (kollisionstest(player, block)) {
-                if (player.lives >= 1) {
-                    player.lives -= 1; // Remove a life
-                    player.cooldown = 60; // Set the cooldown to 60 frames (1 second at 60 FPS)
-                    player.alpha = 0.5; // Decrease the player's opacity
-                } else {
-                    app.stage.removeChild(player);
-                    player.kollidiert = true;
-                }
-            }
-        });
-    });
+    
+        // Retrieve potential collisions from the spatial hashmap
+        const potentialCollisions = gameState.getPotentialCollisions(player);
 
-    hearts.forEach((heart) => {
-        players.forEach(player => {
-            // If the player has collided, skip the collision check
-            if (player.kollidiert) {
-                return;
-            }
-            if (kollisionstest(player, heart)) {
-                player.score += 1;
-                if (player.score % 2) {
-                    player.lives += 1; // Add an extra life
-                    console.log(player.lives);
-                }
-                app.stage.removeChild(heart);
-                const index = hearts.indexOf(heart);
-                if (index !== -1) {
-                    hearts.splice(index, 1);
+        // Check for collisions
+        potentialCollisions.forEach(object => {
+            if (kollisionstest(player, object)) {
+                if (object.type === 'block') {
+                    if (player.lives > 0) {
+                        player.lives -= 1; // Remove a life
+                        player.cooldown = 60; // Set cooldown
+                        player.alpha = 0.5; // Decrease opacity
+                    } else {
+                        app.stage.removeChild(player);
+                        player.kollidiert = true;
+                        gameState.removeObject(player);
+                    }
+                } else if (object.type === 'heart') {
+                    gameState.removeObject(object);
+                    player.score += 1;
+                    if (player.score % 2 === 0) {
+                        player.lives += 1; // Add a life if the new score is even
+                    }
+                    app.stage.removeChild(object);
+                    const index = hearts.indexOf(object);
+                    if (index !== -1) {
+                        hearts.splice(index, 1);
+                    }
+                } else if (object.type === 'star') {
+                    gameState.removeObject(object);
+                    app.stage.removeChild(object);
+                    player.cooldown = 120; // Set cooldown to 120
+                    player.alpha = 0.5; // Decrease opacity
+                    const index = stars.indexOf(object);
+                    if (index !== -1) {
+                        stars.splice(index, 1);
+                    }
                 }
             }
         });
