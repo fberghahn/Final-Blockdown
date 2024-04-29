@@ -335,9 +335,34 @@ function gameLoop(players) {
         // Update the player's position in the game state
         gameState.updateObjectPosition(player, oldX, oldY);
     });
+    // Clear previous scores from the stage (if necessary)
+    app.stage.children.forEach(child => {
+        if (child.isScoreText) {
+            app.stage.removeChild(child);
+        }
+    });
 
-    scoreText.text = 'Scores:\n' + players.map(player => `${player.name}: ${player.score}, Lives: ${player.lives}`).join('\n');
-    app.stage.setChildIndex(scoreText, app.stage.children.length - 1);
+    players.forEach((player, index) => {
+        // Determine the color based on the kollidiert property
+        const color = player.kollidiert ? 'grey' : 'white';
+    
+        // Create a text style for this player
+        const playerStyle = new PIXI.TextStyle({
+            ...StandardTextStyle,
+            fontSize: 24,
+            fill: color, // Set color based on kollidiert status
+        });
+    
+        // Create the text object for this player
+        const playerText = new PIXI.Text(`${player.name}: ${player.score}, Lives: ${player.lives}`, playerStyle);
+        playerText.y = index * 40; // Position each player's score 30 pixels apart vertically
+        playerText.x = 10; // Horizontal positioning
+        playerText.isScoreText = true; // Custom property to identify score texts for removal
+
+
+        // Add to the stage
+        app.stage.addChild(playerText);
+    });
 }
 
 // Add a keydown for "N" event listener for sending the reset message to the server
