@@ -88,18 +88,7 @@ window.onload = function () {
 
     // Add the mute icon to the stage
     app.stage.addChild(muteIcon); 
-
-    createRestartText();
     };
-
-
-
-function createRestartText() {
-    const restartText = new PIXI.Text('Press Enter to restart the game', StandardTextStyle);
-    restartText.x = app.view.width / 2;
-    restartText.y = (app.view.height / 2) + 300;
-    restartText.anchor.set(0.5);
-}
 
 // Getting QR-Code Canvas Element and not showing it, because it gets turned into an image and displayed with Pixijs  
 var qrcanvas = document.getElementById("qrcode");
@@ -137,12 +126,6 @@ let Xpositions = {};
 var host = location.origin.replace(/^http/, 'ws')
 // create the websocket connection
 var websocket = new WebSocket(host);
-
-// Score Text for how many points each player has
-let scoreText = new PIXI.Text('', StandardTextStyle2);
-scoreText.style.fontSize = 24;
-scoreText.x = 10;
-scoreText.y = 10;
 
 // Manage Messages from the server
 websocket.onmessage = message => {
@@ -206,8 +189,6 @@ websocket.onmessage = message => {
     if (response.method === "join") {
         const game = response.game;
         activePlayerCount = initiatePlayers(game, app, players,gameState);
-        // Add the score text to the stage
-        app.stage.addChild(scoreText);
         gameLoopTicker.start();
     };
 
@@ -315,6 +296,12 @@ function gameLoop(players) {
     const jumpSpeed = 5; // The speed of the jump in pixels per frame
     //  Standard Y-Positions for the players
     const startYPosition = app.view.height / 1.2;
+    // Clear previous scores from the stage
+    app.stage.children.forEach(child => {
+        if (child.isScoreText) {
+            app.stage.removeChild(child);
+        }
+    });
 
     players.forEach((player, index) => {
         let oldX = player.x;
@@ -334,18 +321,10 @@ function gameLoop(players) {
         player.x = Xpositions[index + 1];
         // Update the player's position in the game state
         gameState.updateObjectPosition(player, oldX, oldY);
-    });
-    // Clear previous scores from the stage (if necessary)
-    app.stage.children.forEach(child => {
-        if (child.isScoreText) {
-            app.stage.removeChild(child);
-        }
-    });
 
-    players.forEach((player, index) => {
         // Determine the color based on the kollidiert property
         const color = player.kollidiert ? 'grey' : 'white';
-    
+
         // Create a text style for this player
         const playerStyle = new PIXI.TextStyle({
             ...StandardTextStyle,
@@ -359,7 +338,6 @@ function gameLoop(players) {
         playerText.x = 10; // Horizontal positioning
         playerText.isScoreText = true; // Custom property to identify score texts for removal
 
-
         // Add to the stage
         app.stage.addChild(playerText);
     });
@@ -367,7 +345,7 @@ function gameLoop(players) {
 
 // Add a keydown for "N" event listener for sending the reset message to the server
 document.addEventListener('keydown', function(event) {
-    if ((event.key === 'N' || event.key === 'n') && !isGameStarted) {
+    if ((event.key === 'R' || event.key === 'r') && !isGameStarted) {
         const payLoad = {
             "method": "reset",
             "gameId": gameId,
@@ -463,6 +441,12 @@ collisionAndWinnerTicker.add(() => {
         winnerText.y = (app.view.height / 2) - 300;
         winnerText.anchor.set(0.5);
         app.stage.addChild(winnerText);
+
+        const resetText = new PIXI.Text('Press "R" to reset', StandardTextStyle);
+        resetText.x = app.view.width / 2;
+        resetText.y = (app.view.height / 2) + 100;
+        resetText.anchor.set(0.5);
+        app.stage.addChild(resetText);
 
         moveBlocksTicker.stop();
         gameLoopTicker.stop();
