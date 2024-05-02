@@ -1,7 +1,5 @@
 // File description: This file contains the functions that are used in the game to create objects, move them, remove them and detect collisions.
 
-import {SpatialHashmap} from './SpatialHashmap.js';
-
 export function initiatePlayers(game, app, players, gameState) {
     game.clients.forEach((client, index) => {
         if (index != 0) {
@@ -28,7 +26,7 @@ export function initiatePlayers(game, app, players, gameState) {
     return players.length;
 }
 
-// Hier wird eine random position innerhalb des app views auf der xachse erzeugt
+// Here, a random position based on the gridsize of 48 is generated, within the app view on the x-axis
 export function getRandomXPosition(app) {
     // Get the maximum multiple of 48 that fits within app.view.width
     var maxMultiple = Math.floor(app.view.width / 48);
@@ -126,7 +124,7 @@ export function moveObjects(array, app, blockSpeed, gameState) {
         }
     });
     blockSpeed += 0.0025;
-    // Hier wird die Geschwindigkeit der Blöcke zurückgegeben um sie im jeweiligen Modus zu speichern
+    // Here, the speed of the blocks is returned to save it in the respective mode
     return blockSpeed;
 }
 
@@ -138,7 +136,7 @@ export function removeObjects(objects, app, gameState) {
     }
 }
 
-// Kolisionserkennungsfunktion gibt true oder false zurück
+// function for collsion detection between player and object return true or false
 export function kollisionstest(player, block) {
     let playerBox = player.getBounds();
     let blockBox = block.getBounds();
@@ -148,6 +146,7 @@ export function kollisionstest(player, block) {
                 playerBox.y < blockBox.y + blockBox.height;
 }
 
+// Collision detection function with the gameState, right now not in use
 export function collisionTest(playerName, objectName, gameState) {
     // Get the player and object data from the game state
     let playerPosition = gameState.get(playerName);
