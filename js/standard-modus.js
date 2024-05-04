@@ -7,12 +7,12 @@ import {SpatialHashmap} from './SpatialHashmap.js';
 
 // PixiJS-App erstellen
 let app;
-let neustartText;
 let appWidth;
 let appHeight;
 let basicText;
 let basicText2;
 let winnerText;
+let resetText;
 let urlParams;
 window.onload = function () {
 
@@ -251,7 +251,7 @@ websocket.onmessage = message => {
         });
         players = [];
         app.stage.removeChild(winnerText);
-        app.stage.removeChild(neustartText);
+        app.stage.removeChild(resetText);
         // initiate the players again and set the active player count
         activePlayerCount = initiatePlayers(game, app, players,gameState);
         gameLoopTicker.start();
@@ -448,7 +448,7 @@ collisionAndWinnerTicker.add(() => {
         winnerText.anchor.set(0.5);
         app.stage.addChild(winnerText);
 
-        const resetText = new PIXI.Text('Press "R" to reset', StandardTextStyle);
+        resetText = new PIXI.Text('Press "R" to reset', StandardTextStyle);
         resetText.x = app.view.width / 2;
         resetText.y = (app.view.height / 2) + 100;
         resetText.anchor.set(0.5);
