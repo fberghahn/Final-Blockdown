@@ -37,7 +37,7 @@ html, body, .page {
     float: right;
 }
   #p2 { background: tomato; }
-  #p3 { background: gold; }
+  #p3 { background: rgb(0, 119, 255); }
   #p4 { background: deeppink; }
   #p5 { background: rebeccapurple; }
   
