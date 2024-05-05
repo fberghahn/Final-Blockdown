@@ -14,7 +14,7 @@ They gave great Feedback, had creative ideas, tested, evaluated and found lots o
 Richard Semrau  
 [Simon Jigalin](https://github.com/copilot-ss-test)  
 [Karl Goering](https://github.com/KarlCJ)  
-[Maximilian Feldmann](https://github.com/MaximilianFeldmann-test)  
+[Maximilian Feldmann](https://github.com/MaximilianFeldmann)  
 Can Attila Gabes  
 Elias Muradi  
 
