@@ -197,7 +197,6 @@ websocket.onmessage = message => {
     // Updates the state of the game by setting thew new X-positions of the players and checking if the game can be started
     if (response.method === "update"){
         const game = response.game;
-        console.log(game)
         Xpositions = game.Xpositionen;              
         //If the lobby is full, the game can be started. For this, the number of players must be reached and the game must not have started yet
         if (activePlayerCount >= Number(spielerAnzahl) && !isGameStarted ) {
