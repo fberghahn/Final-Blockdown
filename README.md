@@ -10,7 +10,7 @@ This Project was designed and iterated using a [Participatory Design Process](ht
 They gave great Feedback, had creative ideas, tested, evaluated and found lots of Bugs. My great thanks and appreciation goes out to:
 
 [Robert Klein](https://github.com/robertKlein02)  
-[Ylli Loshaj](https://github.com/yloshaj-test)  
+[Ylli Loshaj](https://github.com/yloshaj)  
 Richard Semrau  
 [Simon Jigalin](https://github.com/copilot-ss-test)  
 [Karl Goering](https://github.com/KarlCJ-test)  
