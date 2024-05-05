@@ -3,20 +3,21 @@ body {
     background-size: cover;
     background-attachment: fixed;
     margin: 0;
-    height: 90vh;
+    /* height: 90vh; */
     display: flex;
     justify-content: center;
     align-items: center;
     color: #353535; 
-    padding-bottom: 10vh; 
+    /* padding-bottom: 10vh;  */
 }
 .container {
     width: 90%; 
     max-width: 1000px; 
-    padding: 20px;
+    padding: 4vh;
     background: rgba(255, 255, 255, 0.95); 
     border-radius: 8px;
-    /* margin-top: 5vh; */
+    margin-top: 3vh;
+    margin-bottom: 10vh;
 }
 
 header h1 {
