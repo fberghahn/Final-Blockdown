@@ -1,55 +1,58 @@
-#  Final Blockdown
-Dieser Spieleprototyp wurde für die Ausarbeitung des Praxisprojekts im Studiengang Medieninformatik der TH Köln erstellt. Der Titel der Projektarbeit lautet: "Mobile Endgeräte als Controller - Umsetzungsmöglichkeiten des Complementarity Patterns am Beispiel eines webbasierten geräteübergreifenden Minigames".
-Das Ziel dieses Projekts war die Nutzung mobiler Endgeräte zur Steuerung eines Browsergames mit besonderem Augenmerk auf die Realisierung des Complementarity Patterns, ein für das Konzept essenzielles Multiscreen UX Designmuster.
+#  Finalblockdown
+An open-source multiplayer cross-platform web game, where every player controls a block and needs to dodge incoming blocks or collect items. The game is played on a host PC, where the players move their blocks using their mobile device as controller. The game is built with Node.js, Express.js, PixiJS and Websockets.
 
-## Spielprinzip
-Der entstandene Prototyp ist ein Multiplayer Auto-Runner basierend auf dem Client-Servermodell, welches mobile Endgeräte zur Steuerung verwendet. Die Spieler steuern jeweils einen farbigen Block, der ihnen zugewiesen wurde und versuchen solange wie möglich den herabfallenden Blöcken auszuweichen. Der Spieler, der am längsten überlebt, ist der Gewinner.
+## Live
 
-## Verwendete Technologien und Programmiersprachen
-- HTML, CSS und Javascript für das Userinterface
-- Javascript mit nodeJS als Runtime Umgebung auf dem Server
-- Websockets mit der [Websocket-Node Library](https://github.com/theturtle32/WebSocket-Node)
-- Linux-Ubuntu auf dem benötigten VServer
-- [Apache2](https://httpd.apache.org/) als HTTP-Server
-- [PixiJS](https://pixijs.com/) für Browsergrafik und Interaktionen
+You can play and test out the game [Here](https://final-blockdown.de/)
 
-## Hosting
-Die Live-Version zum Testen kann man über die folgende URL erreichen:
+## Technologies, Libraries and Programming Concepts used
+- HTML, CSS, and JavaScript for the user interface
+- JavaScript with nodeJS as the runtime environment on the server
+- Websockets with the [Websocket-Node Library](https://github.com/theturtle32/WebSocket-Node)
+- Linux-Ubuntu on the required VServer
+- [Apache2](https://httpd.apache.org/) as the HTTP server
+- [PixiJS](https://pixijs.com/) for browser graphics and interactions
+- A simple implementation of a [Spatial Hashmap](https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/spatial-hashing-r2697/) for collision detection 
 
-[Prototyp](https://florian-berghahn.de)
+## Local Execution
 
-Sie ist auf einem VServer, mit Apache2 als HTTP-Server gehostet und wird auch nach dem Projekt weiter iteriert werden.
-
-## Lokale Ausführung
-
-Für die lokale Ausführung muss nodeJS installiert sein, damit der Server wie folgt gestartet werden kann: 
+For local execution, nodeJS must be installed so that the server can be started as follows:
 ```
-node index.js
+node server.js
 ```
 
-Dann kann im Browser auf localhost:9000/ das System aufgerufen werden. Falls der Port belegt ist, kann er in der index.js Datei bei Zeile 11 angepasst werden.
+Then, the system can be accessed in the browser at localhost:9000/. If the port is occupied, it can be adjusted in the server.js file at line 11.
 ```
-// Hier kann der Port falls nötig geändert werden
+// Here the port can be changed if necessary
 var port = process.env.PORT || 9000
 ```
-Über den localhost können keine mobilen Endgeräte verbunden werden, doch sie können über den Browser simuliert werden, denn das System lenkt Geräte, die eine Bildschirmbreite unter 700 Pixel haben, auf die mobile.html Seite weiter. So können Browserfenster mit geringer Breite als mobile Endgeräte für Testzwecke genutzt werden. Das wird wie folgt umgesetzt:
+Mobile devices cannot be connected via localhost, but they can be simulated via the browser, by:
 
-1. Klicken Sie den Button "Neues Spiel"
-2. Klicken Sie daraufhin den "Localhostlink kopieren" Button  
-3. Öffnen Sie einen neuen Tab oder ein neues Browserfenster
-4. Verkleinern Sie die Breite des Fensters unter 700 Pixel oder öffnen Sie die Entwicklertools und wählen eine mobile Ansicht aus
-5. Fügen Sie dann die kopierte URL ein damit werden Sie auf die mobile Seite weitergeleitet und können der Lobby beitreten 
-6. Erstellen Sie so "Spieler" bis die Lobby voll ist und wechseln Sie zum Haupttab, wo sie das Spiel nun starten können
+1. Opening the console
+2. Clicking the printed localhost link and opening new tabs or windows for every player you wanna add
+3. Input a name and join the lobby (the name input is turned, because its desinged for mobile and detects it as landscape on pc) 
+4. Go to back to your main window or tab
 
-## Quellen & Fremdcode
-Als Einarbeitung in das Themengebiet wurde ein Tutorial von Hussein Nasser durchgearbeitet und der entstandene Code als Grundgerüst für eine Websocketkommunikation genutzt.
+## Academic Background
 
-[Youtube Link zum Tutorial](https://www.youtube.com/watch?v=cXxEiWudIUY)
 
-[Github Link des Tutorial Codes](https://github.com/hnasr/javascript_playground/tree/master/websocket-cell-game)
 
-## Bugs & Probleme
+## Sources & Third-Party Code
+As an introduction to the topic, a tutorial by Hussein Nasser was worked through and the resulting code was used as a basic framework for WebSocket communication.
 
-- Positionen sind teilweise "hard coded", da es zu Problemen kam, diese von der Bildschirmweite abhängig zu machen und dann zum Server zu senden.  
+[Youtube Link to the Tutorial](https://www.youtube.com/watch?v=cXxEiWudIUY)
 
-- Man kann als Spieler den Bildschirm verlassen und ist dort sicher, hängt auch mit dem Problem der variierenden Bildschirmbreite zusammen. Da die Grenzen dort gesetzt werden müssten.
+[Github Link to the Tutorial Code](https://github.com/hnasr/javascript_playground/tree/master/websocket-cell-game)
+
+The Css menu is based on the work from: 
+
+[Alberto Hartzet](https://gist.github.com/richardmax/2301a77633e17cb16fdcf587551c4e2f)
+
+The Background music for the game is from:
+
+Powerful Trap Beat | Strong by Alex-Productions | https://onsound.eu/
+Music promoted by https://www.chosic.com/free-music/all/
+Creative Commons CC BY 3.0
+https://creativecommons.org/licenses/by/3.0/
+
+## Bugs & Problems

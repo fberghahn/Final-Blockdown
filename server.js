@@ -3,11 +3,11 @@ var http = require("http")
 var express = require("express")
 var app = express()
 
-// Port für den Vserver
+// Port for the Vserver
 // var port = process.env.PORT || 8081
 
-// Port für lokale Ausführung da auf 8081 Postgres den Port belegt
-// Hier kann der Port falls nötig geändert werden
+// Port for local execution since Postgres occupies the port 8081
+// Here the port can be changed if necessary
 var port = process.env.PORT || 9000
 
 app.use(express.static(__dirname + "/"))
