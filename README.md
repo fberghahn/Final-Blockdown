@@ -55,9 +55,9 @@ var port = process.env.PORT || 9000
 Mobile devices cannot be connected via localhost, but they can be simulated via the browser, by:
 
 1. Opening the console
-2. Clicking the printed localhost link and opening new tabs or windows for every player you wanna add
-3. Input a name and join the lobby (the name input is turned, because its desinged for mobile and detects it as landscape on pc) 
-4. Go to back to your main window or tab
+2. Clicking the printed localhost link and opening new tabs or windows for every player you want to add
+3. Input a name and join the lobby (the name input is turned, because it's designed for mobile and detects it as landscape on a PC) 
+4. Go back to your main window or tab
 
 
 ## Sources & Third-Party Code
