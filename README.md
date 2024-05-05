@@ -9,7 +9,7 @@ You can play and test out the game [Here](https://final-blockdown.de/)
 This Project was designed and iterated using a [Participatory Design Process](https://www.interaction-design.org/literature/topics/participatory-design), by including choosen test users into the development process.  
 They gave great Feedback, had creative ideas, tested, evaluated and found lots of Bugs. My great thanks and appreciation goes out to:
 
-[Robert Klein](https://github.com/robertKlein02-test)  
+[Robert Klein](https://github.com/robertKlein02)  
 [Ylli Loshaj](https://github.com/yloshaj-test)  
 Richard Semrau  
 [Simon Jigalin](https://github.com/copilot-ss-test)  
