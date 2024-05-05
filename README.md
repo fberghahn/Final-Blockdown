@@ -79,3 +79,5 @@ Creative Commons CC BY 3.0
 https://creativecommons.org/licenses/by/3.0/
 
 ## Bugs & Problems
+
+- There are still some issues for some mobile devices when screen rotation is activated
