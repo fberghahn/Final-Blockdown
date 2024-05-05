@@ -30,13 +30,13 @@ window.onload = function () {
     let bg;
 
     if (backgroundImage === "1") {
-        bg = PIXI.Sprite.from(`/images/spiel-backgroundimg2.png`);
+        bg = PIXI.Sprite.from(`/images/game-background-1.png`);
     }
     else if (backgroundImage === "2") {
-        bg = PIXI.Sprite.from(`/images/background-img.png`);
+        bg = PIXI.Sprite.from(`/images/game-background-2.png`);
     }
     else if (backgroundImage === "3") {
-        bg = PIXI.Sprite.from(`/images/hintergrund-img2.png`);
+        bg = PIXI.Sprite.from(`/images/game-background-3.png`);
     }
     bg.width = appWidth;
     bg.height = appHeight;
