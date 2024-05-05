@@ -5,6 +5,32 @@ An open-source multiplayer cross-platform web game, where every player controls 
 
 You can play and test out the game [Here](https://final-blockdown.de/)
 
+## Contributors
+This Project was designed and iterated using a [Participatory Design Process](https://www.interaction-design.org/literature/topics/participatory-design), by including choosen test users into the development process.  
+They gave great Feedback, had creative ideas, tested, evaluated and found lots of Bugs. My great thanks and appreciation goes out to:
+
+[Robert Klein](https://github.com/robertKlein02-test)  
+[Ylli Loshaj](https://github.com/yloshaj-test)  
+Richard Semrau  
+[Simon Jigalin](https://github.com/copilot-ss-test)  
+[Karl Goering](https://github.com/KarlCJ-test)  
+[Maximilian Feldmann](https://github.com/MaximilianFeldmann-test)  
+Can Attila Gabes  
+Elias Muradi  
+
+
+## Contribution
+You can be a part of Finalblockdown too! This is an Open-Source project, where we would love your input or optimization of the game.
+
+Here is a [Guide to Contribution](https://github.com/fberghahn/Final-Blockdown/blob/main/CONTRIBUTING.md) so you know the preferred process. 
+This Project is licensed under the [MIT-License](https://github.com/fberghahn/Final-Blockdown/blob/main/LICENSE.txt), feel free to reach out if you have any question regarding Contribution.
+
+## Academic Background
+
+This is a project developed by Florian Berghahn during his practical project and bachelor's thesis at the TH Köln in the Media Computerscience degree. Find more information about the bachelor thesis and the participatory process [Here](https://final-blockdown.de/pages/projectInfo.html)
+
+
+
 ## Technologies, Libraries and Programming Concepts used
 - HTML, CSS, and JavaScript for the user interface
 - JavaScript with nodeJS as the runtime environment on the server
@@ -33,9 +59,6 @@ Mobile devices cannot be connected via localhost, but they can be simulated via 
 3. Input a name and join the lobby (the name input is turned, because its desinged for mobile and detects it as landscape on pc) 
 4. Go to back to your main window or tab
 
-## Academic Background
-
-
 
 ## Sources & Third-Party Code
 As an introduction to the topic, a tutorial by Hussein Nasser was worked through and the resulting code was used as a basic framework for WebSocket communication.
@@ -50,9 +73,9 @@ The Css menu is based on the work from:
 
 The Background music for the game is from:
 
-Powerful Trap Beat | Strong by Alex-Productions | https://onsound.eu/
-Music promoted by https://www.chosic.com/free-music/all/
-Creative Commons CC BY 3.0
+Powerful Trap Beat | Strong by Alex-Productions | https://onsound.eu/  
+Music promoted by https://www.chosic.com/free-music/all/  
+Creative Commons CC BY 3.0  
 https://creativecommons.org/licenses/by/3.0/
 
 ## Bugs & Problems
